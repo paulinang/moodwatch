@@ -1,0 +1,5 @@
+/env
+*.pyc
+secrets.sh
+Product.txt
+test_code.py
