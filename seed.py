@@ -12,9 +12,7 @@ def load_drugs():
     with open('Product.txt') as products:
         drugs = []
         for product in products:
-            info = product.rstrip().split('\t')
-            # will need application number to access application documents in other file
-            drug_name, active_ingredients = info[7:]
+            drug_name, active_ingredients = product.rstrip().split('\t')[7:]
             drugs.append((drug_name, active_ingredients))
 
     for drug in set(drugs):
@@ -22,6 +20,7 @@ def load_drugs():
         db.session.add(drug_record)
 
     db.session.commit()
+
 
 if __name__ == "__main__":
     connect_to_db(app)

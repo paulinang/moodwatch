@@ -1,4 +1,4 @@
-/env
+env/
 *.pyc
 secrets.sh
 Product.txt
