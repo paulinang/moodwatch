@@ -3,7 +3,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, jsonify, render_template, request, redirect, flash
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db
+from model import connect_to_db, db, User, Drug
 
 
 app = Flask(__name__)
@@ -39,9 +39,19 @@ def process_registration():
     password = request.form.get('password')
     email = request.form.get('email')
 
-    flash('Created account for %s with email %s and secret password that is not %s' % (username, email, password))
+    # if there doesn't exist a record in the database with that email or username
+    if db.session.query(User).filter(User.email == email).first():
+        flash('An account with that email already exists')
+    elif db.session.query(User).filter(User.username == username).first():
+        flash('That username has already been taken')
+    else:
+        user = User(username=username, email=email, password=password)
+        db.session.add(user)
+        db.session.commit()
+        flash('Account successfully created.')
 
     return redirect('/')
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
