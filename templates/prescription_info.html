@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Prescription of {{ prescription.drug.drug_name }} for {{prescription.user.username }}</h1>
+    <h1>Prescription of <a href='/drugs/{{ prescription.drug.drug_id }}'>{{ prescription.drug.drug_name }}</a> for {{prescription.user.username }}</h1>
     <ul>
         <li>Dosage: {{ prescription.dosage }}</li>
         <li>Frequency: {{ prescription.frequency }}</li>
