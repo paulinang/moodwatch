@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ drug.drug_name }}</h1>
+    <p>Active ingredient(s): {{ drug.active_ingredients }}</p>
+    <br><br>
+    <h3><a href='/add_prescription?drug={{ drug.drug_id }}'>Add prescription with this drug</a></h3>
+{% endblock %}    

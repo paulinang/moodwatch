@@ -1,8 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{{user.username}}'s Profile <h1>
-    <p>Email: {{user.email}}</p>
-    <p>Prescriptions:</p>
+    <h1>{{ user.username }}'s Profile <h1>
+    <h3>Email: {{ user.email }}</h3>
+    <h3>Prescriptions:</h3>
+    <h4><a href='/drugs'>Add prescription from drug list</a></h4>
+    <ul>
+        {% for prescription in user.prescriptions %}
+        <li>{{ prescription.drug.drug_name }}
+            <ul>
+                <li>Dosage: {{ prescription.dosage }}</li>
+                <li>Frequency: {{ prescription.frequency }}</li>
+                <li>Started: {{ prescription.start_date }}</li>
+                <li>Ended: {{ prescription.end_date }}</li>
+                <li>Prescribed by: {{ prescription.physician }}</li>
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
     <p>Mood logs:</p>
 {% endblock %}    

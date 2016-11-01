@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Add prescription of {{ drug.drug_name }}</h1>
+    <form action='/add_prescription' method='POST'>
+        <label for='dosage'>Dosage: </label>
+        <input id='dosage' type='text' name='dosage' required><br>
+
+        <label for'frequency'>Frequency: </label>
+        <input id='frequency' type='text' name='frequency' required><br>
+
+        <label for'start-date'>Start Date: </label>
+        <input id='start-date' type='date' name='start-date' required><br>
+
+        <label for'end-date'>End Date: </label>
+        <input id='end-date' type='date' name='end-date'><br>
+
+        <label for'physician'>Prescribed By: </label>
+        <input id='physician' type='text' name='physician' required><br>
+
+        <input id='drug-id' type='hidden' name='drug-id' value={{drug.drug_id }}>
+
+        <input type='submit' value='Add Prescription'>
+{% endblock %}    

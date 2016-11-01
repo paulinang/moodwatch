@@ -44,6 +44,7 @@ class Prescription(db.Model):
     end_date = db.Column(db.DateTime, nullable=True)
     physician = db.Column(db.String(64), nullable=True)
     dosage = db.Column(db.String(64), nullable=False)
+    frequency = db.Column(db.String(64), nullable=False)
 
     user = db.relationship('User', backref="prescriptions")
     drug = db.relationship('Drug', backref="prescriptions")

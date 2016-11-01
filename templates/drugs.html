@@ -4,7 +4,7 @@
     <h1>Click on a drug for more information and to add a prescription</h1>
     <ul>
         {% for drug in drugs %}
-            <li><a href='/drugs/{{drug.drug_id}}'>{{drug.drug_name}}</li>
+            <li><a href='/drugs/{{ drug.drug_id }}'>{{ drug.drug_name }}</li>
         {% endfor %}
     </ul>
 {% endblock %}    
