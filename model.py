@@ -25,6 +25,12 @@ class User(db.Model):
     username = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(64), nullable=False)
 
+    def __repr__(self):
+        "Gives username and email of record"
+
+        return "<User user_id=%s username=%s email=%s>" % (self.user_id, self.username, self.email)
+
+
 
 class Prescription(db.Model):
     """Preseciption of a drug to a user"""
@@ -51,6 +57,11 @@ class Drug(db.Model):
     drug_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     drug_name = db.Column(db.String(128), nullable=False)
     active_ingredients = db.Column(db.Text, nullable=False)
+
+    def __repr__(self):
+        "Gives drug_name of record"
+
+        return "<Drug drug_id=%s drug_name=%s>" % (self.drug_id, self.drug_name)
 
 
 class Day(db.Model):
