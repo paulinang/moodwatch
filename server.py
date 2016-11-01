@@ -53,6 +53,14 @@ def process_registration():
     return redirect('/')
 
 
+@app.route('/drugs')
+def drug_list():
+    """ Show a list of all drugs in database"""
+    drugs = Drug.query.all()
+
+    return render_template('drugs.html', drugs=drugs)
+
+
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
