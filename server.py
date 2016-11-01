@@ -1,6 +1,6 @@
 from jinja2 import StrictUndefined
 
-from flask import Flask, jsonify, render_template, request, redirect, flash
+from flask import Flask, jsonify, render_template, request, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, User, Drug
@@ -51,6 +51,59 @@ def process_registration():
         flash('Account successfully created.')
 
     return redirect('/')
+
+
+@app.route('/login')
+def show_login_form():
+    """Show login to account form"""
+
+    return render_template('login_form.html')
+
+
+@app.route('/login', methods=['POST'])
+def process_login():
+    """Validates and logs in to user account"""
+
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    user = db.session.query(User).filter(User.username == username,
+                                         User.password == password).first()
+
+    if user:
+        session['user_id'] = user.user_id
+        return redirect('/user_profile')
+    else:
+        flash('Username and/or password invalid')
+        return redirect('/')
+
+@app.route('/logout')
+def logout():
+    """Logout of account"""
+
+    if session.get('user_id'):
+        session.pop('user_id')
+        flash('Logged out successfully')
+    else:
+        flash('You are not logged in.')
+
+    return redirect('/')
+
+
+@app.route('/user_profile')
+def show_user_profile():
+    """Show user profile page"""
+
+    user_id = session.get('user_id')
+
+    # only shows profile page if user logged in
+    if user_id:
+        user = db.session.query(User).get(user_id)
+        return render_template('user_profile.html', user=user)
+    else:
+        flash('You are not logged in.')
+        return redirect('/')
+
 
 
 @app.route('/drugs')

@@ -13,7 +13,11 @@
         </ul>
       {% endif %}
     {% endwith %}
-    
+
+    {% if 'user_id' in session %}
+      <h3><a href='/logout'>Log out</a></h3>
+    {% endif %}
+
     {% block content %}CONTENT GOES HERE{% endblock %}
 </body>
 </html>
