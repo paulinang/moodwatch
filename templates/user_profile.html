@@ -7,7 +7,7 @@
     <h4><a href='/drugs'>Add prescription from drug list</a></h4>
     <ul>
         {% for prescription in user.prescriptions %}
-        <li>{{ prescription.drug.drug_name }}
+        <li><a href='prescription_info/{{ prescription.prescription_id }}'>{{ prescription.drug.drug_name }}</a>
             <ul>
                 <li>Dosage: {{ prescription.dosage }}</li>
                 <li>Frequency: {{ prescription.frequency }}</li>

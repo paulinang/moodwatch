@@ -26,7 +26,7 @@ def index():
     return render_template('index.html')
 
 ####################################################################################
-# USER ACCOUNT RELATED 
+# USER ACCOUNT RELATED
 
 @app.route('/register')
 def show_register_form():
@@ -131,6 +131,22 @@ def show_drug_info(drug_id):
     return render_template('drug_info.html', drug=drug)
 
 
+##################################################################################
+# PRESCRIPTION RELATED
+
+@app.route('/prescription_info/<prescription_id>')
+def show_prescription_info(prescription_id):
+    """ Show details for a prescription"""
+
+    prescription = Prescription.query.get(prescription_id)
+
+    if prescription.user_id == session.get('user_id'):
+        return render_template('prescription_info.html', prescription=prescription)
+    else:
+        flash('You do not have access to this user\'s prescription.')
+        return redirect('/')
+
+
 @app.route('/add_prescription')
 def prescription_form():
     """ Show add prescription form """
@@ -155,6 +171,7 @@ def process_prescription():
         end_date = datetime.strptime(end_date, "%Y-%m-%d")
     else:
         end_date = None
+
     physician = request.form.get('physician')
     drug_id = request.form.get('drug-id')
     user_id = session['user_id']
@@ -172,6 +189,26 @@ def process_prescription():
 
     flash('Prescription added')
     return redirect('/user_profile')
+
+
+@app.route('/end_prescription', methods=['POST'])
+def end_prescription():
+    """ Ends an existing prescription """
+
+    prescription_id = request.form.get('prescription-id')
+    end_date = request.form.get('end-date')
+    old_prescription = Prescription.query.get(prescription_id)
+    old_prescription.end_date = end_date
+    flash('Prescription ended')
+    db.session.commit()
+
+    if request.form.get('add-prescription'):
+        return redirect('/add_prescription?drug=%s' % old_prescription.drug_id)
+    else:
+        return redirect('/user_profile')
+
+
+
 
 
 
