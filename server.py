@@ -153,15 +153,14 @@ def prescription_form():
 
     drug_id = request.args.get('drug', default=None)
 
-    active_prescription = Prescription.query.filter_by(drug_id=drug_id,
-                                                       user_id=session['user_id'],
-                                                       end_date=None).first()
-    if active_prescription:
-        flash('You have an active prescription for this drug. End it before creating a new prescription with updated information.')
-        return redirect('/prescription_info/%s' % active_prescription.prescription_id)
-    else:
+    last_prescription = Prescription.query.filter_by(drug_id=drug_id,
+                                                     user_id=session['user_id']).order_by(Prescription.end_date.desc()).first()
+    if (not last_prescription) or (last_prescription.end_date):
         drug = Drug.query.get(drug_id)
-        return render_template('prescription_form.html', drug=drug)
+        return render_template('prescription_form.html', drug=drug, last_prescription=last_prescription)
+    else:
+        flash('You have an active prescription for this drug. End it before creating a new prescription with updated information.')
+        return redirect('/prescription_info/%s' % last_prescription.prescription_id)
 
 
 @app.route('/add_prescription', methods=['POST'])
