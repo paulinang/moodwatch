@@ -15,11 +15,11 @@
             <ul>
                 {% for prescription in prescription_list %}
                 <li>
-                    <!-- Notes whether prescription is active -->
                     <a href='prescription_info/{{ prescription.prescription_id }}'>
                         Dosage: {{ prescription.dosage }},
                         Frequency: {{ prescription.frequency }}
                     </a>
+                    <!-- Notes whether prescription is active -->
                     {% if not prescription.end_date %}[ ACTIVE ]{% endif %}
                 </li>
                 {% endfor %}

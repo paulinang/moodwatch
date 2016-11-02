@@ -9,11 +9,18 @@
         <label for='frequency'>Frequency: </label>
         <input id='frequency' type='text' name='frequency' required><br>
 
-        <label for='start-date'>Start Date: </label>
+        <label for='start-date'>Start Date *: </label>
         <input id='start-date' type='date' name='start-date' min='1900-01-01' required><br>
 
         <!-- If there was a previous prescription, new prescription has to be started after the last was ended -->
         {% if last_prescription %}
+            <h4>* Your 
+                <a href='prescription_info/{{ last_prescription.prescription_id }}'>
+                    last presciption
+                </a>
+                ended {{ last_prescription.end_date }}. Your new prescription cannot have started before then.
+            </h4>:          
+
             <script>
                 var lastDate = '{{ last_prescription.end_date }}';
                 var lastDate = lastDate.slice(0, 10)
