@@ -48,6 +48,10 @@ class Prescription(db.Model):
     user = db.relationship('User', backref=db.backref("prescriptions", order_by="desc(Prescription.end_date)"))
     drug = db.relationship('Drug', backref=db.backref("prescriptions", order_by="desc(Prescription.end_date)"))
 
+    def __repr__(self):
+        "Gives drug_id and user_id of record"
+
+        return "<Prescription user_id=%s drug_id=%s>" % (self.user_id, self.drug_id)
 
 class Drug(db.Model):
     """Drug information provided by FDA"""
