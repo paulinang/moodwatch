@@ -10,10 +10,20 @@
         <input id='frequency' type='text' name='frequency' required><br>
 
         <label for='start-date'>Start Date: </label>
-        <input id='start-date' type='date' name='start-date' required><br>
+        <input id='start-date' type='date' name='start-date' min='1900-01-01' required><br>
+        <script>
+            var d = new Date();
+            var day = d.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            var dStr = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + day;
+            console.log(dStr);
+            $('#start-date').attr('max', dStr);
+        </script>
 
-        <label for='end-date'>End Date: </label>
-        <input id='end-date' type='date' name='end-date'><br>
+<!--         <label for='end-date'>End Date: </label>
+        <input id='end-date' type='date' name='end-date'><br> -->
 
         <label for='physician'>Prescribed By: </label>
         <input id='physician' type='text' name='physician' required><br>

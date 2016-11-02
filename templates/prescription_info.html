@@ -14,7 +14,22 @@
     <h3>This prescription is active. You can end it and add a new prescription for the same drug with different details (ex. dosage, frequency)</h3>
         <form action='/end_prescription' method='POST'>
             <label for='end-date'>End Date: </label>
-            <input id='end-date' type='date' name='end-date' required><br>
+            <input id='end-date' type='date' name='end-date' min='{{ prescription.start_date }}' required><br>
+            <script>
+            
+                var d = new Date();
+                var day = d.getDate();
+                if (day < 10) {
+                    day = '0' + day;
+                }
+                var dStr = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + day;
+                console.log(dStr);
+                $('#end-date').attr('max', dStr);
+
+                var minDate = $('#end-date').attr('min')
+                $('#end-date').attr('min', minDate.slice(0, 10))
+
+            </script>
             <label for='add-prescription'>Add new prescription for this drug?</label>
             <input id='add-prescription' type='checkbox' name='add-prescription' value='True'><br>
             <input id='prescription-id' type='hidden' name='prescription-id' value='{{ prescription.prescription_id }}'>
