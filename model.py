@@ -21,15 +21,14 @@ class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(64), nullable=False)
-    username = db.Column(db.String(64), nullable=False)
+    email = db.Column(db.String(64), nullable=False, unique=True)
+    username = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(64), nullable=False)
 
     def __repr__(self):
         "Gives username and email of record"
 
         return "<User user_id=%s username=%s email=%s>" % (self.user_id, self.username, self.email)
-
 
 
 class Prescription(db.Model):
@@ -46,8 +45,8 @@ class Prescription(db.Model):
     dosage = db.Column(db.String(64), nullable=False)
     frequency = db.Column(db.String(64), nullable=False)
 
-    user = db.relationship('User', backref="prescriptions")
-    drug = db.relationship('Drug', backref="prescriptions")
+    user = db.relationship('User', backref=db.backref("prescriptions", order_by="desc(Prescription.end_date)"))
+    drug = db.relationship('Drug', backref=db.backref("prescriptions", order_by="desc(Prescription.end_date)"))
 
 
 class Drug(db.Model):

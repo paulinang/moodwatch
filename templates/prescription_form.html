@@ -11,6 +11,17 @@
 
         <label for='start-date'>Start Date: </label>
         <input id='start-date' type='date' name='start-date' min='1900-01-01' required><br>
+
+        <!-- If there was a previous prescription, new prescription has to be started after the last was ended -->
+        {% if last_prescription %}
+            <script>
+                var lastDate = '{{ last_prescription.end_date }}';
+                var lastDate = lastDate.slice(0, 10)
+                $('#start-date'). attr('min', lastDate)
+            </script>
+        {% endif %}
+
+        <!-- Set max start date of nex prescription to current day -->
         <script>
             var d = new Date();
             var day = d.getDate();
@@ -18,7 +29,6 @@
                 day = '0' + day;
             }
             var dStr = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + day;
-            console.log(dStr);
             $('#start-date').attr('max', dStr);
         </script>
 

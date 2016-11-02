@@ -2,8 +2,11 @@
 
 {% block content %}
     <h1>{{ drug.drug_name }}</h1>
+
     <p>Active ingredient(s): {{ drug.active_ingredients }}</p>
     <br><br>
+
+    <!-- Check if logged in user has prescriptions for that -->
     {% if drug.prescriptions %}
         <h3>Your Prescriptions</h3>
         {% for prescription in drug.prescriptions %}
