@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import Flask, jsonify, render_template, request, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, User, Drug, Prescription, Day
+from model import connect_to_db, db, User, Drug, Prescription, Day, Event, EventDay
 
 
 app = Flask(__name__)
@@ -164,17 +164,20 @@ def show_day_mood_form():
 def process_day_mood_log():
     """ Add day log to database """
 
-    user_id = session['user_id']
-    overall_mood = request.form.get('overall-mood')
-    if not request.form.get('min-mood'):
-        min_mood = None
-        max_mood = None
-    else:
-        min_mood = request.form.get('min-mood')
-        max_mood = request.form.get('max-mood')
-    print type(min_mood), type(max_mood)
-    notes = request.form.get('notes')
     date = request.form.get('date')
+    user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
+    # user_id = session['user_id']
+    # overall_mood = request.form.get('overall-mood')
+    # notes = request.form.get('notes')
+    # min and max mood are not req in html, will give empty str if not filled
+    # changes empty str to None in Python before passing it into Day instance
+    # prevents error when making record in db (min/max mood are integers)
+    # if not request.form.get('min-mood'):
+    #     min_mood = None
+    #     max_mood = None
+    # else:
+    #     min_mood = request.form.get('min-mood')
+    #     max_mood = request.form.get('max-mood')
 
     day = Day(user_id=user_id,
               datetime=date,
@@ -185,6 +188,51 @@ def process_day_mood_log():
 
     db.session.add(day)
     db.session.commit()
+
+    return redirect('/user_profile')
+
+
+@app.route('/log_event_mood')
+def show_event_mood_form():
+    """ Show add mood log for event form """
+
+    return render_template('event_mood_form.html')
+
+
+@app.route('/log_event_mood', methods=['POST'])
+def process_event_mood_log():
+    """ Add event log to db"""
+
+    # get user inputs
+    event_name = request.form.get('event_name')
+    # GET DATE RANGE
+    user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
+
+    # create event
+    event = Event(event_name=event_name,
+                  overall_mood=overall_mood,
+                  max_mood=max_mood,
+                  min_mood=min_mood,
+                  notes=notes)
+    db.session.add(event)
+    db.session.commit()
+    # GET EVENT ID FOR NEWLY CREATED EVENT
+
+    # create eventdays for all days user has logged that fall into event duration
+    user = User.query.get(user_id)
+    for day in user.days:
+        # IF day.datetime IN DATE RANGE
+            event_day = EventDay(event_id=event_id,
+                                 day_id=day.day_id)
+            db.session.add(event_day)
+    db.session.commit()
+
+    # FOR NOW, EVENT DAYS ARE ONLY CREATED ON EVENT CREATION
+    # IT WILL SKIP DAYS THAT USER HAS NOT LOGGED
+    # EITHER:
+    #   PREVENT USER FROM ADDING EVENTS FOR A DAY THAT DNE
+    #   ADD DAYS LATER AND IF IT FALLS WITHIN EXISTING EVENT DURATION
+    #       CREATE NEW EVENT DAY TO LINK THE TWO
 
     return redirect('/user_profile')
 
@@ -286,6 +334,25 @@ def end_prescription():
 
 ###################################################################################
 # HELPER FUNCTIONS
+
+def get_mood_rating():
+    """Gets ratings for a mood (day/event)"""
+
+    user_id = session['user_id']
+    overall_mood = request.form.get('overall-mood')
+    notes = request.form.get('notes')
+    # min and max mood are not req in html, will give empty str if not filled
+    # changes empty str to None in Python before passing it into Day instance
+    # prevents error when making record in db (min/max mood are integers)
+    if not request.form.get('min-mood'):
+        min_mood = None
+        max_mood = None
+    else:
+        min_mood = request.form.get('min-mood')
+        max_mood = request.form.get('max-mood')
+
+    return [user_id, overall_mood, min_mood, max_mood, notes]
+
 
 # def is_loggedin():
 #     """ Checks if there is a valid user logged in """
