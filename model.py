@@ -2,7 +2,6 @@
     Layout taken from Ratings lab exercise"""
 
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 
 # This is the connection to the PostgreSQL database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
@@ -38,8 +37,8 @@ class Prescription(db.Model):
     prescription_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     drug_id = db.Column(db.Integer, db.ForeignKey('drugs.drug_id'), nullable=True)
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=True)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=True)
     physician = db.Column(db.String(64), nullable=True)
     dosage = db.Column(db.String(64), nullable=False)
     frequency = db.Column(db.String(64), nullable=False)
@@ -75,19 +74,19 @@ class Day(db.Model):
 
     day_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    datetime = db.Column(db.DateTime, default=datetime.utcnow(), nullable=False)
+    date = db.Column(db.Date, unique=True, nullable=False)
     overall_mood = db.Column(db.Integer, nullable=False)
     max_mood = db.Column(db.Integer, nullable=True)
     min_mood = db.Column(db.Integer, nullable=True)
     notes = db.Column(db.Text, nullable=True)
 
-    user = db.relationship('User', backref=db.backref('days', order_by='desc(Day.datetime)'))
-    db.UniqueConstraint('user_id', 'datetime')
+    user = db.relationship('User', backref=db.backref('days', order_by='desc(Day.date)'))
+    db.UniqueConstraint('user_id', 'date')
 
     def __repr__(self):
         """Gives date and user of record"""
 
-        return "<Day user_id =%s day_id=%s datetime=%s>" % (self.user_id, self.day_id, self.datetime)
+        return "<Day user_id =%s day_id=%s date=%s>" % (self.user_id, self.day_id, self.date)
 
 
 class Event(db.Model):

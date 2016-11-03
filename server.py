@@ -1,7 +1,5 @@
 from jinja2 import StrictUndefined
 
-from datetime import datetime
-
 from flask import Flask, jsonify, render_template, request, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
@@ -180,7 +178,7 @@ def process_day_mood_log():
     #     max_mood = request.form.get('max-mood')
 
     day = Day(user_id=user_id,
-              datetime=date,
+              date=date,
               overall_mood=overall_mood,
               max_mood=max_mood,
               min_mood=min_mood,
@@ -286,7 +284,7 @@ def process_prescription():
     drug_id = request.form.get('drug-id')
     dosage = request.form.get('dosage')
     frequency = request.form.get('frequency')
-    start_date = datetime.strptime(request.form.get('start-date'), "%Y-%m-%d")
+    start_date = request.form.get('start-date')
 
     # sets end_date as None if none entered
     # CODE COMMENTED OUT - prescription form does not take end_date for now

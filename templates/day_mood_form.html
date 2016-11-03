@@ -35,13 +35,16 @@
         $('#date').attr('max', dStr);
 
         function validateMoodRange(evt){
-
-            // .val() returns str, need to make it int for comparisons
-            var overallMood = parseInt($('#overall-mood').val())
-            var minMood = parseInt($('#min-mood').val())
-            var maxMood = parseInt($('#max-mood').val())
+            var overallMood = $('#overall-mood').val()
+            var minMood = $('#min-mood').val()
+            var maxMood = $('#max-mood').val()
 
             if ((minMood && maxMood)) {
+                // .val() returns str, need to make it int for comparisons
+                overallMood = parseInt(overallMood)
+                minMood = parseInt(minMood)
+                maxMood = parseInt(maxMood)
+
                 if (minMood > maxMood) {
                     var msg = '** Min should not be greater than max **'
                     // evt.preventDefault();

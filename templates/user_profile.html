@@ -13,10 +13,11 @@
     <ul>
         {% for day in user.days %}
         <li>
-            <b>{{ day.datetime }}</b>
+            <b>{{ day.date }}</b>
             <ul>
                 <li>Overall: {{ day.overall_mood }}</li>
-                {% if day.min_mood %}
+                <!-- must check if either min or max is non-zero. zero mood gets mistaken for no mood -->
+                {% if day.min_mood or day.max_mood %}
                     <li>Range: {{ day.min_mood }} to {{day.max_mood }}
                 {% endif %}
                 {% if day.notes %}
