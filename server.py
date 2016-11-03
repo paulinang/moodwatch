@@ -162,7 +162,7 @@ def show_day_mood_form():
 def process_day_mood_log():
     """ Add day log to database """
 
-    date = request.form.get('date')
+    date = (request.form.get('date'))
     user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
     # user_id = session['user_id']
     # overall_mood = request.form.get('overall-mood')
@@ -285,7 +285,6 @@ def process_prescription():
     dosage = request.form.get('dosage')
     frequency = request.form.get('frequency')
     start_date = request.form.get('start-date')
-
     # sets end_date as None if none entered
     # CODE COMMENTED OUT - prescription form does not take end_date for now
     # end_date = request.form.get('end-date')
