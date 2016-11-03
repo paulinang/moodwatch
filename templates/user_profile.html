@@ -5,9 +5,31 @@
     <h1>{{ user.username }}'s Profile <h1>
     <h3>Email: {{ user.email }}</h3>
 
+    <!-- Show mood logs -->
+    <p>Mood logs:</p>
+    <h4><a href='/log_day_mood'>Add mood log for a day</a></h4>
+
+    <ul>
+        {% for day in user.days %}
+        <li>
+            <b>{{ day.datetime }}</b>
+            <ul>
+                <li>Overall: {{ day.overall_mood }}</li>
+                {% if day.min_mood %}
+                    <li>Range: {{ day.min_mood }} to {{day.max_mood }}
+                {% endif %}
+                {% if day.notes %}
+                    <li>Notes: {{ day.notes }}</li>
+                {% endif %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+
     <!-- Show prescription logs -->
     <h3>Prescriptions:</h3>
     <h4><a href='/drugs'>Add prescription from drug list</a></h4>
+
     <ul>
         {% for drug, prescription_list in prescriptions.items() %}
         <li>
@@ -28,6 +50,5 @@
         {% endfor %}
     </ul>
 
-    <!-- Show mood logs -->
-    <p>Mood logs:</p>
+
 {% endblock %}    

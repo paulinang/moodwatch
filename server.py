@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import Flask, jsonify, render_template, request, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, User, Drug, Prescription
+from model import connect_to_db, db, User, Drug, Prescription, Day
 
 
 app = Flask(__name__)
@@ -151,7 +151,47 @@ def show_drug_info(drug_id):
 
 
 ##################################################################################
+# DAY LOG RELATED -- have to be logged in
+
+@app.route('/log_day_mood')
+def show_day_mood_form():
+    """ Show add mood log for day form"""
+
+    return render_template('day_mood_form.html')
+
+
+@app.route('/log_day_mood', methods=['POST'])
+def process_day_mood_log():
+    """ Add day log to database """
+
+    user_id = session['user_id']
+    overall_mood = request.form.get('overall-mood')
+    if not request.form.get('min-mood'):
+        min_mood = None
+        max_mood = None
+    else:
+        min_mood = request.form.get('min-mood')
+        max_mood = request.form.get('max-mood')
+    print type(min_mood), type(max_mood)
+    notes = request.form.get('notes')
+    date = request.form.get('date')
+
+    day = Day(user_id=user_id,
+              datetime=date,
+              overall_mood=overall_mood,
+              max_mood=max_mood,
+              min_mood=min_mood,
+              notes=notes)
+
+    db.session.add(day)
+    db.session.commit()
+
+    return redirect('/user_profile')
+
+
+##################################################################################
 # PRESCRIPTION RELATED -- have to be logged in
+
 
 @app.route('/prescription_info/<prescription_id>')
 def show_prescription_info(prescription_id):

@@ -11,7 +11,6 @@ from datetime import datetime
 db = SQLAlchemy()
 
 
-
 ##############################################################################
 # Model definitions
 
@@ -26,7 +25,7 @@ class User(db.Model):
     password = db.Column(db.String(64), nullable=False)
 
     def __repr__(self):
-        "Gives username and email of record"
+        """Gives username and email of record"""
 
         return "<User user_id=%s username=%s email=%s>" % (self.user_id, self.username, self.email)
 
@@ -49,9 +48,10 @@ class Prescription(db.Model):
     drug = db.relationship('Drug', backref=db.backref("prescriptions", order_by="desc(Prescription.end_date)"))
 
     def __repr__(self):
-        "Gives drug_id and user_id of record"
+        """Gives drug_id and user_id of record"""
 
         return "<Prescription user_id=%s drug_id=%s>" % (self.user_id, self.drug_id)
+
 
 class Drug(db.Model):
     """Drug information provided by FDA"""
@@ -63,7 +63,7 @@ class Drug(db.Model):
     active_ingredients = db.Column(db.Text, nullable=False)
 
     def __repr__(self):
-        "Gives drug_name of record"
+        """Gives drug_name of record"""
 
         return "<Drug drug_id=%s drug_name=%s>" % (self.drug_id, self.drug_name)
 
@@ -80,6 +80,14 @@ class Day(db.Model):
     max_mood = db.Column(db.Integer, nullable=True)
     min_mood = db.Column(db.Integer, nullable=True)
     notes = db.Column(db.Text, nullable=True)
+
+    user = db.relationship('User', backref=db.backref('days', order_by='desc(Day.datetime)'))
+    db.UniqueConstraint('user_id', 'datetime')
+
+    def __repr__(self):
+        """Gives date and user of record"""
+
+        return "<Day user_id =%s day_id=%s datetime=%s>" % (self.user_id, self.day_id, self.datetime)
 
 
 class Event(db.Model):

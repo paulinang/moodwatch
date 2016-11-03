@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Log your mood for a day:</h1>
+    <form id='day-mood-form' action='/log_day_mood' method='POST'>
+        <label for='date'>Date: </label>
+        <input id='date' type='date' name='date' required><br>
+
+        <label for='overall-mood'>Overall Mood: </label>
+        <input id='overall-mood' type='number' name='overall-mood' min='-50' max='50' required><br>
+
+        <p id='mood-range'>Range of Mood: 
+        <label for='min-mood'>Min: </label>
+        <input id='min-mood' type='number' name='min-mood' min='-50' max='50'>
+
+        <label for='max-mood'>Max: </label>
+        <input id='max-mood' type='number' name='max-mood' min='-50' max='50'><span id="alert-msg" style='color:red;'></span><br>
+        </p>
+
+        <label for='notes'>Notes About This Day:</label>
+        <input id='notes' type='textarea' name='notes'><br>
+
+        <input type='submit' value='Add Day Mood Log'>
+    </form>
+
+
+    <script>            
+        var d = new Date();
+        var day = d.getDate();
+        if (day < 10) {
+            day = '0' + day;
+        }
+        var dStr = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + day;
+        $('#date').attr('max', dStr);
+
+        function validateMoodRange(evt){
+
+            var overallMood = $('#overall-mood').val()
+            var minMood = $('#min-mood').val()
+            var maxMood = $('#max-mood').val()
+
+            if ((minMood && maxMood)) {
+                if (minMood > maxMood) {
+                    var msg = '** Min should not be greater than max **'
+                    // evt.preventDefault();
+                    // $('#alert-msg').html('** Min should not be greater than max **');
+                }
+                else if (!((minMood < overallMood) && (overallMood < maxMood))) {
+                    var msg = '** Overall mood should be within mood range **'
+                    // evt.preventDefault();
+                    // $('#alert-msg').html('** Overall mood should be within mood range **');
+                }
+            }
+            else if ((!minMood && maxMood) || (!maxMood && minMood)) {
+                var msg = '** Both min and max must be entered or empty**';
+            }
+
+            if (msg) {
+                evt.preventDefault();
+                $('#alert-msg').html(msg);
+            }
+        }
+
+        $('#day-mood-form').on('submit', validateMoodRange);
+
+    </script>
+
+
+{% endblock %}

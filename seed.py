@@ -22,6 +22,23 @@ def load_drugs():
     db.session.commit()
 
 
+def load_users():
+    """ Add users to user table"""
+
+    print "Users"
+
+    User.query.delete()
+
+    chicken = User(username='not_chicken', password='am_duck', email='actually@goose.com')
+    duck = User(username='not_duck', password='am_chicken', email='actually@mongoose.com')
+    turkey = User(username='not_turkey', password='am_vulture', email='actually@catgoose.com')
+
+    db.session.add(chicken)
+    db.session.add(duck)
+    db.session.add(turkey)
+    db.session.commit()
+
+
 if __name__ == "__main__":
     connect_to_db(app)
 
@@ -30,3 +47,4 @@ if __name__ == "__main__":
 
     # Import different types of data
     load_drugs()
+    load_users()
