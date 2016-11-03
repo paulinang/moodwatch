@@ -39,6 +39,21 @@ def load_users():
     db.session.commit()
 
 
+def load_days():
+    """ Add days to days table"""
+
+    print "Days"
+
+    Day.query.delete()
+
+    for i in range(1, 30):
+        day = Day(user_id=1, date='2016-10-%s' % i, overall_mood=5)
+        db.session.add(day)
+
+    db.session.commit()
+
+
+
 if __name__ == "__main__":
     connect_to_db(app)
 
@@ -48,3 +63,4 @@ if __name__ == "__main__":
     # Import different types of data
     load_drugs()
     load_users()
+    load_days()

@@ -1,5 +1,7 @@
 from jinja2 import StrictUndefined
 
+from datetime import datetime
+
 from flask import Flask, jsonify, render_template, request, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
@@ -164,18 +166,6 @@ def process_day_mood_log():
 
     date = (request.form.get('date'))
     user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
-    # user_id = session['user_id']
-    # overall_mood = request.form.get('overall-mood')
-    # notes = request.form.get('notes')
-    # min and max mood are not req in html, will give empty str if not filled
-    # changes empty str to None in Python before passing it into Day instance
-    # prevents error when making record in db (min/max mood are integers)
-    # if not request.form.get('min-mood'):
-    #     min_mood = None
-    #     max_mood = None
-    # else:
-    #     min_mood = request.form.get('min-mood')
-    #     max_mood = request.form.get('max-mood')
 
     day = Day(user_id=user_id,
               date=date,
@@ -202,8 +192,9 @@ def process_event_mood_log():
     """ Add event log to db"""
 
     # get user inputs
-    event_name = request.form.get('event_name')
-    # GET DATE RANGE
+    event_name = request.form.get('event-name')
+    start_date = datetime.strptime(request.form.get('start-date'), '%Y-%m-%d')
+    end_date = datetime.strptime(request.form.get('end-date'), '%Y-%m-%d')
     user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
 
     # create event
@@ -214,13 +205,12 @@ def process_event_mood_log():
                   notes=notes)
     db.session.add(event)
     db.session.commit()
-    # GET EVENT ID FOR NEWLY CREATED EVENT
 
     # create eventdays for all days user has logged that fall into event duration
     user = User.query.get(user_id)
     for day in user.days:
-        # IF day.datetime IN DATE RANGE
-            event_day = EventDay(event_id=event_id,
+        if (start_date.date() <= day.date) and (day.date <= end_date.date()):
+            event_day = EventDay(event_id=event.event_id,
                                  day_id=day.day_id)
             db.session.add(event_day)
     db.session.commit()
