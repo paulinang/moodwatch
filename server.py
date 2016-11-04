@@ -193,8 +193,8 @@ def process_event_mood_log():
 
     # get user inputs
     event_name = request.form.get('event-name')
-    start_date = datetime.strptime(request.form.get('start-date'), '%Y-%m-%d')
-    end_date = datetime.strptime(request.form.get('end-date'), '%Y-%m-%d')
+    start_date = datetime.strptime(request.form.get('start-date'), '%Y-%m-%d').date()
+    end_date = datetime.strptime(request.form.get('end-date'), '%Y-%m-%d').date()
     user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
 
     # create event
@@ -209,7 +209,7 @@ def process_event_mood_log():
     # create eventdays for all days user has logged that fall into event duration
     user = User.query.get(user_id)
     for day in user.days:
-        if (start_date.date() <= day.date) and (day.date <= end_date.date()):
+        if (start_date <= day.date) and (day.date <= end_date):
             event_day = EventDay(event_id=event.event_id,
                                  day_id=day.day_id)
             db.session.add(event_day)

@@ -28,6 +28,26 @@ class User(db.Model):
 
         return "<User user_id=%s username=%s email=%s>" % (self.user_id, self.username, self.email)
 
+    def group_prescriptions_by_drug(self):
+        """Returns a dictionary {'drug_name': [list of prescription objects]}"""
+
+        prescription_dict = {}
+        for prescription in self.prescriptions:
+            prescription_dict.setdefault(prescription.drug.drug_name, []).append(prescription)
+
+        return prescription_dict
+
+    def has_active_prescription(self, drug):
+        """Checks if there is an active prescription for that drug"""
+
+        # If there exists a prescription for the user, with that drug and no end date
+        if db.session.query(Prescription).filter(Prescription.user_id == self.user_id,
+                                                 Prescription.drug_id == drug.drug_id,
+                                                 Prescription.end_date.is_(None)).first():
+            return True
+
+        return False
+
 
 class Prescription(db.Model):
     """Preseciption of a drug to a user"""
@@ -50,6 +70,15 @@ class Prescription(db.Model):
         """Gives drug_id and user_id of record"""
 
         return "<Prescription user_id=%s drug_id=%s>" % (self.user_id, self.drug_id)
+
+    def is_active(self):
+        """Checks if prescription is active"""
+
+        # return True if end date exists
+        if self.end_date:
+            return True
+
+        return False
 
 
 class Drug(db.Model):
@@ -86,7 +115,7 @@ class Day(db.Model):
     def __repr__(self):
         """Gives date and user of record"""
 
-        return "<Day user_id =%s day_id=%s date=%s>" % (self.user_id, self.day_id, self.date)
+        return "<Day user_id =%s date=%s>" % (self.user_id, self.date)
 
 
 class Event(db.Model):
@@ -95,15 +124,44 @@ class Event(db.Model):
     __tablename__ = "events"
 
     event_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     event_name = db.Column(db.String(64), nullable=False)
     overall_mood = db.Column(db.Integer, nullable=False)
     max_mood = db.Column(db.Integer, nullable=True)
     min_mood = db.Column(db.Integer, nullable=True)
     notes = db.Column(db.Text, nullable=True)
 
-    days = db.relationship('Day',
+    user = db.relationship('User', backref=db.backref('events'))
+    # Gives days associated with event from start to end date
+    days = db.relationship('Day', order_by='desc(Day.date)',
                            secondary='event_days',
                            backref='events')
+
+    def __repr__(self):
+        """Gives name and user of record"""
+
+        return "<Day user_id =%s event=%s>" % (self.user_id, self.event_name)
+
+    def get_duration(self):
+        """Get start and end date of event"""
+
+        # It actually gives the earliest and latest dates of days associated with the event.
+        return (self.days[0].date, self.days[-1].date)
+
+    def associate_days(self, start_date, end_date):
+        """Create association between event and all logged days within duration"""
+
+        # to check if day has already been associated with event
+        # not (day in self.days))
+
+        # for each day logged by the user owning that event
+        for day in self.user.days:
+            # if the day falls within the event duration
+            if ((start_date <= day) and (day <= end_date)):
+                event_day = EventDay(event_id=self.event_id,
+                                     day_id=day.day_id)
+                db.session.add(event_day)
+                db.session.commit()
 
 
 class EventDay(db.Model):
@@ -115,6 +173,8 @@ class EventDay(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('events.event_id'), nullable=False)
     day_id = db.Column(db.Integer, db.ForeignKey('days.day_id'), nullable=False)
 
+    # Prevent event from being associate with a unique day more than once
+    db.UniqueConstraint('event_id', 'day_id')
 
 
 ##############################################################################
