@@ -275,13 +275,6 @@ def process_prescription():
     dosage = request.form.get('dosage')
     frequency = request.form.get('frequency')
     start_date = request.form.get('start-date')
-    # sets end_date as None if none entered
-    # CODE COMMENTED OUT - prescription form does not take end_date for now
-    # end_date = request.form.get('end-date')
-    # if end_date:
-    #     end_date = datetime.strptime(end_date, "%Y-%m-%d")
-    # else:
-    #     end_date = None
 
     # create new prescription from form inputs, add to db
     prescription = Prescription(user_id=user_id,
@@ -339,17 +332,6 @@ def get_mood_rating():
         max_mood = request.form.get('max-mood')
 
     return [user_id, overall_mood, min_mood, max_mood, notes]
-
-
-# def is_loggedin():
-#     """ Checks if there is a valid user logged in """
-
-#     user_id = session.get('user_id')
-
-#     if not user_id:
-#         return 'You are not logged in.'
-#     else:
-#         user = User.query.get(user_id)
 
 
 if __name__ == "__main__":
