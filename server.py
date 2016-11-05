@@ -29,12 +29,6 @@ def index():
 ####################################################################################
 # USER ACCOUNT RELATED
 
-@app.route('/register')
-def show_register_form():
-    """Show form for creating new user account"""
-
-    return render_template('register_form.html')
-
 
 @app.route('/register', methods=['POST'])
 def process_registration():
@@ -56,13 +50,6 @@ def process_registration():
         flash('Account successfully created.')
 
     return redirect('/')
-
-
-@app.route('/login')
-def show_login_form():
-    """Show login to account form"""
-
-    return render_template('login_form.html')
 
 
 @app.route('/login', methods=['POST'])

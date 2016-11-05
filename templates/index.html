@@ -1,7 +1,66 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1><a href="/register">SPAWN MORE OVERLORDS</a></h1><br>
-    <img src="../static/clayZergling_1.JPG" style="height: 400px">
-    <h1><a href="/login">SCV, reporting for duty</a></h1>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#login-modal">
+      Log Into Existing Account
+    </button>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="login-modal">
+      <div class="modal-dialog" role="document">
+
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="login-title">Log In </h4>
+          </div>
+          <div class="modal-body">
+            <form action='/login' method='POST'>
+              <label for='username'>Username: </label>
+              <input id='username' type='text' name='username' required><br>
+
+              <label for='password'>Password: </label>
+              <input id='password' type='text' name='password' required><br>
+
+              <input type='submit' value='Log In'>
+            </form>          
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#register-modal">
+      Register New Account
+    </button>    
+
+    <!-- Regiser Modal -->
+    <div class="modal fade" id="register-modal" tabindex="-1" role="dialog" aria-labelledby="regster-modal">
+      <div class="modal-dialog" role="document">
+
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="register-title">Register </h4>
+          </div>
+          <div class="modal-body">
+            <form action='/register' method='POST'>
+              <label for='username'>Username: </label>
+              <input id='username' type='text' name='username' required><br>
+
+              <label for'password'>Password: </label>
+              <input id='password' type='text' name='password' required><br>
+
+              <label for 'email'>Email: </label>
+              <input id='email' type='text' name='email' required><br>
+
+                <input type='submit' value='Create Account'>
+            </form>   
+          </div>
+        </div>
+      </div>
+    </div>
+
+
 {% endblock %}    

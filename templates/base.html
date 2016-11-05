@@ -1,28 +1,57 @@
 <!doctype html>
 <html>
-<head>
+  <head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <title>Paulina's HB Project</title>
-</head>
-<body>
-  <!-- Flash Messages -->
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+  </head>
+  <body>
+    <script src="https://code.jquery.com/jquery.js"></script>
 
-  <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Bootstrap NavBar -->
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Mood/Med Log</a>
+        </div>
 
-  <!-- If user is logged in, give option to view profile or log out -->
-  {% if 'user_id' in session %}
-    <h1><a href='/user_profile'>User Profile</a></h1>
-    <h3><a href='/logout'>Log out</a></h3>
-  {% endif %}
 
-  {% block content %}CONTENT GOES HERE{% endblock %}
-</body>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        {% if 'user_id' in session %}
+          <ul class="nav navbar-nav">
+            <li><a href="/user_profile">Profile</a></li>
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        {% endif %}
+
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+
+    <!-- Flash Messages -->
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=flashes>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+
+    {% block content %}CONTENT GOES HERE{% endblock %}
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </body>
 </html>
