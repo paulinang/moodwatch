@@ -157,7 +157,7 @@ class Event(db.Model):
         # for each day logged by the user owning that event
         for day in self.user.days:
             # if the day falls within the event duration
-            if ((start_date <= day) and (day <= end_date)):
+            if ((start_date <= day.date) and (day.date <= end_date)):
                 event_day = EventDay(event_id=self.event_id,
                                      day_id=day.day_id)
                 db.session.add(event_day)

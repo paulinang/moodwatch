@@ -1,5 +1,6 @@
 from model import connect_to_db, db, User, Prescription, Drug, Day, Event, EventDay
 from server import app
+from datetime import datetime
 
 
 def load_drugs():
@@ -29,13 +30,12 @@ def load_users():
 
     User.query.delete()
 
-    chicken = User(username='not_chicken', password='am_duck', email='actually@goose.com')
-    duck = User(username='not_duck', password='am_chicken', email='actually@mongoose.com')
-    turkey = User(username='not_turkey', password='am_vulture', email='actually@catgoose.com')
+    for i in range(1, 5):
+        user = User(username='user%s' % i,
+                    password='password',
+                    email='user%s@email.com' % i)
+        db.session.add(user)
 
-    db.session.add(chicken)
-    db.session.add(duck)
-    db.session.add(turkey)
     db.session.commit()
 
 
@@ -47,11 +47,32 @@ def load_days():
     Day.query.delete()
 
     for i in range(1, 30):
-        day = Day(user_id=1, date='2016-10-%s' % i, overall_mood=5)
+        day = Day(user_id=1,
+                  date='2016-10-%s' % i,
+                  overall_mood=5,
+                  max_mood=10,
+                  min_mood=0)
         db.session.add(day)
 
     db.session.commit()
 
+
+def load_events():
+    """ Add event to events table"""
+
+    print "Events"
+
+    Event.query.delete()
+
+    event = Event(user_id=1,
+                  event_name='event1',
+                  overall_mood=2)
+    db.session.add(event)
+    db.session.commit()
+
+    start_date = datetime.strptime('2016-10-05', '%Y-%m-%d').date()
+    end_date = datetime.strptime('2016-10-20', '%Y-%m-%d').date()
+    event.associate_days(start_date, end_date)
 
 
 if __name__ == "__main__":
@@ -64,3 +85,4 @@ if __name__ == "__main__":
     load_drugs()
     load_users()
     load_days()
+    load_events()
