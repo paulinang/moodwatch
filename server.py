@@ -34,8 +34,8 @@ def index():
 def process_registration():
     """Creates new user account"""
 
-    username = request.form.get('username')
-    password = request.form.get('password')
+    username = request.form.get('new-username')
+    password = request.form.get('new-password')
     email = request.form.get('email')
 
     # if there doesn't exist a record in the database with that email or username
@@ -142,7 +142,10 @@ def show_drug_info(drug_id):
 def show_day_mood_form():
     """ Show add mood log for day form"""
 
-    return render_template('day_mood_form.html')
+    user = User.query.get(session['user_id'])
+    logged_days = [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days]
+
+    return render_template('day_mood_form.html', logged_days=logged_days)
 
 
 @app.route('/log_day_mood', methods=['POST'])
