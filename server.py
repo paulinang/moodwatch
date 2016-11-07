@@ -104,9 +104,7 @@ def show_user_profile():
         user = db.session.query(User).get(user_id)
 
         # Create a dict that groups prescriptions of the same drug together
-        prescription_dict = {}
-        for prescription in user.prescriptions:
-            prescription_dict.setdefault(prescription.drug.drug_name, []).append(prescription)
+        prescription_dict = user.group_prescriptions_by_drug()
 
         return render_template('user_profile.html', user=user, prescriptions=prescription_dict)
     else:
@@ -193,14 +191,16 @@ def process_event_mood_log():
     db.session.add(event)
     db.session.commit()
 
+    event.associate_days(start_date, end_date)
+
     # create eventdays for all days user has logged that fall into event duration
-    user = User.query.get(user_id)
-    for day in user.days:
-        if (start_date <= day.date) and (day.date <= end_date):
-            event_day = EventDay(event_id=event.event_id,
-                                 day_id=day.day_id)
-            db.session.add(event_day)
-    db.session.commit()
+    # user = User.query.get(user_id)
+    # for day in user.days:
+    #     if (start_date <= day.date) and (day.date <= end_date):
+    #         event_day = EventDay(event_id=event.event_id,
+    #                              day_id=day.day_id)
+    #         db.session.add(event_day)
+    # db.session.commit()
 
     # FOR NOW, EVENT DAYS ARE ONLY CREATED ON EVENT CREATION
     # IT WILL SKIP DAYS THAT USER HAS NOT LOGGED

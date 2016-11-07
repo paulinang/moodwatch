@@ -103,19 +103,20 @@ class Day(db.Model):
 
     day_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    date = db.Column(db.Date, unique=True, nullable=False)
+    date = db.Column(db.Date, nullable=False)
     overall_mood = db.Column(db.Integer, nullable=False)
     max_mood = db.Column(db.Integer, nullable=True)
     min_mood = db.Column(db.Integer, nullable=True)
     notes = db.Column(db.Text, nullable=True)
 
     user = db.relationship('User', backref=db.backref('days', order_by='desc(Day.date)'))
-    db.UniqueConstraint('user_id', 'date')
 
     def __repr__(self):
         """Gives date and user of record"""
 
         return "<Day user_id =%s date=%s>" % (self.user_id, self.date)
+
+db.Index('user_date', Day.user_id, Day.date, unique=True)
 
 
 class Event(db.Model):
@@ -174,7 +175,8 @@ class EventDay(db.Model):
     day_id = db.Column(db.Integer, db.ForeignKey('days.day_id'), nullable=False)
 
     # Prevent event from being associate with a unique day more than once
-    db.UniqueConstraint('event_id', 'day_id')
+
+db.Index('event_day', EventDay.event_id, EventDay.day_id, unique=True)
 
 
 ##############################################################################

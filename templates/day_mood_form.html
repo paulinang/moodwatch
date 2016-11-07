@@ -4,7 +4,7 @@
     <h1>Log your mood for a day:</h1>
     <form id='day-mood-form' action='/log_day_mood' method='POST'>
         <label for='date'>Date: </label>
-        <input type="text" id="date" name="date" required><br>
+        <input type="text" id="date" name="date" readonly="true" required><br>
 
         <label for='overall-mood'>Overall Mood: </label>
         <input id='overall-mood' type='number' name='overall-mood' min='-50' max='50' required><br>
