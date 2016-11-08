@@ -7,14 +7,58 @@
     </script>
 
 
-    <div class="mood-chart">
+    <div class="mood-chart" style='height: 50vh; width: 75vw'>
       <canvas id="moodChart"></canvas>
     <div>
+    <br>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#day-log-modal">
+      Log A New Day
+    </button>
+
+    <!-- Add Day Modal -->
+    <div class="modal fade" id="day-log-modal" tabindex="-1" role="dialog" aria-labelledby="day-log-modal">
+      <div class="modal-dialog" role="document">
+
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="day-log-title">Log Day </h4>
+          </div>
+          <div class="modal-body">
+            <form id='day-mood-form' action='/log_day_mood' method='POST'>
+                <label for='date'>Date: </label>
+                <input type="text" id="date" name="date" readonly="true" required><br>
+
+                <label for='overall-mood'>Overall Mood: </label>
+                <input id='overall-mood' type='number' name='overall-mood' min='-50' max='50' required><br>
+
+                <p id='mood-range'>Range of Mood: 
+                <label for='min-mood'>Min: </label>
+                <input id='min-mood' type='number' name='min-mood' min='-50' max='50'>
+
+                <label for='max-mood'>Max: </label>
+                <input id='max-mood' type='number' name='max-mood' min='-50' max='50'>
+                <span id="alert-msg" style='color:red;'></span><br>
+                </p>
+
+                <label for='notes'>Notes About This Day:</label>
+                <input id='notes' type='textarea' name='notes'><br>
+
+                <input type='submit' value='Add Day Mood Log'>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <script>
     // 'use strict';
     
         var options = { responsive: true,
+                        maintainAspectRatio: false,
             // http://stackoverflow.com/questions/37061945/how-to-format-x-axis-time-scale-values-in-chart-js-v2
                         scales: {
                             xAxes: [{
