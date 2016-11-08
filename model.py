@@ -2,6 +2,7 @@
     Layout taken from Ratings lab exercise"""
 
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 # This is the connection to the PostgreSQL database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
@@ -47,6 +48,14 @@ class User(db.Model):
             return True
 
         return False
+
+    def get_day_log_range(self):
+        """Gets dates of earliest and latest logged days as strings"""
+
+        latest = datetime.strftime(self.days[0].date, '%Y-%m-%d')
+        earliest = datetime.strftime(self.days[-1].date, '%Y-%m-%d')
+
+        return [earliest, latest]
 
     # def get_days_overall_mood_days(self):
     #     """Gets graphable data for chart.js"""

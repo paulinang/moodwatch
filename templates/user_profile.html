@@ -2,38 +2,64 @@
 
 {% block content %}
     <!-- Show basic user info -->
-    <h1>{{ user.username }}'s Profile <h1>
-    <h3>Email: {{ user.email }}</h3>
+    <h1>{{ user_info.user.username }}'s Profile <h1>
+    <h3>Email: {{ user_info.user.email }}</h3>
 
     <!-- Show mood logs -->
     <p>Mood logs:</p>
     <h4><a href='/log_day_mood'>Add mood log for a day</a></h4>
     <h4><a href='/log_event_mood'>Add mood log for an event</a></h4>
 
-    <ul>
-        {% for day in user.days %}
-        <li>
-            <b>{{ day.date }}</b>
-            <ul>
-                <li>Overall: {{ day.overall_mood }}</li>
-                <!-- must check if either min or max is non-zero. zero mood gets mistaken for no mood -->
-                {% if day.min_mood or day.max_mood %}
-                    <li>Range: {{ day.min_mood }} to {{day.max_mood }}
-                {% endif %}
-                {% if day.notes %}
-                    <li>Notes: {{ day.notes }}</li>
-                {% endif %}
-            </ul>
-        </li>
-        {% endfor %}
-    </ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.2/moment.min.js"></script>
+    <script src=
+      "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js">
+    </script>
+
+
+    <div class="mood-chart" style='height: 50vh; width: 75vw'>
+      <canvas id="moodChart"></canvas>
+    <div>
+    <br>
+
+    <script>
+    // 'use strict';
+    
+        var options = { responsive: true,
+                        maintainAspectRatio: false,
+            // http://stackoverflow.com/questions/37061945/how-to-format-x-axis-time-scale-values-in-chart-js-v2
+                        scales: {
+                            xAxes: [{
+                                type:'time',
+                                unit: 'day',
+                                unitStepSize: 1,
+                                time: {
+                                    displayFormats: {
+                                        'day': 'MMM DD'
+                                    },
+                                min: '{{ user_info.day_log_range[0] }}',
+                                max: '{{ user_info.day_log_range[1] }}'                                
+                                } 
+                            }]
+                        }};
+
+        var ctx = $('#moodChart').get(0).getContext('2d');
+        $.get('/day_mood_chart.json', function (data) {
+            console.log(data);
+            var moodChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: options
+        });
+        });
+
+    </script>        
 
     <!-- Show prescription logs -->
     <h3>Prescriptions:</h3>
     <h4><a href='/drugs'>Add prescription from drug list</a></h4>
 
     <ul>
-        {% for drug, prescription_list in prescriptions.items() %}
+        {% for drug, prescription_list in user_info.prescriptions.items() %}
         <li>
             <b>{{ drug }}</b>
             <ul>

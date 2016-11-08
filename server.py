@@ -104,11 +104,13 @@ def show_user_profile():
         # Retrieve user object and pass it into profile template
         user = db.session.query(User).get(user_id)
 
-        # Create a dict that groups prescriptions of the same drug together
-        prescription_dict = user.group_prescriptions_by_drug()
+        return render_template('user_profile.html',
+                               user_info={'user': user,
+                                          'prescriptions': user.group_prescriptions_by_drug(),
+                                          'day_log_range': user.get_day_log_range()
+                                          }
+                               )
 
-        return render_template('user_profile.html', user=user, prescriptions=prescription_dict)
-    else:
         flash('You are not logged in.')
         return redirect('/')
 
