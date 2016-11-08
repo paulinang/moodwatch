@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.2/moment.min.js"></script>
+    <script src=
+      "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js">
+    </script>
+
+
+    <div class="mood-chart">
+      <canvas id="moodChart"></canvas>
+    <div>
+
+    <script>
+    // 'use strict';
+    
+        var options = { responsive: true,
+            // http://stackoverflow.com/questions/37061945/how-to-format-x-axis-time-scale-values-in-chart-js-v2
+                        scales: {
+                            xAxes: [{
+                                type:'time',
+                                unit: 'day',
+                                unitStepSize: 1,
+                                time: {
+                                    displayFormats: {
+                                        'day': 'MMM DD'
+                                    },
+                                min: '{{ earliest }}',
+                                max: '{{ latest }}'                                
+                                } 
+                            }]
+                        }};
+        var ctx = $('#moodChart').get(0).getContext('2d');
+        $.get('/day_mood_chart.json', function (data) {
+            console.log(data);
+            var moodChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: options
+        });
+        });
+
+    </script>
+
+{% endblock %}

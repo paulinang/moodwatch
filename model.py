@@ -48,6 +48,18 @@ class User(db.Model):
 
         return False
 
+    # def get_days_overall_mood_days(self):
+    #     """Gets graphable data for chart.js"""
+
+    #     data_dict = {
+    #         'labels': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days],
+    #         'datasets': [{
+    #             'label': 'Overall Mood',
+    #             'data': [day.overall_mood for day in user.days]
+    #             }]
+    #         }
+    #     return data
+
 
 class Prescription(db.Model):
     """Preseciption of a drug to a user"""

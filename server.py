@@ -7,6 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, User, Drug, Prescription, Day, Event, EventDay
 
+import json
 
 app = Flask(__name__)
 
@@ -302,8 +303,36 @@ def end_prescription():
         return redirect('/user_profile')
 
 
+########### CHART.JS PRACTICE ###################
+@app.route('/user_day_moods')
+def display_day_mmood_chart():
+
+    days = User.query.get(session['user_id']).days
+    latest = datetime.strftime(days[0].date, '%Y-%m-%d')
+    earliest = datetime.strftime(days[-1].date, '%Y-%m-%d')
+    return render_template("chart_practice.html", latest=latest, earliest=earliest)
+
+
+@app.route('/day_mood_chart.json')
+def day_mood_chart_data():
+    """ Return some data to chart"""
+
+    user = User.query.get(session['user_id'])
+
+    data_dict = {
+        'labels': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days],
+        'datasets': [{
+            'label': 'Overall Mood',
+            'data': [day.overall_mood for day in user.days]
+            }]
+        }
+
+    return jsonify(data_dict)
+
+
 ###################################################################################
 # HELPER FUNCTIONS
+
 
 def get_mood_rating():
     """Gets ratings for a mood (day/event)"""
