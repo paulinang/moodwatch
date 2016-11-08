@@ -107,7 +107,8 @@ def show_user_profile():
         return render_template('user_profile.html',
                                user_info={'user': user,
                                           'prescriptions': user.group_prescriptions_by_drug(),
-                                          'day_log_range': user.get_day_log_range()
+                                          'day_log_range': user.get_day_log_range(),
+                                          'logged_days': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days]
                                           }
                                )
 
