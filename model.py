@@ -51,23 +51,11 @@ class User(db.Model):
 
     def get_day_log_range(self):
         """Gets dates of earliest and latest logged days as strings"""
+        if self.days:
+            latest = datetime.strftime(self.days[0].date, '%Y-%m-%d')
+            earliest = datetime.strftime(self.days[-1].date, '%Y-%m-%d')
 
-        latest = datetime.strftime(self.days[0].date, '%Y-%m-%d')
-        earliest = datetime.strftime(self.days[-1].date, '%Y-%m-%d')
-
-        return [earliest, latest]
-
-    # def get_days_overall_mood_days(self):
-    #     """Gets graphable data for chart.js"""
-
-    #     data_dict = {
-    #         'labels': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days],
-    #         'datasets': [{
-    #             'label': 'Overall Mood',
-    #             'data': [day.overall_mood for day in user.days]
-    #             }]
-    #         }
-    #     return data
+            return [earliest, latest]
 
 
 class Prescription(db.Model):

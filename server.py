@@ -142,15 +142,6 @@ def show_drug_info(drug_id):
 ##################################################################################
 # DAY LOG RELATED -- have to be logged in
 
-@app.route('/log_day_mood')
-def show_day_mood_form():
-    """ Show add mood log for day form"""
-
-    user = User.query.get(session['user_id'])
-    logged_days = [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days]
-
-    return render_template('day_mood_form.html', logged_days=logged_days)
-
 
 @app.route('/log_day_mood', methods=['POST'])
 def process_day_mood_log():
@@ -168,15 +159,10 @@ def process_day_mood_log():
 
     db.session.add(day)
     db.session.commit()
+    # day_datapoint = {'date': datetime.strftime(day.date, '%Y-%m-%d'),
+    #                  'overall_mood': day.overall_mood}
 
     return redirect('/user_profile')
-
-
-@app.route('/log_event_mood')
-def show_event_mood_form():
-    """ Show add mood log for event form """
-
-    return render_template('event_mood_form.html')
 
 
 @app.route('/log_event_mood', methods=['POST'])
@@ -191,6 +177,7 @@ def process_event_mood_log():
 
     # create event
     event = Event(event_name=event_name,
+                  user_id=user_id,
                   overall_mood=overall_mood,
                   max_mood=max_mood,
                   min_mood=min_mood,
@@ -354,6 +341,22 @@ def get_mood_rating():
         max_mood = request.form.get('max-mood')
 
     return [user_id, overall_mood, min_mood, max_mood, notes]
+
+
+def day_mood_data():
+    """ Return some data to chart"""
+
+    user = User.query.get(session['user_id'])
+
+    data_dict = {
+        'labels': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days],
+        'datasets': [{
+            'label': 'Overall Mood',
+            'data': [day.overall_mood for day in user.days]
+            }]
+        }
+
+    return data_dict
 
 
 if __name__ == "__main__":
