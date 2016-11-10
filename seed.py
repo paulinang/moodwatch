@@ -1,6 +1,7 @@
 from model import connect_to_db, db, User, Prescription, Drug, Day, Event, EventDay
 from server import app
 from datetime import datetime
+from random import choice
 
 
 def load_drugs():
@@ -45,13 +46,15 @@ def load_days():
     print "Days"
 
     Day.query.delete()
+    MAX = [10, 20, 50]
+    MIN = [0, -10, -30]
 
     for i in range(1, 30):
         day = Day(user_id=1,
                   date='2016-10-%s' % i,
                   overall_mood=5,
-                  max_mood=10,
-                  min_mood=0)
+                  max_mood=choice(MAX),
+                  min_mood=choice(MIN))
         db.session.add(day)
 
     db.session.commit()
@@ -66,7 +69,9 @@ def load_events():
 
     event = Event(user_id=1,
                   event_name='event1',
-                  overall_mood=2)
+                  overall_mood=4,
+                  min_mood=2,
+                  max_mood=7)
     db.session.add(event)
     db.session.commit()
 

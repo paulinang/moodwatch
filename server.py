@@ -309,15 +309,39 @@ def day_mood_chart_data():
 
     user = User.query.get(session['user_id'])
 
-    data_dict = {
-        'labels': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days],
-        'datasets': [{
-            'label': 'Overall Mood',
-            'data': [day.overall_mood for day in user.days]
-            }]
-        }
+    # initialize list of datasets
+    datasets = []
+    # create a dataset for each day's range
+    for day in user.days:
+        # format date into a moment.js format so chart.js can plot on a time scale
+        date = datetime.strftime(day.date, '%Y-%m-%d')
+        # initialize a dataset with that day's overall mood
+        dataset = [{'x': date, 'y': day.overall_mood}]
+        # if there is a mood range assocaited as well
+        if day.min_mood or day.max_mood:
+            # extend the day's mood dataset with the range values
+            dataset.extend([{'x': date, 'y': day.min_mood},
+                            {'x': date, 'y': day.max_mood}])
+        # append the day dataset to the master list of datasets
+        datasets.append({'data': dataset})
 
-    return jsonify(data_dict)
+    for event in user.events:
+        event_dataset = []
+        for day in event.days:
+            date = datetime.strftime(day.date, '%Y-%m-%d')
+            event_dataset.append({'x': date, 'y': event.overall_mood})
+
+        datasets.append({'label': event.event_name, 'backgroundColor': 'rgba(255, 153, 0, 0.4)', 'data': event_dataset})
+
+    # data_dict = {
+        # 'labels': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days],
+        # 'datasets': [{
+        #     'label': 'Overall Mood',
+        #     'data': [day.overall_mood for day in user.days]
+        #     }]
+        # }
+
+    return jsonify({'datasets': datasets})
 
 
 ###################################################################################

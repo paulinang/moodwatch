@@ -72,11 +72,23 @@
                                 min: '{{ earliest }}',
                                 max: '{{ latest }}'                                
                                 } 
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    min: -50,
+                                    max: 50
+                                }
                             }]
-                        }};
+                        },
+                        legend: {
+                                display: false
+                            }
+                        };
         var ctx = $('#moodChart').get(0).getContext('2d');
         $.get('/day_mood_chart.json', function (data) {
             console.log(data);
+            // data.datasets.push({data:[{x: '2016-10-20', y: 0}, {x: '2016-10-20', y: 10}]});
+            // console.log(data);
             var moodChart = new Chart(ctx, {
                 type: 'line',
                 data: data,
