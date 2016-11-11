@@ -5,8 +5,13 @@
     <script src=
       "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js">
     </script>
-
-
+    <button type='button' class='move-time-button' value='backward' disabled>&lt;</button>
+    <select id='chart-time-window' name='time-window'>
+        <option value='all-time'>All time</option>
+        <option value='monthly'>Monthly</option>
+    <select>
+    <button type='button' class='move-time-button' value='forward' disabled>&gt;</button>
+    <br><br>
     <div class="mood-chart" style='height: 50vh; width: 75vw'>
       <canvas id="moodChart"></canvas>
     <div>
@@ -71,9 +76,9 @@
                                     displayFormats: {
                                         'day': 'MMM DD'
                                     },
-                                min: '{{ earliest }}',
-                                max: '{{ latest }}'                                
-                                } 
+                                    min: '{{ earliest }}',
+                                    max: '{{ latest }}'                                
+                                    } 
                             }],
                             yAxes: [{
                                 ticks: {
@@ -89,7 +94,7 @@
         var ctx = $('#moodChart').get(0).getContext('2d');
         var moodChart;
         $.get('/day_mood_chart.json', function (data) {
-            console.log(data);
+            // console.log(data);
             // data.datasets.push({data:[{x: '2016-10-20', y: 0}, {x: '2016-10-20', y: 10}]});
             // console.log(data);
             moodChart = new Chart(ctx, {
@@ -119,6 +124,36 @@
             }
             moodChart.update();
 
+        });
+
+        $('#chart-time-window').on('change', function () {
+            var timeWindow = ($(this).val());
+            if (timeWindow == 'monthly') {
+                $('.move-time-button').attr('disabled', false);
+                moodChart.options.scales.xAxes[0].time.min = moment().startOf('month');
+                moodChart.options.scales.xAxes[0].time.max = moment().endOf('month');
+                moodChart.update();
+            }
+            else {
+                $('.move-time-button').attr('disabled', true);
+                moodChart.options.scales.xAxes[0].time.min = '{{ earliest }}';
+                moodChart.options.scales.xAxes[0].time.max = '{{ latest }}';
+                moodChart.update();
+            }
+        });
+
+        $('.move-time-button').on('click', function () {
+            var timeWindow = ($('#chart-time-window').val());
+            if ($(this).val() == 'backward') {
+                moodChart.options.scales.xAxes[0].time.min.subtract(1, 'month');
+                moodChart.options.scales.xAxes[0].time.max.subtract(1, 'month');
+                moodChart.update();
+            }
+            else if ($(this).val() == 'forward') {
+                moodChart.options.scales.xAxes[0].time.min.add(1, 'month');
+                moodChart.options.scales.xAxes[0].time.max.add(1, 'month');
+                moodChart.update();
+            }
         });
 
     </script>
