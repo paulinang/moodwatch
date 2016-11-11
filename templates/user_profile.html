@@ -11,8 +11,8 @@
     <!-- Day Log Mood Chart -->
     <div class="mood-chart" style='height: 50vh; width: 75vw'>
       <canvas id="moodChart"></canvas>
-    <div>
-    <br>
+    </div>
+    <button type="button" id="toggle-events">Toggle Events</button><br><br>
 
     <script>
         {% if user_info.user.days %}
@@ -58,6 +58,21 @@
                     data: data,
                     options: options
                 });
+            });
+
+            $('#toggle-events').on('click', function () {
+                var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
+                console.log(events);
+                for (i=0; i<events.length; i++) {
+                    if (events[i].borderColor != 'rgba(255,153,0,0.4)') {
+                        events[i].borderColor = 'rgba(255,153,0,0.4)';
+                    }
+                    else {
+                        events[i].borderColor = 'rgba(0,0,0,0)';
+                    }
+                }
+                moodChart.update();
+
             });
         {% endif %}
 

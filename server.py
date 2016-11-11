@@ -303,6 +303,30 @@ def display_day_mmood_chart():
     return render_template("chart_practice.html", latest=latest, earliest=earliest)
 
 
+# @app.route('/event_mood.json')
+# def event_mood_data():
+#     """Return graphable event data"""
+#     user = User.query.get(session['user_id'])
+#     datasets = []
+#     for event in user.events:
+#         event_datasets = {'overall': []}
+#         for day in event.days:
+#             date = datetime.strftime(day.date, '%Y-%m-%d')
+#             event_datasets['overall'].append({'x': date, 'y': event.overall_mood})
+#             if event.min_mood or event.max_mood:
+#                 event_datasets.setdefault('min', []).append({'x': date, 'y': event.min_mood})
+#                 event_datasets.setdefault('max', []).append({'x': date, 'y': event.max_mood})
+
+#         for mood, dataset in event_datasets.iteritems():
+#             datasets.append({'label': event.event_name + mood,
+#                              'backgroundColor': 'rgba(0,0,0,0)',
+#                              'borderColor': 'rgba(255, 153, 0, 0.4)',
+#                              'pointBackgroundColor': 'rgba(255, 153, 0, 0.4)',
+#                              'data': dataset})
+
+#     return jsonify(datasets)
+
+
 @app.route('/day_mood_chart.json')
 def day_mood_chart_data():
     """ Return some data to chart"""
@@ -326,20 +350,20 @@ def day_mood_chart_data():
         datasets.append({'data': dataset})
 
     for event in user.events:
-        event_dataset = []
+        event_datasets = {'overall': []}
         for day in event.days:
             date = datetime.strftime(day.date, '%Y-%m-%d')
-            event_dataset.append({'x': date, 'y': event.overall_mood})
+            event_datasets['overall'].append({'x': date, 'y': event.overall_mood})
+            if event.min_mood or event.max_mood:
+                event_datasets.setdefault('min', []).append({'x': date, 'y': event.min_mood})
+                event_datasets.setdefault('max', []).append({'x': date, 'y': event.max_mood})
 
-        datasets.append({'label': event.event_name, 'backgroundColor': 'rgba(255, 153, 0, 0.4)', 'data': event_dataset})
-
-    # data_dict = {
-        # 'labels': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days],
-        # 'datasets': [{
-        #     'label': 'Overall Mood',
-        #     'data': [day.overall_mood for day in user.days]
-        #     }]
-        # }
+        for mood, dataset in event_datasets.iteritems():
+            datasets.append({'label': 'event',
+                             'backgroundColor': 'rgba(0,0,0,0)',
+                             'borderColor': 'rgba(0,0,0,0)',
+                             # 'pointBackgroundColor': 'rgba(0,0,0,0)',
+                             'data': dataset})
 
     return jsonify({'datasets': datasets})
 

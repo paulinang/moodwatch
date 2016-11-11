@@ -12,6 +12,8 @@
     <div>
     <br>
 
+    <button type="button" id="toggle-events">Toggle Events</button><br><br>
+
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#day-log-modal">
       Log A New Day
@@ -85,15 +87,38 @@
                             }
                         };
         var ctx = $('#moodChart').get(0).getContext('2d');
+        var moodChart;
         $.get('/day_mood_chart.json', function (data) {
             console.log(data);
             // data.datasets.push({data:[{x: '2016-10-20', y: 0}, {x: '2016-10-20', y: 10}]});
             // console.log(data);
-            var moodChart = new Chart(ctx, {
+            moodChart = new Chart(ctx, {
                 type: 'line',
                 data: data,
                 options: options
         });
+        });
+
+        // function addEventChartData(evt){
+        //     $.get('/event_mood.json', function (data) {
+        //         moodChart.data.datasets.push.apply(moodChart.data.datasets, data);
+        //         moodChart.update();
+        //     });
+        // }
+
+        $('#toggle-events').on('click', function () {
+            var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
+            console.log(events);
+            for (i=0; i<events.length; i++) {
+                if (events[i].borderColor != 'rgba(255,153,0,0.4)') {
+                    events[i].borderColor = 'rgba(255,153,0,0.4)';
+                }
+                else {
+                    events[i].borderColor = 'rgba(0,0,0,0)';
+                }
+            }
+            moodChart.update();
+
         });
 
     </script>
