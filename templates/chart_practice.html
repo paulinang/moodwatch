@@ -144,12 +144,12 @@
 
         $('.move-time-button').on('click', function () {
             var timeWindow = ($('#chart-time-window').val());
-            if ($(this).val() == 'backward') {
+            if (this.value == 'backward') {
                 moodChart.options.scales.xAxes[0].time.min.subtract(1, 'month');
                 moodChart.options.scales.xAxes[0].time.max.subtract(1, 'month');
                 moodChart.update();
             }
-            else if ($(this).val() == 'forward') {
+            else if ((this.value == 'forward') && (moodChart.options.scales.xAxes[0].time.max < moment().endOf('month'))) {
                 moodChart.options.scales.xAxes[0].time.min.add(1, 'month');
                 moodChart.options.scales.xAxes[0].time.max.add(1, 'month');
                 moodChart.update();
