@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form id='drug-search-form' action='/search_drug' method='POST'>
+        Drug name: <input type='text' id='drug-keyword' name='drug-keyword'>
+        <input type='submit' value='Search for drug'>
+    </form><br>
+    <div id='search-results'></div>
+
+    <script>
+        function showDrugSearchResults(results) {
+            // console.log(results);
+            for (i = 0; i < results.length; i++) {
+                console.log(results[i]);
+                var info = results[i].openfda;
+                
+                // $('#search_results').append('<li>info.brand_name<ul><li>results[i].description</li><li>results[i].active_ingredient</li></ul></li>')
+                $('#search-results').append(info.brand_name);
+
+            }
+        }
+
+        $('#drug-search-form').on('submit', function(evt) {
+            evt.preventDefault();
+            var formInputs = {drug_keyword: $('#drug-keyword').val()};
+            $.post('/search_openfda.json', formInputs, showDrugSearchResults);
+        });
+
+    </script>
+
+{% endblock %}

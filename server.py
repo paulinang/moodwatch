@@ -8,6 +8,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Drug, Prescription, Day, Event, EventDay
 
 import json
+import requests
 
 app = Flask(__name__)
 
@@ -367,6 +368,28 @@ def day_mood_chart_data():
                              'data': dataset})
 
     return jsonify({'datasets': datasets})
+
+################### OPENFDA API PRACTICE ######################
+
+
+@app.route('/drug_search')
+def show_drug_search_form():
+    """Show drug search form"""
+
+    return render_template('drug_search.html')
+
+
+@app.route('/search_openfda.json', methods=['POST'])
+def search_openfda():
+
+    user_input = request.form.get('drug_keyword')
+    print user_input
+    r = requests.get("https://api.fda.gov/drug/label.json?limit=10&search=brand_name:%s" % user_input)
+
+    drug_results = r.json()['results']
+    # print drug_results
+
+    return jsonify(drug_results)
 
 
 ###################################################################################
