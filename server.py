@@ -312,7 +312,7 @@ def display_day_mmood_chart():
 #         event_datasets = {'overall': []}
 #         for day in event.days:
 #             date = datetime.strftime(day.date, '%Y-%m-%d')
-#             event_datasets['overall'].append({'x': date, 'y': event.overall_mood})
+#             event_datasets['overall'].append({'x': date, 'y': event.overall_mood})ag
 #             if event.min_mood or event.max_mood:
 #                 event_datasets.setdefault('min', []).append({'x': date, 'y': event.min_mood})
 #                 event_datasets.setdefault('max', []).append({'x': date, 'y': event.max_mood})
@@ -347,7 +347,8 @@ def day_mood_chart_data():
             dataset.extend([{'x': date, 'y': day.min_mood},
                             {'x': date, 'y': day.max_mood}])
         # append the day dataset to the master list of datasets
-        datasets.append({'data': dataset})
+        datasets.append({'label': 'day %s' % date,
+                         'data': dataset})
 
     for event in user.events:
         event_datasets = {'overall': []}

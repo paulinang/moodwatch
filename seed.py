@@ -49,9 +49,17 @@ def load_days():
     MAX = [10, 20, 50]
     MIN = [0, -10, -30]
 
-    for i in range(1, 30):
+    for i in range(1, 32):
         day = Day(user_id=1,
                   date='2016-10-%s' % i,
+                  overall_mood=5,
+                  max_mood=choice(MAX),
+                  min_mood=choice(MIN))
+        db.session.add(day)
+
+    for i in range(1, 31):
+        day = Day(user_id=1,
+                  date='2016-11-%s' % i,
                   overall_mood=5,
                   max_mood=choice(MAX),
                   min_mood=choice(MIN))
