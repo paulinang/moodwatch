@@ -9,8 +9,17 @@ from model import connect_to_db, db, User, Drug, Prescription, Day, Event, Event
 
 import json
 import requests
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
+app.config.update(dict(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USERNAME='paulinahbproject@gmail.com',
+    MAIL_PASSWORD='heimdall9402'))
+
+mail = Mail(app)
 
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
@@ -141,7 +150,7 @@ def show_drug_info(drug_id):
 
 
 ##################################################################################
-# DAY LOG RELATED -- have to be logged in
+# MOOD LOG RELATED -- have to be logged in
 
 
 @app.route('/log_day_mood', methods=['POST'])
@@ -187,22 +196,6 @@ def process_event_mood_log():
     db.session.commit()
 
     event.associate_days(start_date, end_date)
-
-    # create eventdays for all days user has logged that fall into event duration
-    # user = User.query.get(user_id)
-    # for day in user.days:
-    #     if (start_date <= day.date) and (day.date <= end_date):
-    #         event_day = EventDay(event_id=event.event_id,
-    #                              day_id=day.day_id)
-    #         db.session.add(event_day)
-    # db.session.commit()
-
-    # FOR NOW, EVENT DAYS ARE ONLY CREATED ON EVENT CREATION
-    # IT WILL SKIP DAYS THAT USER HAS NOT LOGGED
-    # EITHER:
-    #   PREVENT USER FROM ADDING EVENTS FOR A DAY THAT DNE
-    #   ADD DAYS LATER AND IF IT FALLS WITHIN EXISTING EVENT DURATION
-    #       CREATE NEW EVENT DAY TO LINK THE TWO
 
     return redirect('/user_profile')
 
