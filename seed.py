@@ -89,7 +89,7 @@ def load_events():
 
 
 if __name__ == "__main__":
-    connect_to_db(app)
+    connect_to_db(app, 'projectdb')
 
     # In case tables haven't been created, create them
     db.create_all()
