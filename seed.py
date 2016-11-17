@@ -1,7 +1,8 @@
 from model import connect_to_db, db, User, Prescription, Drug, Day, Event, EventDay
 from server import app
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import choice
+from math import sin
 
 
 def load_drugs():
@@ -46,46 +47,47 @@ def load_days():
     print "Days"
 
     Day.query.delete()
-    MAX = [10, 20, 50]
-    MIN = [0, -10, -30]
 
-    for i in range(1, 32):
-        day = Day(user_id=1,
-                  date='2016-10-%s' % i,
-                  overall_mood=5,
-                  max_mood=choice(MAX),
-                  min_mood=choice(MIN))
-        db.session.add(day)
+    # create a list of numbers to randomly choose from
+    # steps up/down from overall_mood to create min/max
+    MOOD_STEP = range(5, 30, 5)
 
-    for i in range(1, 31):
+    # Create a list of dates starting from 10 days ago to 300 days ago
+    dates = [datetime.today().date() - timedelta(days=x) for x in range(10, 301)]
+    # Create a list of overall_moods based on a sine wave limited to (-15,15)
+    # Corresponds to amount of dates (290)
+    overall_moods = [int(15 * sin(x * 0.1)) for x in range(0, 291)]
+
+    for i, date in enumerate(dates):
+        overall_mood = overall_moods[i]
         day = Day(user_id=1,
-                  date='2016-11-%s' % i,
-                  overall_mood=5,
-                  max_mood=choice(MAX),
-                  min_mood=choice(MIN))
+                  date=date,
+                  overall_mood=overall_mood,
+                  max_mood=overall_mood + choice(MOOD_STEP),
+                  min_mood=overall_mood - choice(MOOD_STEP))
         db.session.add(day)
 
     db.session.commit()
 
 
-def load_events():
-    """ Add event to events table"""
+# def load_events():
+#     """ Add event to events table"""
 
-    print "Events"
+#     print "Events"
 
-    Event.query.delete()
+#     Event.query.delete()
 
-    event = Event(user_id=1,
-                  event_name='event1',
-                  overall_mood=4,
-                  min_mood=2,
-                  max_mood=7)
-    db.session.add(event)
-    db.session.commit()
+#     event = Event(user_id=1,
+#                   event_name='event1',
+#                   overall_mood=4,
+#                   min_mood=2,
+#                   max_mood=7)
+#     db.session.add(event)
+#     db.session.commit()
 
-    start_date = datetime.strptime('2016-10-05', '%Y-%m-%d').date()
-    end_date = datetime.strptime('2016-10-20', '%Y-%m-%d').date()
-    event.associate_days(start_date, end_date)
+#     start_date = datetime.strptime('2016-10-05', '%Y-%m-%d').date()
+#     end_date = datetime.strptime('2016-10-20', '%Y-%m-%d').date()
+#     event.associate_days(start_date, end_date)
 
 
 if __name__ == "__main__":
@@ -98,4 +100,4 @@ if __name__ == "__main__":
     load_drugs()
     load_users()
     load_days()
-    load_events()
+    # load_events()
