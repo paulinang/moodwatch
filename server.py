@@ -148,17 +148,25 @@ def show_drug_info(drug_id):
 def process_day_mood_log():
     """ Add day log to database """
 
-    date = (request.form.get('date'))
+    date = datetime.strptime(request.form.get('today-date'), '%Y-%m-%d').date()
     user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
 
-    day = Day(user_id=user_id,
-              date=date,
-              overall_mood=overall_mood,
-              max_mood=max_mood,
-              min_mood=min_mood,
-              notes=notes)
+    day = Day.query.filter_by(user_id=1, date=date).first()
 
-    db.session.add(day)
+    if day:
+        day.overall_mood = overall_mood
+        day.min_mood = min_mood
+        day.max_mood = max_mood
+        day.notes = notes
+    else:
+        day = Day(user_id=user_id,
+                  date=date,
+                  overall_mood=overall_mood,
+                  max_mood=max_mood,
+                  min_mood=min_mood,
+                  notes=notes)
+        db.session.add(day)
+
     db.session.commit()
     # day_datapoint = {'date': datetime.strftime(day.date, '%Y-%m-%d'),
     #                  'overall_mood': day.overall_mood}
@@ -172,8 +180,8 @@ def process_event_mood_log():
 
     # get user inputs
     event_name = request.form.get('event-name')
-    start_date = datetime.strptime(request.form.get('start-date'), '%Y-%m-%d').date()
-    end_date = datetime.strptime(request.form.get('end-date'), '%Y-%m-%d').date()
+    event_date = datetime.strptime(request.form.get('today-event-date'), '%Y-%m-%d').date()
+    # end_date = datetime.strptime(request.form.get('end-date'), '%Y-%m-%d').date()
     user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
 
     # create event
@@ -186,7 +194,10 @@ def process_event_mood_log():
     db.session.add(event)
     db.session.commit()
 
-    event.associate_days(start_date, end_date)
+    # event.associate_days(start_date, end_date)
+    if not event_date in [day.date for day in event.user.days]:
+        event.create_dummy_day(event_date)
+        flash('Event %s on today (%s) successfully created' % (event_name, event_date))
 
     return redirect('/user_profile')
 
@@ -322,18 +333,19 @@ def day_mood_chart_data():
     datasets = []
     # create a dataset for each day's range
     for day in user.days:
-        # format date into a moment.js format so chart.js can plot on a time scale
-        date = datetime.strftime(day.date, '%Y-%m-%d')
-        # initialize a dataset with that day's overall mood
-        dataset = [{'x': date, 'y': day.overall_mood}]
-        # if there is a mood range assocaited as well
-        if day.min_mood or day.max_mood:
-            # extend the day's mood dataset with the range values
-            dataset.extend([{'x': date, 'y': day.min_mood},
-                            {'x': date, 'y': day.max_mood}])
-        # append the day dataset to the master list of datasets
-        datasets.append({'label': 'day %s' % date,
-                         'data': dataset})
+        if day.overall_mood:
+            # format date into a moment.js format so chart.js can plot on a time scale
+            date = datetime.strftime(day.date, '%Y-%m-%d')
+            # initialize a dataset with that day's overall mood
+            dataset = [{'x': date, 'y': day.overall_mood}]
+            # if there is a mood range assocaited as well
+            if day.min_mood or day.max_mood:
+                # extend the day's mood dataset with the range values
+                dataset.extend([{'x': date, 'y': day.min_mood},
+                                {'x': date, 'y': day.max_mood}])
+            # append the day dataset to the master list of datasets
+            datasets.append({'label': 'day %s' % date,
+                             'data': dataset})
 
     for event in user.events:
         event_datasets = {'overall': []}

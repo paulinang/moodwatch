@@ -113,7 +113,7 @@ class Day(db.Model):
     day_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    overall_mood = db.Column(db.Integer, nullable=False)
+    overall_mood = db.Column(db.Integer, nullable=True)
     max_mood = db.Column(db.Integer, nullable=True)
     min_mood = db.Column(db.Integer, nullable=True)
     notes = db.Column(db.Text, nullable=True)
@@ -173,6 +173,14 @@ class Event(db.Model):
                 db.session.add(event_day)
                 db.session.commit()
 
+    def create_dummy_day(self, event_date):
+        """Creates dummy day log for an event with a date that hasn't been logged by user"""
+
+        day = Day(user_id=self.user.user_id,
+                  date=event_date)
+        db.session.add(day)
+        db.session.commit()
+
 
 class EventDay(db.Model):
     """Association table between days and events"""
@@ -218,5 +226,5 @@ if __name__ == "__main__":
     # you in a state of being able to work with the database directly.
 
     from server import app
-    connect_to_db(app)
+    connect_to_db(app, 'projectdb')
     print "Connected to DB."
