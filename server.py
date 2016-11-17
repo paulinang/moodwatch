@@ -9,17 +9,8 @@ from model import connect_to_db, db, User, Drug, Prescription, Day, Event, Event
 
 import json
 import requests
-from flask_mail import Mail, Message
 
 app = Flask(__name__)
-app.config.update(dict(
-    MAIL_SERVER='smtp.gmail.com',
-    MAIL_PORT=587,
-    MAIL_USE_TLS=True,
-    MAIL_USERNAME='paulinahbproject@gmail.com',
-    MAIL_PASSWORD='heimdall9402'))
-
-mail = Mail(app)
 
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
