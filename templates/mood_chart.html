@@ -35,6 +35,11 @@
             $('.mood-chart').html('You Have Not Logged Any Days!')
         {% endif %}
 
+        $('#chart-time-window').on('change', function () {
+            var timeWindow = this.value;
+            changeTimeWindow(timeWindow,minDate);
+        });
+
     </script>
     <br>
 

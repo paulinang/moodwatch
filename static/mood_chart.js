@@ -45,6 +45,42 @@ function createMoodChart(minDate, maxDate, options) {
         });
 }
 
+// Changes time window according to user selection in dropdown menu
+function changeTimeWindow(timeWindow, minDate) {
+    if (timeWindow == 'monthly') {
+        // enable time nav button
+        $('.move-time-button').attr('disabled', false);
+        // change xAxes min and max to end and start of current month
+        moodChart.options.scales.xAxes[0].time.min = moment().startOf('month');
+        moodChart.options.scales.xAxes[0].time.max = moment().endOf('month');
+        moodChart.update();
+    }
+    else if (timeWindow == 'all-time') {
+        // disable time nav button
+        $('.move-time-button').attr('disabled', true);
+        // change xAxes min/max to earliest log/ current day
+        moodChart.options.scales.xAxes[0].time.min = minDate;
+        moodChart.options.scales.xAxes[0].time.max = moment().format('YYYY-MM-DD');
+        moodChart.update();
+    }
+}
+// $('#chart-time-window').on('change', function () {
+//     var timeWindow = ($(this).val());
+//     if (timeWindow == 'monthly') {
+//         $('.move-time-button').attr('disabled', false);
+//         moodChart.options.scales.xAxes[0].time.min = moment().startOf('month');
+//         moodChart.options.scales.xAxes[0].time.max = moment().endOf('month');
+//         moodChart.update();
+//     }
+//     else {
+//         $('.move-time-button').attr('disabled', true);
+//         moodChart.options.scales.xAxes[0].time.min = '{{ earliest }}';
+//         moodChart.options.scales.xAxes[0].time.max = '{{ latest }}';
+//         moodChart.update();
+//     }
+// });
+
+
 // $('#toggle-events').on('click', function () {
 //     var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
 //     console.log(events);
@@ -60,21 +96,6 @@ function createMoodChart(minDate, maxDate, options) {
 
 // });
 
-        // $('#chart-time-window').on('change', function () {
-        //     var timeWindow = ($(this).val());
-        //     if (timeWindow == 'monthly') {
-        //         $('.move-time-button').attr('disabled', false);
-        //         moodChart.options.scales.xAxes[0].time.min = moment().startOf('month');
-        //         moodChart.options.scales.xAxes[0].time.max = moment().endOf('month');
-        //         moodChart.update();
-        //     }
-        //     else {
-        //         $('.move-time-button').attr('disabled', true);
-        //         moodChart.options.scales.xAxes[0].time.min = '{{ earliest }}';
-        //         moodChart.options.scales.xAxes[0].time.max = '{{ latest }}';
-        //         moodChart.update();
-        //     }
-        // });
 
         // $('.move-time-button').on('click', function () {
         //     var timeWindow = ($('#chart-time-window').val());
