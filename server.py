@@ -104,14 +104,28 @@ def show_user_profile():
     if user_id:
         # Retrieve user object and pass it into profile template
         user = db.session.query(User).get(user_id)
+        # today = datetime.today().date()
 
+        # Is most recent logged day of user today
+        if user.days:
+            latest_day_date = user.days[0].date
+            latest_day_overall = user.days[0].overall_mood
+        else:
+            latest_day_date = None
+            latest_day_overall = None
+
+        # today_logged = (latest_day.date == today) and (not latest_day.date is None)
+
+    # 'logged_days': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days]
         return render_template('user_profile.html',
                                user_info={'user': user,
                                           'prescriptions': user.group_prescriptions_by_drug(),
                                           'day_log_range': user.get_day_log_range(),
-                                          'logged_days': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days]
+                                          'latest_day_date': latest_day_date,
+                                          'latest_day_overall': latest_day_overall
                                           }
                                )
+    else:
 
         flash('You are not logged in.')
         return redirect('/')
@@ -151,7 +165,7 @@ def process_day_mood_log():
     date = datetime.strptime(request.form.get('today-date'), '%Y-%m-%d').date()
     user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
 
-    day = Day.query.filter_by(user_id=1, date=date).first()
+    day = Day.query.filter_by(user_id=user_id, date=date).first()
 
     if day:
         day.overall_mood = overall_mood
