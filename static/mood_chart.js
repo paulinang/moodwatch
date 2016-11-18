@@ -59,3 +59,50 @@ function createMoodChart(minDate, maxDate, options) {
 //     moodChart.update();
 
 // });
+
+        // $('#chart-time-window').on('change', function () {
+        //     var timeWindow = ($(this).val());
+        //     if (timeWindow == 'monthly') {
+        //         $('.move-time-button').attr('disabled', false);
+        //         moodChart.options.scales.xAxes[0].time.min = moment().startOf('month');
+        //         moodChart.options.scales.xAxes[0].time.max = moment().endOf('month');
+        //         moodChart.update();
+        //     }
+        //     else {
+        //         $('.move-time-button').attr('disabled', true);
+        //         moodChart.options.scales.xAxes[0].time.min = '{{ earliest }}';
+        //         moodChart.options.scales.xAxes[0].time.max = '{{ latest }}';
+        //         moodChart.update();
+        //     }
+        // });
+
+        // $('.move-time-button').on('click', function () {
+        //     var timeWindow = ($('#chart-time-window').val());
+        //     if (this.value == 'backward') {
+        //         moodChart.options.scales.xAxes[0].time.min.subtract(1, 'month');
+        //         moodChart.options.scales.xAxes[0].time.max.subtract(1, 'month');
+        //         moodChart.update();
+        //     }
+        //     else if ((this.value == 'forward') && (moodChart.options.scales.xAxes[0].time.max < moment().endOf('month'))) {
+        //         moodChart.options.scales.xAxes[0].time.min.add(1, 'month');
+        //         moodChart.options.scales.xAxes[0].time.max.add(1, 'month');
+        //         moodChart.update();
+        //     }
+        // });
+
+
+
+        // $('#toggle-events').on('click', function () {
+        //     var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
+        //     console.log(events);
+        //     for (i=0; i<events.length; i++) {
+        //         if (events[i].borderColor != 'rgba(255,153,0,0.4)') {
+        //             events[i].borderColor = 'rgba(255,153,0,0.4)';
+        //         }
+        //         else {
+        //             events[i].borderColor = 'rgba(0,0,0,0)';
+        //         }
+        //     }
+        //     moodChart.update();
+
+        // });

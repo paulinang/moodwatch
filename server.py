@@ -198,12 +198,14 @@ def process_event_mood_log():
 
 
 @app.route('/user_day_moods')
-def display_day_mmood_chart():
+def display_day_mood_chart():
+    user = User.query.get(session['user_id'])
+    return render_template('mood_chart.html',
+                           user_info={'user': user,
+                                      'day_log_range': user.get_day_log_range(),
+                                      }
+                           )
 
-    # days = User.query.get(session['user_id']).days
-    # latest = datetime.strftime(days[0].date, '%Y-%m-%d')
-    # earliest = datetime.strftime(days[-1].date, '%Y-%m-%d')
-    # return render_template("chart_practice.html", latest=latest, earliest=earliest)
     return render_template('mood_chart.html')
 
 
