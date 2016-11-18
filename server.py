@@ -7,8 +7,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, User, Drug, Prescription, Day, Event, EventDay
 
-import json
-import requests
+# import json
+# import requests
 
 app = Flask(__name__)
 
@@ -131,29 +131,6 @@ def show_user_profile():
         return redirect('/')
 
 
-###########################################################################################
-# DRUG RELATED
-
-@app.route('/drugs')
-def drug_list():
-    """ Show a list of all drugs in database"""
-
-    # Get a list of all drug objects
-    drugs = Drug.query.all()
-
-    return render_template('drugs.html', drugs=drugs)
-
-
-@app.route('/drugs/<drug_id>')
-def show_drug_info(drug_id):
-    """ Show details for a drug"""
-
-    # Get specific drug object
-    drug = Drug.query.get(drug_id)
-
-    return render_template('drug_info.html', drug=drug)
-
-
 ##################################################################################
 # MOOD LOG RELATED -- have to be logged in
 
@@ -214,6 +191,74 @@ def process_event_mood_log():
         flash('Event %s on today (%s) successfully created' % (event_name, event_date))
 
     return redirect('/user_profile')
+
+
+##################################################################################
+# MOOD CHART
+
+
+@app.route('/user_day_moods')
+def display_day_mmood_chart():
+
+    # days = User.query.get(session['user_id']).days
+    # latest = datetime.strftime(days[0].date, '%Y-%m-%d')
+    # earliest = datetime.strftime(days[-1].date, '%Y-%m-%d')
+    # return render_template("chart_practice.html", latest=latest, earliest=earliest)
+    return render_template('mood_chart.html')
+
+
+@app.route('/mood_chart.json')
+def get_mood_chart_data():
+    """ Return relevant data to display on chart.js """
+
+    user = User.query.get(session['user_id'])
+    min_date = datetime.strptime(request.args.get('minDate'), '%Y-%m-%d').date()
+    max_date = datetime.strptime(request.args.get('maxDate'), '%Y-%m-%d').date()
+
+    # initialize master list of datasets
+    datasets = []
+    # create a dataset for each day's range
+    for day in user.days:
+        # only for days between requested time window that have an overall mood
+        if (day.overall_mood) and (min_date <= day.date) and (day.date <= max_date):
+            # format date into moment.js format to be plottable on chart.js
+            date = datetime.strftime(day.date, '%Y-%m-%d')
+            # initialize dataset with point(date, overall_mood)
+            dataset = [{'x': date, 'y': day.overall_mood}]
+            # if there is a mood range (check by or, in cases min or max is 0)
+            if day.min_mood or day.max_mood:
+                # extend the day's mood dataset with the range values
+                dataset.extend([{'x': date, 'y': day.min_mood},
+                                {'x': date, 'y': day.max_mood}])
+            # append day dataset to the master list of datasets
+            datasets.append({'label': 'Day %s' % date,
+                             'data': dataset})
+
+    return jsonify({'datasets': datasets})
+
+
+###########################################################################################
+# DRUG RELATED
+
+
+@app.route('/drugs')
+def drug_list():
+    """ Show a list of all drugs in database"""
+
+    # Get a list of all drug objects
+    drugs = Drug.query.all()
+
+    return render_template('drugs.html', drugs=drugs)
+
+
+@app.route('/drugs/<drug_id>')
+def show_drug_info(drug_id):
+    """ Show details for a drug"""
+
+    # Get specific drug object
+    drug = Drug.query.get(drug_id)
+
+    return render_template('drug_info.html', drug=drug)
 
 
 ##################################################################################
@@ -303,105 +348,6 @@ def end_prescription():
         return redirect('/user_profile')
 
 
-########### CHART.JS PRACTICE ###################
-@app.route('/user_day_moods')
-def display_day_mmood_chart():
-
-    days = User.query.get(session['user_id']).days
-    latest = datetime.strftime(days[0].date, '%Y-%m-%d')
-    earliest = datetime.strftime(days[-1].date, '%Y-%m-%d')
-    return render_template("chart_practice.html", latest=latest, earliest=earliest)
-
-
-# @app.route('/event_mood.json')
-# def event_mood_data():
-#     """Return graphable event data"""
-#     user = User.query.get(session['user_id'])
-#     datasets = []
-#     for event in user.events:
-#         event_datasets = {'overall': []}
-#         for day in event.days:
-#             date = datetime.strftime(day.date, '%Y-%m-%d')
-#             event_datasets['overall'].append({'x': date, 'y': event.overall_mood})ag
-#             if event.min_mood or event.max_mood:
-#                 event_datasets.setdefault('min', []).append({'x': date, 'y': event.min_mood})
-#                 event_datasets.setdefault('max', []).append({'x': date, 'y': event.max_mood})
-
-#         for mood, dataset in event_datasets.iteritems():
-#             datasets.append({'label': event.event_name + mood,
-#                              'backgroundColor': 'rgba(0,0,0,0)',
-#                              'borderColor': 'rgba(255, 153, 0, 0.4)',
-#                              'pointBackgroundColor': 'rgba(255, 153, 0, 0.4)',
-#                              'data': dataset})
-
-#     return jsonify(datasets)
-
-
-@app.route('/day_mood_chart.json')
-def day_mood_chart_data():
-    """ Return some data to chart"""
-
-    user = User.query.get(session['user_id'])
-
-    # initialize list of datasets
-    datasets = []
-    # create a dataset for each day's range
-    for day in user.days:
-        if day.overall_mood:
-            # format date into a moment.js format so chart.js can plot on a time scale
-            date = datetime.strftime(day.date, '%Y-%m-%d')
-            # initialize a dataset with that day's overall mood
-            dataset = [{'x': date, 'y': day.overall_mood}]
-            # if there is a mood range assocaited as well
-            if day.min_mood or day.max_mood:
-                # extend the day's mood dataset with the range values
-                dataset.extend([{'x': date, 'y': day.min_mood},
-                                {'x': date, 'y': day.max_mood}])
-            # append the day dataset to the master list of datasets
-            datasets.append({'label': 'day %s' % date,
-                             'data': dataset})
-
-    for event in user.events:
-        event_datasets = {'overall': []}
-        for day in event.days:
-            date = datetime.strftime(day.date, '%Y-%m-%d')
-            event_datasets['overall'].append({'x': date, 'y': event.overall_mood})
-            if event.min_mood or event.max_mood:
-                event_datasets.setdefault('min', []).append({'x': date, 'y': event.min_mood})
-                event_datasets.setdefault('max', []).append({'x': date, 'y': event.max_mood})
-
-        for mood, dataset in event_datasets.iteritems():
-            datasets.append({'label': 'event',
-                             'backgroundColor': 'rgba(0,0,0,0)',
-                             'borderColor': 'rgba(0,0,0,0)',
-                             # 'pointBackgroundColor': 'rgba(0,0,0,0)',
-                             'data': dataset})
-
-    return jsonify({'datasets': datasets})
-
-################### OPENFDA API PRACTICE ######################
-
-
-@app.route('/drug_search')
-def show_drug_search_form():
-    """Show drug search form"""
-
-    return render_template('drug_search.html')
-
-
-@app.route('/search_openfda.json', methods=['POST'])
-def search_openfda():
-
-    user_input = request.form.get('drug_keyword')
-    print user_input
-    r = requests.get("https://api.fda.gov/drug/label.json?limit=10&search=brand_name:%s" % user_input)
-
-    drug_results = r.json()['results']
-    # print drug_results
-
-    return jsonify(drug_results)
-
-
 ###################################################################################
 # HELPER FUNCTIONS
 
@@ -425,20 +371,10 @@ def get_mood_rating():
     return [user_id, overall_mood, min_mood, max_mood, notes]
 
 
-def day_mood_data():
-    """ Return some data to chart"""
+# def parse_date(form_input_name):
+#     """Parses date input from web form into datetime object"""
 
-    user = User.query.get(session['user_id'])
-
-    data_dict = {
-        'labels': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days],
-        'datasets': [{
-            'label': 'Overall Mood',
-            'data': [day.overall_mood for day in user.days]
-            }]
-        }
-
-    return data_dict
+#     return datetime.strptime(request.args.get(form_input_name), '%Y-%m-%d').date()
 
 
 if __name__ == "__main__":

@@ -30,7 +30,7 @@
                                             'day': 'MMM DD'
                                         },
                                     min: '{{ user_info.day_log_range[0] }}',
-                                    max: '{{ user_info.day_log_range[1] }}'
+                                    max: moment().format('YYYY-MM-DD')
                                     } 
                                 }],
                                 yAxes: [{
@@ -52,13 +52,15 @@
             var moodChart;
 
             // AJAX request for json to create line chart with
-            $.get('/day_mood_chart.json', function (data) {
-                moodChart = new Chart(ctx, {
-                    type: 'line',
-                    data: data,
-                    options: options
+            $.get('/mood_chart.json',
+                {minDate: '{{ user_info.day_log_range[0] }}',
+                 maxDate: moment().format('YYYY-MM-DD')}, function (data) {
+                    moodChart = new Chart(ctx, {
+                        type: 'line',
+                        data: data,
+                        options: options
+                    });
                 });
-            });
 
             $('#toggle-events').on('click', function () {
                 var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
