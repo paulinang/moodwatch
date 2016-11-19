@@ -226,15 +226,27 @@ def get_mood_chart_data():
             # format date into moment.js format to be plottable on chart.js
             date = datetime.strftime(day.date, '%Y-%m-%d')
             # initialize dataset with point(date, overall_mood)
-            dataset = [{'x': date, 'y': day.overall_mood}]
+            day_dataset = [{'x': date, 'y': day.overall_mood}]
             # if there is a mood range (check by or, in cases min or max is 0)
             if day.min_mood or day.max_mood:
                 # extend the day's mood dataset with the range values
-                dataset.extend([{'x': date, 'y': day.min_mood},
-                                {'x': date, 'y': day.max_mood}])
+                day_dataset.extend([{'x': date, 'y': day.min_mood},
+                                    {'x': date, 'y': day.max_mood}])
             # append day dataset to the master list of datasets
             datasets.append({'label': 'Day %s' % date,
-                             'data': dataset})
+                             'data': day_dataset})
+
+            # also append events for logged (no dummy) days
+            for event in day.events:
+                if event.overall_mood:
+                    event_dataset = [{'x': date, 'y': event.overall_mood}]
+                    if event.min_mood or event.max_mood:
+                        event_dataset.extend([{'x': date, 'y': event.min_mood},
+                                              {'x': date, 'y': event.max_mood}])
+                    datasets.append({'label': 'event',
+                                     'backgroundColor': 'rgba(255,153,0,0.4)',
+                                     'borderColor': 'rgba(255,153,0,0.4)',
+                                     'data': event_dataset})
 
     return jsonify({'datasets': datasets})
 

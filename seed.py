@@ -70,21 +70,27 @@ def load_days():
     db.session.commit()
 
 
-# def load_events():
-#     """ Add event to events table"""
+def load_events():
+    """ Add event to events table"""
 
-#     print "Events"
+    print "Events"
 
-#     Event.query.delete()
+    Event.query.delete()
 
-#     event = Event(user_id=1,
-#                   event_name='event1',
-#                   overall_mood=4,
-#                   min_mood=2,
-#                   max_mood=7)
-#     db.session.add(event)
-#     db.session.commit()
-
+    user = User.query.get(1)
+    nums = [1, -1, -2, 2]
+    for x, i in enumerate(range(0, len(user.days), 3)):
+        day = user.days[i]
+        event = Event(user_id=1,
+                      event_name='event %s' % x,
+                      overall_mood=(day.overall_mood + choice(nums)),
+                      min_mood=(day.min_mood - 2),
+                      max_mood=(day.max_mood + 2))
+        db.session.add(event)
+        db.session.commit()
+        event_day = EventDay(event_id=event.event_id, day_id=day.day_id)
+        db.session.add(event_day)
+        db.session.commit()
 #     start_date = datetime.strptime('2016-10-05', '%Y-%m-%d').date()
 #     end_date = datetime.strptime('2016-10-20', '%Y-%m-%d').date()
 #     event.associate_days(start_date, end_date)
@@ -100,4 +106,4 @@ if __name__ == "__main__":
     load_drugs()
     load_users()
     load_days()
-    # load_events()
+    load_events()
