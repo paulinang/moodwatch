@@ -114,9 +114,6 @@ def show_user_profile():
             latest_day_date = None
             latest_day_overall = None
 
-        # today_logged = (latest_day.date == today) and (not latest_day.date is None)
-
-    # 'logged_days': [datetime.strftime(day.date, '%Y-%m-%d') for day in user.days]
         return render_template('user_profile.html',
                                user_info={'user': user,
                                           'prescriptions': user.group_prescriptions_by_drug(),
@@ -193,6 +190,13 @@ def process_event_mood_log():
     return redirect('/user_profile')
 
 
+@app.route('/search_log_results.json')
+def get_logs_for_time():
+    start_date = datetime.strptime(request.args.get('startDate'), '%Y-%m-%d').date()
+    day = Day.query.filter_by(user_id=session['user_id'], date=start_date).first()
+    return jsonify(day.get_info_dict())
+
+
 ##################################################################################
 # MOOD CHART
 
@@ -202,11 +206,8 @@ def display_day_mood_chart():
     user = User.query.get(session['user_id'])
     return render_template('mood_chart.html',
                            user_info={'user': user,
-                                      'day_log_range': user.get_day_log_range(),
-                                      }
+                                      'day_log_range': user.get_day_log_range()}
                            )
-
-    return render_template('mood_chart.html')
 
 
 @app.route('/mood_chart.json')

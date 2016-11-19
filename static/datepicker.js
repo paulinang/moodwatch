@@ -1,23 +1,3 @@
-function createDatepicker(datepickerId) {
-    $(datepickerId).datepicker({            
-        minDate: '-1M',
-        maxDate: new Date(),
-        dateFormat: 'yy-mm-dd',
-        // beforeShowDay takes a date from the calendar and returns an array
-        // returns [t/f slectable, css class name to add '' if none, optional popup tooltip]
-    });
-}
-
-function excludeLoggedDays(datepickerId, excludeDates) {
-    $(datepickerId).datepicker('option', 'beforeShowDay', function(date) {
-            // turn date from datepicker into a str
-            var dateStr = $.datepicker.formatDate('yy-mm-dd', date);
-            // return whether dateStr is in excludeDates
-            // array.indexOf(item) returns -1 if item not in array
-            return [excludeDates.indexOf(dateStr) == -1]
-    });
-}
-
 function validateMoodRange(evt){
     var overallMood = $(this).find('.overall-mood').val()
     var minMood = $(this).find('.min-mood').val()

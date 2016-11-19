@@ -38,17 +38,6 @@ class User(db.Model):
 
         return prescription_dict
 
-    def has_active_prescription(self, drug):
-        """Checks if there is an active prescription for that drug"""
-
-        # If there exists a prescription for the user, with that drug and no end date
-        if db.session.query(Prescription).filter(Prescription.user_id == self.user_id,
-                                                 Prescription.drug_id == drug.drug_id,
-                                                 Prescription.end_date.is_(None)).first():
-            return True
-
-        return False
-
     def get_day_log_range(self):
         """Gets dates of earliest and latest logged days as strings"""
         if self.days:
@@ -56,6 +45,17 @@ class User(db.Model):
             earliest = datetime.strftime(self.days[-1].date, '%Y-%m-%d')
 
             return [earliest, latest]
+
+    # def get_logs_for_search(self):
+    #     """Gets all logs by user to be used in autocomplete search form"""
+    #     log_data = []
+    #     for day in self.days:
+    #         if day.overall_mood:
+    #             log_data.append({'label': "%s" % day.date, 'category': "Day"})
+    #     for event in self.events:
+    #         log_data.append({'label': "%s %s" % (event.days[0].date, event.event_name), 'category': "Event"})
+
+    #     return log_data
 
 
 class Prescription(db.Model):
@@ -125,6 +125,15 @@ class Day(db.Model):
 
         return "<Day user_id =%s date=%s>" % (self.user_id, self.date)
 
+    def get_info_dict(self):
+        info = {'date': datetime.strftime(self.date, '%Y-%m-%d'),
+                'overall_mood': self.overall_mood,
+                'max_mood': self.max_mood,
+                'min_mood': self.min_mood,
+                'notes': self.notes,
+                'events': [(event.event_id, event.event_name, event.notes) for event in self.events]}
+        return info
+
 db.Index('user_date', Day.user_id, Day.date, unique=True)
 
 
@@ -150,7 +159,7 @@ class Event(db.Model):
     def __repr__(self):
         """Gives name and user of record"""
 
-        return "<Day user_id =%s event=%s>" % (self.user_id, self.event_name)
+        return "<Event user_id =%s event=%s>" % (self.user_id, self.event_name)
 
     def get_duration(self):
         """Get start and end date of event"""

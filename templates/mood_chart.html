@@ -8,6 +8,7 @@
     <button type='button' class='move-time-button' value='backward' disabled>&lt;</button>
     <select id='chart-time-window' name='time-window'>
         <option value='all-time'>All time</option>
+        <!-- <option value='week'>Weekly</option> -->
         <option value='month'>Monthly</option>
         <option value='quarter'>Quarterly</option>
         <option value='bi-annual'>Bi-Annually</option>
@@ -39,8 +40,76 @@
             var timeWindow = this.value;
             changeTimeWindow(timeWindow);
         });
+        var activePoints;
+        $('#moodChart').on('click', function(evt) {
+            alert('click');
+            activePoints = moodChart.getElementsAtEvent(evt);
+            console.log(activePoints);
+        });
 
     </script>
     <br>
 
+    <!-- Log Details: Search and view details on same page -->
+    <div class='log-search'>
+        <!-- <h3>Choose a time period to look at</h3> -->
+        <label for='start-date'>Day:</label>
+        <input id='start-date' type='text' name='start-date' readonly="true" required>
+        <button type='button' id='clear-search'>Clear Search Results</button>
+<!--         <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <label for='end-date'>End:</label>
+        <input id='end-date' type='text' name='end-date' readonly="true" required><br>
+ -->
+        <script src='static/datepicker.js'></script>
+        <script>
+            // When DOM is ready, turn date input to datepicker
+            $( function() {                 
+                $( "#start-date" ).datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    maxDate: new Date(),
+                    dateFormat: 'yy-mm-dd'
+                });
+
+                // $( "#end-date" ).datepicker({
+                //     changeMonth: true,
+                //     changeYear: true,
+                //     maxDate: new Date(),
+                //     dateFormat: 'yy-mm-dd'
+                // });
+            } );
+
+            $('#start-date').on('change', function(evt) {
+                startDate = this.value;
+                $('.main-log').empty();
+                $('.associated-logs').empty();
+                // endDate =
+                $.get('/search_log_results.json',
+                    {startDate: startDate},
+                    function(data) {
+                        $('.main-log').html('<h3>Day: ' + data.date + '</h3><ul></ul>');
+                        $('.main-log ul').append('<li>Overall Mood:' + data.overall_mood + '</li>');
+                        $('.main-log ul').append('<li>Mood Range: ' + data.min_mood + ' to ' + data.max_mood + '</li>');
+                        $('.main-log ul').append('<li>Notes: ' + data.notes + '</li>');
+                        // debugger;
+                        for (i = 0; i < data.events.length; i++){
+                            var assocEvent = data.events[i]
+                            $('.associated-logs').append('<h4>' + assocEvent[1] + '</h4><ul id=\'assocEvent-' + assocEvent[0] + '\'><li>' + event.notes + '</li></ul>');
+                        }
+                    });
+            });
+            $('#clear-search').on('click', function(evt) {
+                $('.main-log').empty();
+                $('.associated-logs').empty();
+            });
+        </script>
+    </div>
+    <div class='log-details'>
+        <div class='main-log'>
+<!--             <h3>Day: </h3>
+            <ul>
+                <li class='overall-mood'>Overall Mood: </li> -->
+        </div>
+        <div class='associated-logs'></div>
+    </div>
 {% endblock %}
