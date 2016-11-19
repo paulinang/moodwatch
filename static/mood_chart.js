@@ -32,7 +32,8 @@ function initializeOptions(minDate, maxDate) {
 }
 
 // AJAX request for json to create line chart with
-function createMoodChart(minDate, maxDate, options) {
+function createMoodChart(minDate, maxDate) {
+    var options = initializeOptions(minDate, maxDate);
     $.get('/mood_chart.json',
         {minDate: minDate,
          maxDate: maxDate},
@@ -47,29 +48,23 @@ function createMoodChart(minDate, maxDate, options) {
 
 // Changes time window according to user selection in dropdown menu
 function changeTimeWindow(timeWindow) {
+    moodChart.destroy();
     if (timeWindow == 'monthly') {
         // enable time nav button
         // debugger;
         $('.move-time-button').attr('disabled', false);
-        $.get('/mood_chart.json',
-            {minDate: moment().startOf('month').format('YYYY-MM-DD'),
-             maxDate: moment().endOf('month').format('YYYY-MM-DD')},
-             function (data) {
-                debugger;
-                moodChart.data = data;
-                moodChart.options.scales.xAxes[0].time.min = moment().startOf('month').format('YYYY-MM-DD');
-                moodChart.options.scales.xAxes[0].time.max = moment().endOf('month').format('YYYY-MM-DD');
-                moodChart.update();
-             })        
+        var minDate = moment().startOf('month').format('YYYY-MM-DD');
+        var maxDate = moment().endOf('month').format('YYYY-MM-DD');      
     }
-    // else if (timeWindow == 'all-time') {
-    //     // disable time nav button
-    //     $('.move-time-button').attr('disabled', true);
-    //     // change xAxes min/max to earliest log/ current day
-    //     moodChart.options.scales.xAxes[0].time.min = minDate;
-    //     moodChart.options.scales.xAxes[0].time.max = moment().format('YYYY-MM-DD');
-    //     moodChart.update();
-    // }
+    else if (timeWindow == 'all-time') {
+        // debugger;
+        // disable time nav button
+        $('.move-time-button').attr('disabled', true);
+        // change xAxes min/max to earliest log/ current day
+        var minDate = firstLog;
+        var maxDate = moment().format('YYYY-MM-DD');
+    }
+    createMoodChart(minDate, maxDate);
 }
 
 // Moves chart in time based on user clicking back/forth buttons

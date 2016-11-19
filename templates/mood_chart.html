@@ -21,16 +21,16 @@
     <script src='static/mood_chart.js'></script>
     <script>
         {% if user_info.user.days %}
-            var minDate = '{{ user_info.day_log_range[0] }}';
+            var firstLog = '{{ user_info.day_log_range[0] }}';
             var maxDate = moment().format('YYYY-MM-DD');
             // Set options for chart.js mood chart 
-            var options = initializeOptions(minDate, maxDate);
+            // var options = initializeOptions(minDate, maxDate);
             // Select canvas for mood chart
             var ctx = $('#moodChart').get(0).getContext('2d');
             // Declare moodChart var outside AJAX request, so can access it outside later
             var moodChart;
 
-            createMoodChart(minDate, maxDate, options);
+            createMoodChart(firstLog, maxDate);
         {% else %}
             $('.mood-chart').html('You Have Not Logged Any Days!')
         {% endif %}
