@@ -47,22 +47,35 @@ function createMoodChart(minDate, maxDate) {
 }
 
 // Changes time window according to user selection in dropdown menu
+var timeWindows = {'month': 1,
+                   'quarter': 3,
+                   'bi-annual': 6,
+                   'year': 12};
+
+
 function changeTimeWindow(timeWindow) {
     moodChart.destroy();
-    if (timeWindow == 'monthly') {
-        // enable time nav button
-        // debugger;
-        $('.move-time-button').attr('disabled', false);
-        var minDate = moment().startOf('month').format('YYYY-MM-DD');
-        var maxDate = moment().endOf('month').format('YYYY-MM-DD');      
+    $('.move-time-button').attr('disabled', false);
+    if (timeWindow == 'bi-annual') {
+        if (moment().month() < 6) {
+            var minDate = moment().startOf('year').format('YYYY-MM-DD');
+            var maxDate = moment().set({'month': 5, 'date': 30}).format('YYYY-MM-DD');
+        }
+        else {
+            var minDate = moment().set({'month': 6, 'date': 1}).format('YYYY-MM-DD');
+            var maxDate = moment().endOf('year').format('YYYY-MM-DD');
+        }
     }
     else if (timeWindow == 'all-time') {
-        // debugger;
         // disable time nav button
         $('.move-time-button').attr('disabled', true);
         // change xAxes min/max to earliest log/ current day
         var minDate = firstLog;
         var maxDate = moment().format('YYYY-MM-DD');
+    }
+    else {
+        var minDate = moment().startOf(timeWindow).format('YYYY-MM-DD');
+        var maxDate = moment().endOf(timeWindow).format('YYYY-MM-DD');
     }
     createMoodChart(minDate, maxDate);
 }
@@ -70,15 +83,34 @@ function changeTimeWindow(timeWindow) {
 // Moves chart in time based on user clicking back/forth buttons
 $('.move-time-button').on('click', function () {
             var timeWindow = ($('#chart-time-window').val());
-            if (this.value == 'backward') {
-                moodChart.options.scales.xAxes[0].time.min.subtract(1, 'month');
-                moodChart.options.scales.xAxes[0].time.max.subtract(1, 'month');
-                moodChart.update();
+            var currentMinDate = moment(moodChart.options.scales.xAxes[0].time.min);
+            var currentMaxDate = moment(moodChart.options.scales.xAxes[0].time.max);
+            // to compare absolute max date with currentMax Date
+            // must specify startOf('day') as endOf(period) also sets it to end of day
+            var absMaxDate = moment().endOf(timeWindow).startOf('day');
+
+            // moment.js does not recognize 'bi-annual' like 'quarter' or 'year'
+            // have to set my own 'endOf' 'bi-annual' for 1st and 2nd half of year
+            if (timeWindow == 'bi-annual'){
+                absMaxDate = moment().endOf('year').startOf('day');
+                if (moment().month() < 6){
+                    absMaxDate = moment().set({'month': 5, 'date': 30});
+                }
             }
-            else if ((this.value == 'forward') && (moodChart.options.scales.xAxes[0].time.max < moment().endOf('month'))) {
-                moodChart.options.scales.xAxes[0].time.min.add(1, 'month');
-                moodChart.options.scales.xAxes[0].time.max.add(1, 'month');
-                moodChart.update();
+
+            if ((this.value == 'forward') && (currentMaxDate.isBefore(absMaxDate))) {
+                // debugger;
+                var newMinDate = currentMinDate.add(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
+                var newMaxDate = currentMaxDate.add(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
+                moodChart.destroy();
+                createMoodChart(newMinDate, newMaxDate);                
+            }
+
+            if ((this.value == 'backward') && (currentMaxDate.isSameOrBefore(absMaxDate))) {
+                var newMinDate = currentMinDate.subtract(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
+                var newMaxDate = currentMaxDate.subtract(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
+                moodChart.destroy();
+                createMoodChart(newMinDate, newMaxDate);               
             }
         });
 
