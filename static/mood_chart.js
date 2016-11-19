@@ -31,6 +31,7 @@ function initializeOptions(minDate, maxDate) {
     return options
 }
 
+
 // AJAX request for json to create line chart with
 function createMoodChart(minDate, maxDate) {
     var options = initializeOptions(minDate, maxDate);
@@ -46,13 +47,8 @@ function createMoodChart(minDate, maxDate) {
         });
 }
 
+
 // Changes time window according to user selection in dropdown menu
-var timeWindows = {'month': 1,
-                   'quarter': 3,
-                   'bi-annual': 6,
-                   'year': 12};
-
-
 function changeTimeWindow(timeWindow) {
     moodChart.destroy();
     $('.move-time-button').attr('disabled', false);
@@ -80,7 +76,14 @@ function changeTimeWindow(timeWindow) {
     createMoodChart(minDate, maxDate);
 }
 
+
 // Moves chart in time based on user clicking back/forth buttons
+// make object relating time periods to number of months for add/subtraction
+var timeWindows = {'month': 1,
+                   'quarter': 3,
+                   'bi-annual': 6,
+                   'year': 12};
+
 $('.move-time-button').on('click', function () {
             var timeWindow = ($('#chart-time-window').val());
             var currentMinDate = moment(moodChart.options.scales.xAxes[0].time.min);
@@ -99,7 +102,6 @@ $('.move-time-button').on('click', function () {
             }
 
             if ((this.value == 'forward') && (currentMaxDate.isBefore(absMaxDate))) {
-                // debugger;
                 var newMinDate = currentMinDate.add(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
                 var newMaxDate = currentMaxDate.add(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
                 moodChart.destroy();
@@ -114,37 +116,18 @@ $('.move-time-button').on('click', function () {
             }
         });
 
-// $('#toggle-events').on('click', function () {
-//     var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
-//     console.log(events);
-//     for (i=0; i<events.length; i++) {
-//         if (events[i].borderColor != 'rgba(255,153,0,0.4)') {
-//             events[i].borderColor = 'rgba(255,153,0,0.4)';
-//         }
-//         else {
-//             events[i].borderColor = 'rgba(0,0,0,0)';
-//         }
-//     }
-//     moodChart.update();
-
-// });
 
 
-        
-
-
-
-        // $('#toggle-events').on('click', function () {
-        //     var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
-        //     console.log(events);
-        //     for (i=0; i<events.length; i++) {
-        //         if (events[i].borderColor != 'rgba(255,153,0,0.4)') {
-        //             events[i].borderColor = 'rgba(255,153,0,0.4)';
-        //         }
-        //         else {
-        //             events[i].borderColor = 'rgba(0,0,0,0)';
-        //         }
-        //     }
-        //     moodChart.update();
-
-        // });
+// toggle visibility of events on click of button
+$('#toggle-events').on('click', function () {
+    var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
+    for (i=0; i<events.length; i++) {
+        if (events[i].borderColor != 'rgba(255,153,0,0.4)') {
+            events[i].borderColor = 'rgba(255,153,0,0.4)';
+        }
+        else {
+            events[i].borderColor = 'rgba(0,0,0,0)';
+        }
+    }
+    moodChart.update();
+});

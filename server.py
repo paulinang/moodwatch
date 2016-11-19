@@ -244,8 +244,8 @@ def get_mood_chart_data():
                         event_dataset.extend([{'x': date, 'y': event.min_mood},
                                               {'x': date, 'y': event.max_mood}])
                     datasets.append({'label': 'event',
-                                     'backgroundColor': 'rgba(255,153,0,0.4)',
-                                     'borderColor': 'rgba(255,153,0,0.4)',
+                                     'backgroundColor': 'rgba(0,0,0,0)',
+                                     'borderColor': 'rgba(0,0,0,0)',
                                      'data': event_dataset})
 
     return jsonify({'datasets': datasets})
