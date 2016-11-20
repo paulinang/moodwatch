@@ -7,6 +7,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, User, Drug, Prescription, Day, Event, EventDay
 
+from bcrypt import hashpw, gensalt
+
 # import json
 # import requests
 
@@ -38,6 +40,7 @@ def process_registration():
 
     username = request.form.get('new-username')
     password = request.form.get('new-password')
+    hashed = hashpw(str(password), gensalt())
     email = request.form.get('email')
 
     # if there doesn't exist a record in the database with that email or username
@@ -46,7 +49,7 @@ def process_registration():
     elif db.session.query(User).filter(User.username == username).first():
         flash('That username has already been taken')
     else:
-        user = User(username=username, email=email, password=password)
+        user = User(username=username, email=email, password=hashed)
         db.session.add(user)
         db.session.commit()
         flash('Account successfully created.')
@@ -60,19 +63,11 @@ def process_login():
 
     username = request.form.get('username')
     password = request.form.get('password')
+    user = User.query.filter_by(username=username).first()
 
-    # Get user object for that username and password (none if non-existent)
-    user = db.session.query(User).filter(User.username == username,
-                                         User.password == password).first()
-
-    # If user exists:
-    # store id in sesion to keep them logged in
-    # send to user profile
-    if user:
+    if (user) and (hashpw(str(password), str(user.password)) == user.password):
         session['user_id'] = user.user_id
         return redirect('/user_profile')
-    # Else user does not exist:
-    # send back to homepage
     else:
         flash('Username and/or password invalid')
         return redirect('/')

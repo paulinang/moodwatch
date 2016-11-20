@@ -3,6 +3,7 @@ from server import app
 from datetime import datetime, timedelta
 from random import choice
 from math import sin
+from bcrypt import hashpw, gensalt
 
 
 def load_drugs():
@@ -32,11 +33,11 @@ def load_users():
 
     User.query.delete()
 
-    for i in range(1, 5):
-        user = User(username='user%s' % i,
-                    password='password',
-                    email='user%s@email.com' % i)
-        db.session.add(user)
+    user = User(username='loki',
+                password=hashpw('fenrir_hel_jormungand', gensalt()),
+                email='loki@jotunheim.com')
+
+    db.session.add(user)
 
     db.session.commit()
 
