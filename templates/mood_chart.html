@@ -29,11 +29,9 @@
             var moodChart;
             var ctx = $('#moodChart').get(0).getContext('2d');
 
-            var firstLog = '{{ user_info.day_log_range[0] }}';
+            var firstLog = '{{ user_info.daylog_info.firstlog_date}}';
             var maxDate = moment().format('YYYY-MM-DD');
             createMoodChart(firstLog, maxDate);
-        {% else %}
-            $('.mood-chart').html('You Have Not Logged Any Days!')
         {% endif %}
 
         $('#chart-time-window').on('change', function () {

@@ -102,15 +102,19 @@ $('.move-time-button').on('click', function () {
             }
 
             if ((this.value == 'forward') && (currentMaxDate.isBefore(absMaxDate))) {
-                var newMinDate = currentMinDate.add(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
-                var newMaxDate = currentMaxDate.add(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
+                console.log(currentMaxDate);
+                console.log(absMaxDate);
+                // when creating new min and max dates, explicitly ask for start and end of month
+                // deals with problem of being able to go forward one time window past abs maxdate
+                var newMinDate = currentMinDate.add(timeWindows[timeWindow], 'month').startOf('month').format('YYYY-MM-DD');
+                var newMaxDate = currentMaxDate.add(timeWindows[timeWindow], 'month').endOf('month').format('YYYY-MM-DD');
                 moodChart.destroy();
                 createMoodChart(newMinDate, newMaxDate);                
             }
 
-            if ((this.value == 'backward') && (currentMaxDate.isSameOrBefore(absMaxDate))) {
-                var newMinDate = currentMinDate.subtract(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
-                var newMaxDate = currentMaxDate.subtract(timeWindows[timeWindow], 'month').format('YYYY-MM-DD');
+            if ((this.value == 'backward') && (currentMaxDate.isSameOrBefore(absMaxDate))) {              
+                var newMinDate = currentMinDate.subtract(timeWindows[timeWindow], 'month').startOf('month').format('YYYY-MM-DD');
+                var newMaxDate = currentMaxDate.subtract(timeWindows[timeWindow], 'month').endOf('month').format('YYYY-MM-DD');
                 moodChart.destroy();
                 createMoodChart(newMinDate, newMaxDate);               
             }
@@ -119,15 +123,15 @@ $('.move-time-button').on('click', function () {
 
 
 // toggle visibility of events on click of button
-$('#toggle-events').on('click', function () {
-    var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
-    for (i=0; i<events.length; i++) {
-        if (events[i].borderColor != 'rgba(255,153,0,0.4)') {
-            events[i].borderColor = 'rgba(255,153,0,0.4)';
-        }
-        else {
-            events[i].borderColor = 'rgba(0,0,0,0)';
-        }
-    }
-    moodChart.update();
-});
+// $('#toggle-events').on('click', function () {
+//     var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
+//     for (i=0; i<events.length; i++) {
+//         if (events[i].borderColor != 'rgba(255,153,0,0.4)') {
+//             events[i].borderColor = 'rgba(255,153,0,0.4)';
+//         }
+//         else {
+//             events[i].borderColor = 'rgba(0,0,0,0)';
+//         }
+//     }
+//     moodChart.update();
+// });

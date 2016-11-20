@@ -46,13 +46,15 @@ class User(db.Model, UserMixin):
 
         return prescription_dict
 
-    def get_day_log_range(self):
-        """Gets dates of earliest and latest logged days as strings"""
+    def get_daylog_info(self):
+        """Returns pertinent info of user day logs"""
+        daylog_info = {'firstlog_date': None, 'lastlog_date': None, 'is_lastlog_valid': None}
         if self.days:
-            latest = datetime.strftime(self.days[0].date, '%Y-%m-%d')
-            earliest = datetime.strftime(self.days[-1].date, '%Y-%m-%d')
+            daylog_info['firstlog_date'] = datetime.strftime(self.days[-1].date, '%Y-%m-%d')
+            daylog_info['lastlog_date'] = datetime.strftime(self.days[0].date, '%Y-%m-%d')
+            daylog_info['is_lastlog_valid'] = self.days[0].overall_mood is not None
 
-            return [earliest, latest]
+        return daylog_info
 
 
 class Professional(db.Model):

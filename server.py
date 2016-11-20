@@ -103,21 +103,13 @@ def show_user_profile():
     # Retrieve user object and pass it into profile template
     user = db.session.query(User).get(user_id)
     # today = datetime.today().date()
-
-    # Is most recent logged day of user today
-    if user.days:
-        latest_day_date = user.days[0].date
-        latest_day_overall = user.days[0].overall_mood
-    else:
-        latest_day_date = None
-        latest_day_overall = None
+    if user.professional:
+        return render_template('pro_dashboard.html', user=user)
 
     return render_template('basic_dashboard.html',
                            user_info={'user': user,
                                       'prescriptions': user.group_prescriptions_by_drug(),
-                                      'day_log_range': user.get_day_log_range(),
-                                      'latest_day_date': latest_day_date,
-                                      'latest_day_overall': latest_day_overall
+                                      'daylog_info': user.get_daylog_info()
                                       }
                            )
 
@@ -207,7 +199,7 @@ def display_day_mood_chart():
     user = User.query.get(session['user_id'])
     return render_template('mood_chart.html',
                            user_info={'user': user,
-                                      'day_log_range': user.get_day_log_range()}
+                                      'daylog_info': user.get_daylog_info()}
                            )
 
 

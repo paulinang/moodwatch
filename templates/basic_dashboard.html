@@ -16,16 +16,14 @@
     <script src='static/mood_chart.js'></script>
     <script>
         {% if user_info.user.days %}
-            var minDate = '{{ user_info.day_log_range[0] }}';
+            var firstLog = '{{ user_info.daylog_info.firstlog_date}}';
             var maxDate = moment().format('YYYY-MM-DD');
-            // Set options for chart.js mood chart 
-            var options = initializeOptions(minDate, maxDate);
             // Select canvas for mood chart
             var ctx = $('#moodChart').get(0).getContext('2d');
             // Declare moodChart var outside AJAX request, so can access it outside later
             var moodChart;
 
-            createMoodChart(minDate, maxDate, options);
+            createMoodChart(firstLog, maxDate);
         {% endif %}
 
     </script>
@@ -133,11 +131,11 @@
     <script>
         // When DOM is ready
         $( function() {
-            if ('{{ user_info.latest_day_date }}' == 'None') {
+            if ('{{ user_info.daylog_info.firstlog_date }}' == 'None') {
                 $('.mood-chart').hide();
             }
-            else if ('{{ user_info.latest_day_date }}' == moment().format('YYYY-MM-DD')
-                && '{{ user_info.latest_day_overall }}' != 'None')
+            else if ('{{ user_info.daylog_info.lastlog_date }}' == moment().format('YYYY-MM-DD')
+                && '{{ user_info.daylog_info.is_lastlog_valid }}' == 'True')
                 $('#today-log-forms').html('<h1>You Have Already Logged Today</h1>')               
 
             $('.mood-form').on('submit', validateMoodRange);
