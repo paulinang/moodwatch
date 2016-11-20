@@ -4,8 +4,9 @@ from datetime import datetime
 
 from flask import Flask, jsonify, render_template, request, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
+import flask_login
 
-from model import connect_to_db, db, User, Drug, Prescription, Day, Event, EventDay
+from model import connect_to_db, db, User, Drug, Prescription, Day, Event
 
 from bcrypt import hashpw, gensalt
 
@@ -17,11 +18,23 @@ app = Flask(__name__)
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
 
-# Normally, if you use an undefined variable in Jinja2, it fails
-# silently. This is horrible. Fix this so that, instead, it raises an
-# error.
+# Deals with undefined variables passed to jinja
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
+
+##########################################
+###########   LOGIN MANAGER   ############
+##########################################
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = '/'
+
+
+@login_manager.user_loader
+def user_loader(user_id):
+    """ User loader callback to load user object from id stored in session """
+    return User.query.get(user_id)
 
 
 @app.route('/')
@@ -66,7 +79,7 @@ def process_login():
     user = User.query.filter_by(username=username).first()
 
     if (user) and (hashpw(str(password), str(user.password)) == user.password):
-        session['user_id'] = user.user_id
+        flask_login.login_user(user)
         return redirect('/user_profile')
     else:
         flash('Username and/or password invalid')
@@ -77,15 +90,7 @@ def process_login():
 def logout():
     """Logout of account"""
 
-    # Logout route should only be available if user is logged in
-    # Checking user_id exists in session to be safe
-    if session.get('user_id'):
-        # Remove user_id
-        session.pop('user_id')
-        flash('Logged out successfully')
-    else:
-        flash('You are not logged in.')
-
+    flask_login.logout_user()
     return redirect('/')
 
 

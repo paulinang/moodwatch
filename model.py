@@ -3,6 +3,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_login import UserMixin
 
 # This is the connection to the PostgreSQL database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
@@ -14,7 +15,7 @@ db = SQLAlchemy()
 ##############################################################################
 # Model definitions
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     """User accounts"""
 
     __tablename__ = "users"
@@ -28,6 +29,11 @@ class User(db.Model):
         """Gives username and email of record"""
 
         return "<User user_id=%s username=%s email=%s>" % (self.user_id, self.username, self.email)
+
+    def get_id(self):
+        """Overwrite UserMixin method to get user_id instead of id"""
+
+        return self.user_id
 
     def group_prescriptions_by_drug(self):
         """Returns a dictionary {'drug_name': [list of prescription objects]}"""
@@ -45,17 +51,6 @@ class User(db.Model):
             earliest = datetime.strftime(self.days[-1].date, '%Y-%m-%d')
 
             return [earliest, latest]
-
-    # def get_logs_for_search(self):
-    #     """Gets all logs by user to be used in autocomplete search form"""
-    #     log_data = []
-    #     for day in self.days:
-    #         if day.overall_mood:
-    #             log_data.append({'label': "%s" % day.date, 'category': "Day"})
-    #     for event in self.events:
-    #         log_data.append({'label': "%s %s" % (event.days[0].date, event.event_name), 'category': "Event"})
-
-    #     return log_data
 
 
 class Prescription(db.Model):

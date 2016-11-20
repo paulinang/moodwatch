@@ -33,11 +33,16 @@ def load_users():
 
     User.query.delete()
 
-    user = User(username='loki',
+    loki = User(username='loki',
                 password=hashpw('fenrir_hel_jormungand', gensalt()),
                 email='loki@jotunheim.com')
 
-    db.session.add(user)
+    tyr = User(username='tyr',
+               password=hashpw('fenrirBITme', gensalt()),
+               email='tyr@asgard.com')
+
+    db.session.add(loki)
+    db.session.add(tyr)
 
     db.session.commit()
 
