@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import Flask, jsonify, render_template, request, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
-import flask_login
+from flask_login import LoginManager, login_user, logout_user, login_required
 
 from model import connect_to_db, db, User, Drug, Prescription, Day, Event
 
@@ -12,7 +12,6 @@ from bcrypt import hashpw, gensalt
 
 # import json
 # import requests
-
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
@@ -26,7 +25,7 @@ app.jinja_env.auto_reload = True
 ###########   LOGIN MANAGER   ############
 ##########################################
 
-login_manager = flask_login.LoginManager()
+login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = '/'
 
@@ -79,7 +78,7 @@ def process_login():
     user = User.query.filter_by(username=username).first()
 
     if (user) and (hashpw(str(password), str(user.password)) == user.password):
-        flask_login.login_user(user)
+        login_user(user)
         return redirect('/user_profile')
     else:
         flash('Username and/or password invalid')
@@ -90,42 +89,37 @@ def process_login():
 def logout():
     """Logout of account"""
 
-    flask_login.logout_user()
+    logout_user()
     return redirect('/')
 
 
 @app.route('/user_profile')
+@login_required
 def show_user_profile():
     """Show user profile page"""
 
     user_id = session.get('user_id')
 
-    # Profile only available to logged in user
-    if user_id:
-        # Retrieve user object and pass it into profile template
-        user = db.session.query(User).get(user_id)
-        # today = datetime.today().date()
+    # Retrieve user object and pass it into profile template
+    user = db.session.query(User).get(user_id)
+    # today = datetime.today().date()
 
-        # Is most recent logged day of user today
-        if user.days:
-            latest_day_date = user.days[0].date
-            latest_day_overall = user.days[0].overall_mood
-        else:
-            latest_day_date = None
-            latest_day_overall = None
-
-        return render_template('user_profile.html',
-                               user_info={'user': user,
-                                          'prescriptions': user.group_prescriptions_by_drug(),
-                                          'day_log_range': user.get_day_log_range(),
-                                          'latest_day_date': latest_day_date,
-                                          'latest_day_overall': latest_day_overall
-                                          }
-                               )
+    # Is most recent logged day of user today
+    if user.days:
+        latest_day_date = user.days[0].date
+        latest_day_overall = user.days[0].overall_mood
     else:
+        latest_day_date = None
+        latest_day_overall = None
 
-        flash('You are not logged in.')
-        return redirect('/')
+    return render_template('user_profile.html',
+                           user_info={'user': user,
+                                      'prescriptions': user.group_prescriptions_by_drug(),
+                                      'day_log_range': user.get_day_log_range(),
+                                      'latest_day_date': latest_day_date,
+                                      'latest_day_overall': latest_day_overall
+                                      }
+                           )
 
 
 ##################################################################################
@@ -133,6 +127,7 @@ def show_user_profile():
 
 
 @app.route('/log_day_mood', methods=['POST'])
+@login_required
 def process_day_mood_log():
     """ Add day log to database """
 
@@ -163,6 +158,7 @@ def process_day_mood_log():
 
 
 @app.route('/log_event_mood', methods=['POST'])
+@login_required
 def process_event_mood_log():
     """ Add event log to db"""
 
@@ -191,6 +187,7 @@ def process_event_mood_log():
 
 
 @app.route('/search_log_results.json')
+@login_required
 def get_logs_for_time():
     start_date = datetime.strptime(request.args.get('startDate'), '%Y-%m-%d').date()
     day = Day.query.filter_by(user_id=session['user_id'], date=start_date).first()
@@ -202,6 +199,7 @@ def get_logs_for_time():
 
 
 @app.route('/user_day_moods')
+@login_required
 def display_day_mood_chart():
     user = User.query.get(session['user_id'])
     return render_template('mood_chart.html',
@@ -211,6 +209,7 @@ def display_day_mood_chart():
 
 
 @app.route('/mood_chart.json')
+@login_required
 def get_mood_chart_data():
     """ Return relevant data to display on chart.js """
 
