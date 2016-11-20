@@ -65,7 +65,20 @@ class Professional(db.Model):
     user_id = db.Column(db.Integer,
                         db.ForeignKey('users.user_id'),
                         primary_key=True)
-    # pro_id = db.Column(db.Integer, unique=True)
+
+    def __repr__(self):
+        return "<Professional user_id=%s username=%s>" % (self.user_id, self.user.username)
+
+    def sort_clients(self):
+        """Sort clients by status of contracts"""
+
+        clients = {'active': [], 'inactive': []}
+        for contract in self.contracts:
+            if contract.active:
+                clients['active'].append(contract.client)
+            else:
+                clients['inactive'].append(contract.client)
+        return clients
 
 
 class Contract(db.Model):
