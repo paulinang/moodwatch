@@ -2,7 +2,7 @@
 
 {% block content %}
     <!-- Show basic user info -->
-    <h1>{{ user_info.user.username }}'s Profile </h1>
+    <h1>{{ user_info.user.username }}'s Dashboard </h1>
     <h3>Email: {{ user_info.user.email }}</h3>
 
     <!-- Show mood logs -->
@@ -61,13 +61,15 @@
                         <label for='event-overall-mood'>Overall Mood: </label>
                         <input class='event overall-mood' type='number' name='overall-mood' min='-50' max='50' required><br>
 
-                        <p id='event-mood-range'>Range of Mood: 
+                        <!-- <p id='event-mood-range'>Range of Mood: 
                         <label for='event-min-mood'>Min: </label>
                         <input class='event min-mood' type='number' name='min-mood' min='-50' max='50'>
 
                         <label for='event-max-mood'>Max: </label>
                         <input class='event max-mood' type='number' name='max-mood' min='-50' max='50'><span class="event alert-msg" style='color:red;'></span><br>
-                        </p>
+                        </p> -->
+                        <input name='max-mood' type='hidden'>
+                        <input name='min-mood' type='hidden'>
 
                         <label for='event-notes'>Notes About This Event:</label>
                         <input class='event notes' type='textarea' name='notes'><br>

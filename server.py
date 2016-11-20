@@ -61,7 +61,7 @@ def process_registration():
     elif db.session.query(User).filter(User.username == username).first():
         flash('That username has already been taken')
     else:
-        user = User(username=username, email=email, password=hashed)
+        user = User(username=username, email=email, password=hashed, user_type='basic')
         db.session.add(user)
         db.session.commit()
         flash('Account successfully created.')
@@ -112,7 +112,7 @@ def show_user_profile():
         latest_day_date = None
         latest_day_overall = None
 
-    return render_template('user_profile.html',
+    return render_template('basic_dashboard.html',
                            user_info={'user': user,
                                       'prescriptions': user.group_prescriptions_by_drug(),
                                       'day_log_range': user.get_day_log_range(),
@@ -191,7 +191,10 @@ def process_event_mood_log():
 def get_logs_for_time():
     start_date = datetime.strptime(request.args.get('startDate'), '%Y-%m-%d').date()
     day = Day.query.filter_by(user_id=session['user_id'], date=start_date).first()
-    return jsonify(day.get_info_dict())
+    if day:
+        return jsonify(day.get_info_dict())
+
+    return jsonify(None)
 
 
 ##################################################################################

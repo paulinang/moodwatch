@@ -1,4 +1,4 @@
-from model import connect_to_db, db, User, Prescription, Drug, Day, Event, EventDay
+from model import connect_to_db, db, User, Prescription, Drug, Day, Event, EventDay, Professional, Contract
 from server import app
 from datetime import datetime, timedelta
 from random import choice
@@ -41,9 +41,43 @@ def load_users():
                password=hashpw('fenrirBITme', gensalt()),
                email='tyr@asgard.com')
 
+    heimdall = User(username='heimdall',
+                    password=hashpw('Igot9MUMS', gensalt()),
+                    email='heimdall@bifrost.com')
+
+    odin = User(username='odin',
+                password=hashpw('sleipnirISMYride', gensalt()),
+                email='odin@valhalla.com')
+
     db.session.add(loki)
     db.session.add(tyr)
+    db.session.add(heimdall)
+    db.session.add(odin)
 
+    db.session.commit()
+
+
+def load_professionals():
+    print 'Professionals'
+
+    Professional.query.delete()
+
+    for i in range(3, 5):
+        pro = Professional(user_id=i)
+        db.session.add(pro)
+
+    db.session.commit()
+
+
+def load_contracts():
+    print 'Contracts'
+    Contract.query.delete()
+
+    heimdallTyr = Contract(pro_id=3, client_id=2, active=True)
+    odinTyr = Contract(pro_id=4, client_id=2, active=True)
+    odinLoki = Contract(pro_id=4, client_id=1, active=True)
+
+    db.session.add_all([heimdallTyr, odinTyr, odinLoki])
     db.session.commit()
 
 
@@ -89,9 +123,7 @@ def load_events():
         day = user.days[i]
         event = Event(user_id=1,
                       event_name='event %s' % x,
-                      overall_mood=(day.overall_mood + choice(nums)),
-                      min_mood=(day.min_mood - 2),
-                      max_mood=(day.max_mood + 2))
+                      overall_mood=(day.overall_mood + choice(nums)))
         db.session.add(event)
         db.session.commit()
         event_day = EventDay(event_id=event.event_id, day_id=day.day_id)
@@ -111,5 +143,7 @@ if __name__ == "__main__":
     # Import different types of data
     load_drugs()
     load_users()
+    load_professionals()
+    load_contracts()
     load_days()
     load_events()

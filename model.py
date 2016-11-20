@@ -25,6 +25,8 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(64), nullable=False)
 
+    professional = db.relationship('Professional', uselist=False, backref='user')
+
     def __repr__(self):
         """Gives username and email of record"""
 
@@ -51,6 +53,36 @@ class User(db.Model, UserMixin):
             earliest = datetime.strftime(self.days[-1].date, '%Y-%m-%d')
 
             return [earliest, latest]
+
+
+class Professional(db.Model):
+    """A special type of user"""
+
+    __tablename__ = 'professionals'
+
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey('users.user_id'),
+                        primary_key=True)
+    # pro_id = db.Column(db.Integer, unique=True)
+
+
+class Contract(db.Model):
+    """Contract between professional and client"""
+
+    __tablename__ = 'contracts'
+
+    contract_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    pro_id = db.Column(db.Integer, db.ForeignKey('professionals.user_id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    active = db.Column(db.Boolean, default=False)
+    start_date = db.Column(db.Date, nullable=True)
+    professional = db.relationship('Professional', backref=db.backref('contracts'))
+    client = db.relationship('User', backref=db.backref('contracts'))
+
+    def __repr__(self):
+        return "<Contract pro=%s client=%s active=%s>" % (self.pro_id, self.client_id, self.active)
+
+db.Index('contract', Contract.pro_id, Contract.client_id, unique=True)
 
 
 class Prescription(db.Model):
