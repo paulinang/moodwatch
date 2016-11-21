@@ -104,7 +104,7 @@ def show_user_profile():
     user = db.session.query(User).get(user_id)
     # today = datetime.today().date()
     if user.professional:
-        return render_template('pro_dashboard.html', user=user)
+        return render_template('pro_dashboard.html', pro=user)
 
     return render_template('basic_dashboard.html',
                            user_info={'user': user,
@@ -251,13 +251,23 @@ def get_mood_chart_data():
 
 
 @app.route('/drugs')
+@login_required
 def drug_list():
     """ Show a list of all drugs in database"""
 
-    # Get a list of all drug objects
-    drugs = Drug.query.all()
+    user_id = session.get('user_id')
 
-    return render_template('drugs.html', drugs=drugs)
+    # Retrieve user object and pass it into profile template
+    user = db.session.query(User).get(user_id)
+    # today = datetime.today().date()
+    if user.professional:
+        # Get a list of all drug objects
+        drugs = Drug.query.all()
+
+        return render_template('drug.html', drugs=drugs, pro=user)
+
+    flash('Only healthcare professionals can access drug database')
+    return redirect('/user_profile')
 
 
 @app.route('/drugs/<drug_id>')

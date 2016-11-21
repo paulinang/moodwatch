@@ -13,15 +13,10 @@ def load_drugs():
 
     Drug.query.delete()
 
-    with open('Product.txt') as products:
-        drugs = []
-        for product in products:
-            drug_name, active_ingredients = product.rstrip().split('\t')[7:]
-            drugs.append((drug_name, active_ingredients))
-
-    for drug in set(drugs):
-        drug_record = Drug(drug_name=drug[0], active_ingredients=drug[1])
-        db.session.add(drug_record)
+    meds = get_meds_from_txt('psych_meds.txt')
+    for med in meds:
+        drug = Drug(generic_name=med[0], brand_name=med[1], uses=med[2])
+        db.session.add(drug)
 
     db.session.commit()
 
@@ -132,6 +127,44 @@ def load_events():
 #     start_date = datetime.strptime('2016-10-05', '%Y-%m-%d').date()
 #     end_date = datetime.strptime('2016-10-20', '%Y-%m-%d').date()
 #     event.associate_days(start_date, end_date)
+
+
+def get_meds_from_txt(txt_file):
+    """ Prepares a list of meds from txt file to be made into 'drug' objects
+
+    Meant to process a txt file created using pdftotext command-line utility
+    on pdf (http://www.namihelps.org/assets/PDFs/fact-sheets/Medications/Commonly-Psyc-Medications.pdf)
+    """
+
+    with open(txt_file, 'r') as med_txt:
+        # ultimately want a master list of drugs
+        drugs = []
+        # each drug represented by a list [generic, brand, uses]
+        drug = []
+
+        drug_data = {}
+        i = 0
+        labels = ['GENERIC', 'BRAND', 'USES']
+        category = ''
+        for line in med_txt:
+            line = line.strip()
+            if line in labels:
+                category = line
+            elif category:
+                drug_data.setdefault(category, []).append(line)
+            elif i < 3:
+                drug.append(line)
+                i += 1
+            else:
+                drugs.append(drug)
+                drug = [line]
+                i = 1
+
+        for i in range(0, len(drug_data['GENERIC'])):
+            drug = [drug_data['GENERIC'][i], drug_data['BRAND'][i], drug_data['USES'][i]]
+            drugs.append(drug)
+
+    return drugs
 
 
 if __name__ == "__main__":

@@ -1,13 +1,73 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Click on a drug for more information and to add a prescription</h1>
+    <div class="container">
+      <h2>Psychiatric Medication Database</h2>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Generic Name</th>
+            <th>Brand Name(s)</th>
+            <th>Current Uses</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for drug in drugs %}
+            <tr class='drug-record' data-drug-id='{{ drug.drug_id }}'>
+                <td>{{ drug.generic_name }}</td>
+                <td>{{ drug.brand_name }}</td>
+                <td>{{ drug.uses }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-    <!-- List all drugs -->
-    <ul>
-        {% for drug in drugs %}
-            <!-- Each listing is a link to that drug's info -->
-            <li><a href='/drugs/{{ drug.drug_id }}'>{{ drug.drug_name }}</li>
-        {% endfor %}
-    </ul>
+    <!-- ADD PRESCRIPTION FOR DRUG MODAL -->
+        <div class="modal fade" id="addPrescriptionModal" tabindex="-1" role="dialog" aria-labelledby="addPrescriptionLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addPrescriptionTitle">Add Prescription</h4>
+              </div>
+              <div class="modal-body">
+                <h3 id='brand-name'></h3>
+                <ul>
+                    <li id='generic-name'></li>
+                    <li id='uses'></li>
+                </ul> 
+                <form id="add-prescription-form" action='/add_prescription' method='POST'>
+                    <input type='hidden' name='pro-id' value='{{ pro.user.user_id }}'>
+                    <label for='client-name'>Client:</label>
+                    <select id='client' name='client-id'>
+                        {% for client in pro.professional.sort_clients().active %}
+                         <option value='{{ client.user_id }}'>{{ client.username }}</option>
+                         {% endfor %}
+                    </select>
+                   
+                    <input id='today-event-date' type='hidden' name='today-event-date'>
+                    <script>
+                        // Get today's date and assign it to a hidden input
+                        $('#today-event-date').val(moment().format('YYYY-MM-DD'))
+                    </script>
+                    <label for='prescription-instructions'>Instructions: </label>
+                    <input id='prescription-instructions' type='text' required>
+                    <label for='prescription-notes'>Notes: </label>
+                    <input id='prescription-notes' type='text' name='notes'>
+
+                    <input type='submit' value='Add Prescription'>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END OF ADD PRESCRIPTION MODAL -->
+
+
+    <script>
+        $('.drug-record').on('dbl-click', function(){
+            $('#addPrescriptionModal').modal('toggle')
+        }
+    </script>
 {% endblock %}    

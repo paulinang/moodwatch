@@ -42,7 +42,7 @@ class User(db.Model, UserMixin):
 
         prescription_dict = {}
         for prescription in self.prescriptions:
-            prescription_dict.setdefault(prescription.drug.drug_name, []).append(prescription)
+            prescription_dict.setdefault(prescription.drug.generic_name, []).append(prescription)
 
         return prescription_dict
 
@@ -91,6 +91,7 @@ class Contract(db.Model):
     client_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     active = db.Column(db.Boolean, default=False)
     start_date = db.Column(db.Date, nullable=True)
+
     professional = db.relationship('Professional', backref=db.backref('contracts'))
     client = db.relationship('User', backref=db.backref('contracts'))
 
@@ -106,16 +107,17 @@ class Prescription(db.Model):
     __tablename__ = "prescriptions"
 
     prescription_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    pro_id = db.Column(db.Integer, db.ForeignKey('professionals.user_id'), nullable=False)
     drug_id = db.Column(db.Integer, db.ForeignKey('drugs.drug_id'), nullable=True)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=True)
-    physician = db.Column(db.String(64), nullable=True)
-    dosage = db.Column(db.String(64), nullable=False)
-    frequency = db.Column(db.String(64), nullable=False)
+    instructions = db.Column(db.Text, nullable=False)
+    notes = db.Column(db.Text, nullable=True)
 
-    user = db.relationship('User', backref=db.backref("prescriptions", order_by="desc(Prescription.end_date)"))
+    client = db.relationship('User', backref=db.backref("prescriptions", order_by="desc(Prescription.end_date)"))
     drug = db.relationship('Drug', backref=db.backref("prescriptions", order_by="desc(Prescription.end_date)"))
+    professional = db.relationship('Professional', backref=db.backref('prescriptions', order_by="desc(Prescription.end_date)"))
 
     def __repr__(self):
         """Gives drug_id and user_id of record"""
@@ -138,13 +140,14 @@ class Drug(db.Model):
     __tablename__ = "drugs"
 
     drug_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    drug_name = db.Column(db.String(128), nullable=False)
-    active_ingredients = db.Column(db.Text, nullable=False)
+    generic_name = db.Column(db.String(128), nullable=False)
+    brand_name = db.Column(db.Text, nullable=False)
+    uses = db.Column(db.Text)
 
     def __repr__(self):
         """Gives drug_name of record"""
 
-        return "<Drug drug_id=%s drug_name=%s>" % (self.drug_id, self.drug_name)
+        return "<Drug drug_id=%s generic_name=%s uses=%s>" % (self.drug_id, self.generic_name, self.uses)
 
 
 class Day(db.Model):
