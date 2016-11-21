@@ -16,14 +16,12 @@
     <script src='static/mood_chart.js'></script>
     <script>
         {% if user_info.user.days %}
-            var firstLog = '{{ user_info.daylog_info.firstlog_date}}';
-            var maxDate = moment().format('YYYY-MM-DD');
             // Select canvas for mood chart
             var ctx = $('#moodChart').get(0).getContext('2d');
             // Declare moodChart var outside AJAX request, so can access it outside later
             var moodChart;
-
-            createMoodChart(firstLog, maxDate);
+            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')]
+            createMoodChart(currentQuarter[0], currentQuarter[1]);
         {% endif %}
 
     </script>

@@ -51,8 +51,9 @@ function createMoodChart(minDate, maxDate) {
 // Changes time window according to user selection in dropdown menu
 function changeTimeWindow(timeWindow) {
     moodChart.destroy();
-    $('.move-time-button').attr('disabled', false);
+    
     if (timeWindow == 'bi-annual') {
+        $('.move-time-button').attr('disabled', false);
         if (moment().month() < 6) {
             var minDate = moment().startOf('year').format('YYYY-MM-DD');
             var maxDate = moment().set({'month': 5, 'date': 30}).format('YYYY-MM-DD');
@@ -70,6 +71,7 @@ function changeTimeWindow(timeWindow) {
         var maxDate = moment().format('YYYY-MM-DD');
     }
     else {
+        $('.move-time-button').attr('disabled', false);
         var minDate = moment().startOf(timeWindow).format('YYYY-MM-DD');
         var maxDate = moment().endOf(timeWindow).format('YYYY-MM-DD');
     }
@@ -121,17 +123,15 @@ $('.move-time-button').on('click', function () {
         });
 
 
-
-// toggle visibility of events on click of button
-// $('#toggle-events').on('click', function () {
-//     var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
-//     for (i=0; i<events.length; i++) {
-//         if (events[i].borderColor != 'rgba(255,153,0,0.4)') {
-//             events[i].borderColor = 'rgba(255,153,0,0.4)';
-//         }
-//         else {
-//             events[i].borderColor = 'rgba(0,0,0,0)';
-//         }
-//     }
-//     moodChart.update();
-// });
+$('#toggle-events').on('click', function () {
+    var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
+    for (i=0; i<events.length; i++) {
+        if (events[i].borderColor != 'rgba(255,153,0,0.7)') {
+            events[i].borderColor = 'rgba(255,153,0,0.7)';
+        }
+        else {
+            events[i].borderColor = 'rgba(0,0,0,0)';
+        }
+    }
+    moodChart.update();
+});

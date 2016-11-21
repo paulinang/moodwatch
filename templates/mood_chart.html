@@ -5,16 +5,16 @@
     <script src=
       "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js">
     </script>
-    <button type='button' class='move-time-button' value='backward' disabled>&lt;</button>
+    <script src='static/mood_chart.js'></script>
+    <button type='button' class='move-time-button' value='backward'>&lt;</button>
     <select id='chart-time-window' name='time-window'>
-        <option value='all-time'>All time</option>
-        <!-- <option value='week'>Weekly</option> -->
         <option value='month'>Monthly</option>
-        <option value='quarter'>Quarterly</option>
+        <option value='quarter' selected='selected'>Quarterly</option>
         <option value='bi-annual'>Bi-Annually</option>
         <option value='year'>Annual</option>
-    <select>
-    <button type='button' class='move-time-button' value='forward' disabled>&gt;</button>
+        <option value='all-time'>All time</option>
+    </select>
+    <button type='button' class='move-time-button' value='forward'>&gt;</button>
     <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
     <button type="button" id="toggle-events">Toggle Events</button><br><br>
 
@@ -22,7 +22,6 @@
     <div class="mood-chart" style='height: 50vh; width: 75vw'>
       <canvas id="moodChart"></canvas>
     </div>
-    <script src='static/mood_chart.js'></script>
     <script>
         {% if user_info.user.days %}
             // Declare moodChart var outside AJAX request, so can access it outside later
@@ -30,19 +29,26 @@
             var ctx = $('#moodChart').get(0).getContext('2d');
 
             var firstLog = '{{ user_info.daylog_info.firstlog_date}}';
-            var maxDate = moment().format('YYYY-MM-DD');
-            createMoodChart(firstLog, maxDate);
+            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')]
+            createMoodChart(currentQuarter[0], currentQuarter[1]);
         {% endif %}
 
         $('#chart-time-window').on('change', function () {
             var timeWindow = this.value;
             changeTimeWindow(timeWindow);
         });
-        var activePoints;
-        $('#moodChart').on('click', function(evt) {
-            alert('click');
-            activePoints = moodChart.getElementsAtEvent(evt);
-            console.log(activePoints);
+
+        $('#toggle-events').on('click', function (evt) {
+            var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
+            for (i=0; i<events.length; i++) {
+                if (events[i].borderColor != 'rgba(255,153,0,0.7)') {
+                    events[i].borderColor = 'rgba(255,153,0,0.7)';
+                }
+                else {
+                    events[i].borderColor = 'rgba(0,0,0,0)';
+                }
+            }
+            moodChart.update();
         });
 
     </script>
@@ -96,6 +102,7 @@
                         }
                     });
             });
+
             $('#clear-search').on('click', function(evt) {
                 $('.main-log').empty();
                 $('.associated-logs').empty();
