@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 from random import choice
 from math import sin
 from bcrypt import hashpw, gensalt
+import numpy as np
+import pandas as pd
+from datetime import datetime, timedelta
+from pytz import timezone
 
 
 def load_drugs():
@@ -112,16 +116,23 @@ def load_days():
 
     Day.query.delete()
 
+    dates, overall_moods = rand_day_moods()
+
+    # give tyr random moods
+    for i, date in enumerate(dates):
+        overall_mood = overall_moods[i]
+        day = Day(user_id=2,
+                  date=date,
+                  overall_mood=overall_mood)
+        db.session.add(day)
+
     # create a list of numbers to randomly choose from
     # steps up/down from overall_mood to create min/max
     MOOD_STEP = range(5, 30, 5)
 
-    # Create a list of dates starting from 10 days ago to 300 days ago
-    dates = [datetime.today().date() - timedelta(days=x) for x in range(10, 301)]
-    # Create a list of overall_moods based on a sine wave limited to (-15,15)
-    # Corresponds to amount of dates (290)
-    overall_moods = [int(15 * sin(x * 0.1)) for x in range(0, 291)]
+    overall_moods = [int(15 * sin(x * 0.1)) for x in range(0, 1000)]
 
+    # give loki moods based on sine wave
     for i, date in enumerate(dates):
         overall_mood = overall_moods[i]
         day = Day(user_id=1,
@@ -130,7 +141,6 @@ def load_days():
                   max_mood=overall_mood + choice(MOOD_STEP),
                   min_mood=overall_mood - choice(MOOD_STEP))
         db.session.add(day)
-
     db.session.commit()
 
 
@@ -156,6 +166,11 @@ def load_events():
 #     start_date = datetime.strptime('2016-10-05', '%Y-%m-%d').date()
 #     end_date = datetime.strptime('2016-10-20', '%Y-%m-%d').date()
 #     event.associate_days(start_date, end_date)
+
+
+########################################################
+################ HELPER FUNCTIONS ######################
+########################################################
 
 
 def get_meds_from_txt(txt_file):
@@ -196,8 +211,31 @@ def get_meds_from_txt(txt_file):
     return drugs
 
 
+def rand_day_moods(num_days=1000, tz='US/Pacific'):
+    """ Creates a list of days with random moods """
+
+    ca_tz = timezone(tz)
+    today = datetime.now(ca_tz).date()
+    first_day = today - timedelta(days=num_days-1)
+
+    random_moods = pd.Series((np.random.rand(num_days) * 80).astype(int) - 50)
+    mood_list = list(random_moods)
+
+    pd_dates = pd.date_range(first_day, periods=1000)
+    dates_str = [datetime.strftime(date, '%Y-%m-%d') for date in pd_dates]
+
+    # moods = pd.Series(random_moods)
+    # r_window = 60
+    # r = moods.rolling(window=r_window)
+    # r_mean_moods = r.mean()
+    # r_mean_mood_list = [int(mean) for mean in r_mean_moods[(r_window-1):]]
+    # mood_list = list(moods[:(r_window-1)]) + r_mean_mood_list
+
+    return (dates_str, mood_list)
+
+
 if __name__ == "__main__":
-    connect_to_db(app, 'projectdb')
+    connect_to_db(app, 'asgard_db')
 
     # In case tables haven't been created, create them
     db.create_all()

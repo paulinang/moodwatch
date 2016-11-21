@@ -416,7 +416,7 @@ if __name__ == "__main__":
     # point that we invoke the DebugToolbarExtension
     app.debug = True
 
-    connect_to_db(app, 'projectdb')
+    connect_to_db(app, 'asgard_db')
 
     # Use the DebugToolbar
     DebugToolbarExtension(app)
