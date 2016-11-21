@@ -38,8 +38,7 @@
                     <li id='uses'></li>
                 </ul> 
                 <form id="add-prescription-form" action='/add_prescription' method='POST'>
-                    <input type='hidden' name='pro-id' value='{{ pro.user_id }}'>
-
+                    <input id='drug-id' type='hidden' name='drug-id'>
                     <label for='client-name'>Client:</label>
                     <select id='client' name='client-id'>
                         {% for client in pro.professional.sort_clients().active %}
@@ -53,7 +52,7 @@
                     <br>
 
                     <label for='prescription-instructions'>Instructions: </label>
-                    <input id='prescription-instructions' type='textare' required>
+                    <input id='prescription-instructions' type='textarea' name='prescription-instructions' required>
                     <br>
 
                     <label for='prescription-notes'>Notes: </label>
@@ -81,6 +80,8 @@
                 maxDate: '1Y',
                 dateFormat: 'yy-mm-dd'    
             });
+            var drugId = this.dataset['drugId'];
+            $('#drug-id').val(drugId);
             $('#addPrescriptionModal').modal('toggle');
         });
     </script>

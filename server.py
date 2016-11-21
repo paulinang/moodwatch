@@ -270,16 +270,6 @@ def drug_list():
     return redirect('/user_profile')
 
 
-@app.route('/drugs/<drug_id>')
-def show_drug_info(drug_id):
-    """ Show details for a drug"""
-
-    # Get specific drug object
-    drug = Drug.query.get(drug_id)
-
-    return render_template('drug_info.html', drug=drug)
-
-
 ##################################################################################
 # PRESCRIPTION RELATED -- have to be logged in
 
@@ -324,20 +314,21 @@ def prescription_form():
 def process_prescription():
     """ Add new prescription """
 
-    user_id = session['user_id']
-    physician = request.form.get('physician')
-    drug_id = request.form.get('drug-id')
-    dosage = request.form.get('dosage')
-    frequency = request.form.get('frequency')
-    start_date = request.form.get('start-date')
+    pro_id = int(session['user_id'])
+    client_id = int(request.form.get('client-id'))
+    print request.form.get('drug-id')
+    drug_id = int(request.form.get('drug-id'))
+    instructions = request.form.get('prescription-instructions')
+    start_date = datetime.strptime(request.form.get('prescription-start-date'), '%Y-%m-%d').date()
+    notes = request.form.get('prescription-notes')
 
     # create new prescription from form inputs, add to db
-    prescription = Prescription(user_id=user_id,
+    prescription = Prescription(client_id=client_id,
+                                pro_id=pro_id,
                                 drug_id=drug_id,
                                 start_date=start_date,
-                                physician=physician,
-                                dosage=dosage,
-                                frequency=frequency)
+                                instructions=instructions,
+                                notes=notes)
 
     db.session.add(prescription)
     db.session.commit()
