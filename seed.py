@@ -1,6 +1,5 @@
 from model import connect_to_db, db, User, Prescription, Drug, Day, Event, EventDay, Professional, Contract
 from server import app
-from datetime import datetime, timedelta
 from random import choice
 from math import sin
 from bcrypt import hashpw, gensalt

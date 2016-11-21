@@ -20,7 +20,7 @@
             var ctx = $('#moodChart').get(0).getContext('2d');
             // Declare moodChart var outside AJAX request, so can access it outside later
             var moodChart;
-            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')]
+            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')];
             createMoodChart(currentQuarter[0], currentQuarter[1]);
         {% endif %}
 

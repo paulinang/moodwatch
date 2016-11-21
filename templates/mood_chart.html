@@ -29,7 +29,7 @@
             var ctx = $('#moodChart').get(0).getContext('2d');
 
             var firstLog = '{{ user_info.daylog_info.firstlog_date}}';
-            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')]
+            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')];
             createMoodChart(currentQuarter[0], currentQuarter[1]);
         {% endif %}
 
