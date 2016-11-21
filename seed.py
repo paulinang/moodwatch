@@ -76,6 +76,35 @@ def load_contracts():
     db.session.commit()
 
 
+def load_prescriptions():
+    print 'Prescriptions'
+    Prescription.query.delete()
+
+    med1 = Prescription(client_id=2,
+                        pro_id=3,
+                        drug_id=4,
+                        start_date='2016-09-10',
+                        end_date='2016-09-15',
+                        instructions='Take 5mg daily')
+    med2 = Prescription(client_id=2,
+                        pro_id=3,
+                        drug_id=4,
+                        start_date='2016-09-15',
+                        instructions='Take 10mg daily')
+    med3 = Prescription(client_id=2,
+                        pro_id=4,
+                        drug_id=1,
+                        start_date='2016-11-10',
+                        instructions='Take 50mg 2x a day (morning and night)')
+    med4 = Prescription(client_id=1,
+                        pro_id=4,
+                        drug_id=6,
+                        start_date='2016-01-17',
+                        instructions='Take 100mg daily, before bed')
+    db.session.add_all([med1, med2, med3, med4])
+    db.session.commit()
+
+
 def load_days():
     """ Add days to days table"""
 
@@ -178,5 +207,6 @@ if __name__ == "__main__":
     load_users()
     load_professionals()
     load_contracts()
+    load_prescriptions()
     load_days()
     load_events()

@@ -102,14 +102,14 @@ db.Index('contract', Contract.pro_id, Contract.client_id, unique=True)
 
 
 class Prescription(db.Model):
-    """Preseciption of a drug to a user"""
+    """Prescription of a drug by a professional to a client"""
 
     __tablename__ = "prescriptions"
 
     prescription_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     pro_id = db.Column(db.Integer, db.ForeignKey('professionals.user_id'), nullable=False)
-    drug_id = db.Column(db.Integer, db.ForeignKey('drugs.drug_id'), nullable=True)
+    drug_id = db.Column(db.Integer, db.ForeignKey('drugs.drug_id'), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=True)
     instructions = db.Column(db.Text, nullable=False)
@@ -122,7 +122,7 @@ class Prescription(db.Model):
     def __repr__(self):
         """Gives drug_id and user_id of record"""
 
-        return "<Prescription user_id=%s drug_id=%s>" % (self.user_id, self.drug_id)
+        return "<Prescription client_id=%s drug_id=%s>" % (self.client_id, self.drug_id)
 
     def is_active(self):
         """Checks if prescription is active"""

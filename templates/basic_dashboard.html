@@ -170,8 +170,8 @@
                 {% for prescription in prescription_list %}
                 <li>
                     <a href='prescription_info/{{ prescription.prescription_id }}'>
-                        Dosage: {{ prescription.dosage }},
-                        Frequency: {{ prescription.frequency }}
+                        Prescribed by: {{prescription.professional.user.username}}<br>
+                        Instructions: {{ prescription.instructions }}
                     </a>
                     <!-- Notes whether prescription is active -->
                     {% if not prescription.end_date %}[ ACTIVE ]{% endif %}
