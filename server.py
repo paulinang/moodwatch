@@ -264,7 +264,7 @@ def drug_list():
         # Get a list of all drug objects
         drugs = Drug.query.all()
 
-        return render_template('drug.html', drugs=drugs, pro=user)
+        return render_template('drugs.html', drugs=drugs, pro=user)
 
     flash('Only healthcare professionals can access drug database')
     return redirect('/user_profile')

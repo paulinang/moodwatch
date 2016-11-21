@@ -32,29 +32,34 @@
                 <h4 class="modal-title" id="addPrescriptionTitle">Add Prescription</h4>
               </div>
               <div class="modal-body">
-                <h3 id='brand-name'></h3>
+                <h3 id='generic-name'></h3>
                 <ul>
-                    <li id='generic-name'></li>
+                    <li id='brand-name'></li>
                     <li id='uses'></li>
                 </ul> 
                 <form id="add-prescription-form" action='/add_prescription' method='POST'>
-                    <input type='hidden' name='pro-id' value='{{ pro.user.user_id }}'>
+                    <input type='hidden' name='pro-id' value='{{ pro.user_id }}'>
+
                     <label for='client-name'>Client:</label>
                     <select id='client' name='client-id'>
                         {% for client in pro.professional.sort_clients().active %}
                          <option value='{{ client.user_id }}'>{{ client.username }}</option>
                          {% endfor %}
                     </select>
-                   
-                    <input id='today-event-date' type='hidden' name='today-event-date'>
-                    <script>
-                        // Get today's date and assign it to a hidden input
-                        $('#today-event-date').val(moment().format('YYYY-MM-DD'))
-                    </script>
+                    <br>
+                    
+                    <label for='prescription-start-date'>Start Date: </label>
+                    <input id='prescription-start-date' type='text' name='prescription-start-date' readonly="true" required>
+                    <br>
+
                     <label for='prescription-instructions'>Instructions: </label>
-                    <input id='prescription-instructions' type='text' required>
+                    <input id='prescription-instructions' type='textare' required>
+                    <br>
+
                     <label for='prescription-notes'>Notes: </label>
-                    <input id='prescription-notes' type='text' name='notes'>
+                    <input id='prescription-notes' type='textarea' name='notes'>
+                    <br>
+                    <br>
 
                     <input type='submit' value='Add Prescription'>
                 </form>
@@ -64,10 +69,19 @@
         </div>
         <!-- END OF ADD PRESCRIPTION MODAL -->
 
-
     <script>
-        $('.drug-record').on('dbl-click', function(){
-            $('#addPrescriptionModal').modal('toggle')
-        }
+        $('.drug-record').on('dblclick', function(evt){
+            $('#generic-name').html(this.children[0].innerHTML);
+            $('#brand-name').html('Brand Name(s): ' + this.children[1].innerHTML);
+            $('#uses').html('Known Uses: ' + this.children[2].innerHTML);
+            $('#prescription-start-date').datepicker({
+                changeMonth: true,
+                changeMonth: true,
+                minDate: '-2M',
+                maxDate: '1Y',
+                dateFormat: 'yy-mm-dd'    
+            });
+            $('#addPrescriptionModal').modal('toggle');
+        });
     </script>
 {% endblock %}    
