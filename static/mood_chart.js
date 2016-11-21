@@ -39,6 +39,24 @@ function createMoodChart(minDate, maxDate) {
         {minDate: minDate,
          maxDate: maxDate},
          function (data) {
+            // debugger;
+            moodChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: options
+            });
+        });
+}
+
+function createClientChart(minDate, maxDate, clientId) {
+    var options = initializeOptions(minDate, maxDate);
+
+    $.get('/smooth_mood_data.json',
+        {minDate: minDate,
+         maxDate: maxDate,
+         clientId: clientId},
+         function (data) {
+            // debugger;
             moodChart = new Chart(ctx, {
                 type: 'line',
                 data: data,
@@ -123,15 +141,15 @@ $('.move-time-button').on('click', function () {
         });
 
 
-$('#toggle-events').on('click', function () {
-    var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
-    for (i=0; i<events.length; i++) {
-        if (events[i].borderColor != 'rgba(255,153,0,0.7)') {
-            events[i].borderColor = 'rgba(255,153,0,0.7)';
-        }
-        else {
-            events[i].borderColor = 'rgba(0,0,0,0)';
-        }
-    }
-    moodChart.update();
-});
+// $('#toggle-events').on('click', function () {
+//     var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
+//     for (i=0; i<events.length; i++) {
+//         if (events[i].borderColor != 'rgba(255,153,0,0.7)') {
+//             events[i].borderColor = 'rgba(255,153,0,0.7)';
+//         }
+//         else {
+//             events[i].borderColor = 'rgba(0,0,0,0)';
+//         }
+//     }
+//     moodChart.update();
+// });

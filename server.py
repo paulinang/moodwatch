@@ -7,6 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager, login_user, logout_user, login_required
 
 from model import connect_to_db, db, User, Drug, Prescription, Day, Event
+from mood_analysis import get_rolling_mean
 
 from bcrypt import hashpw, gensalt
 
@@ -267,6 +268,29 @@ def get_mood_chart_data():
     return jsonify({'datasets': datasets})
 
 
+@app.route('/smooth_mood_data.json')
+@login_required
+def get_smooth_mood_data():
+    """ Return 'smoothened' moods for a user"""
+
+    client_id = request.args.get('clientId')
+    smooth = get_rolling_mean(client_id)
+    min_date = datetime.strptime(request.args.get('minDate'), '%Y-%m-%d').date()
+    max_date = datetime.strptime(request.args.get('maxDate'), '%Y-%m-%d').date()
+
+    # initialize master list of datasets
+    dataset = []
+    # create a dataset for each day's range
+    for i, date in enumerate(smooth.index):
+        # only for days between requested time window that have an overall mood
+        if (smooth[i] is not None) and (min_date <= date) and (date <= max_date):
+            # format date into moment.js format to be plottable on chart.js
+            date = datetime.strftime(date, '%Y-%m-%d')
+            # initialize dataset with point(date, overall_mood)
+            dataset.append({'x': date, 'y': smooth[i]})
+
+    return jsonify({'datasets': [{'data': dataset}]})
+
 ###########################################################################################
 # DRUG RELATED
 
@@ -377,9 +401,6 @@ def end_prescription():
         return redirect('/add_prescription?drug=%s' % old_prescription.drug_id)
     else:
         return redirect('/user_profile')
-
-
-
 
 
 ###################################################################################

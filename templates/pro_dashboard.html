@@ -17,6 +17,22 @@
         <h3 id='client-name'></h3>
         <h5>Client Prescriptions</h5>
         <ul id='client-meds'></ul>
+
+        <!-- Day Log Mood Chart -->
+        <div class="mood-chart" style='height: 50vh; width: 75vw'>
+          <canvas id="moodChart"></canvas>
+        </div>
+        <!-- <button type="button" id="toggle-events">Toggle Events</button><br><br> -->
+        <script src='static/mood_chart.js'></script>
+        <script>
+            // Select canvas for mood chart
+            var ctx = $('#moodChart').get(0).getContext('2d');
+            // Declare moodChart var outside AJAX request, so can access it outside later
+            var moodChart;
+            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')];
+            
+        </script>
+
     </div>
 
     <script>
@@ -57,6 +73,11 @@
                 medText = medText + '</ul>';
                 $('#client-meds').html(medText);
             });
+            if (moodChart) {
+                moodChart.destroy();
+            }
+            createClientChart(currentQuarter[0], currentQuarter[1], this.value);
+            
         });
     </script>
 {% endblock %}
