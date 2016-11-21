@@ -42,7 +42,7 @@ class User(db.Model, UserMixin):
 
         prescription_dict = {}
         for prescription in self.prescriptions:
-            prescription_dict.setdefault(prescription.drug.generic_name, []).append(prescription)
+            prescription_dict.setdefault(prescription.drug.generic_name, []).append(prescription.make_dict())
 
         return prescription_dict
 
@@ -124,14 +124,25 @@ class Prescription(db.Model):
 
         return "<Prescription client_id=%s drug_id=%s>" % (self.client_id, self.drug_id)
 
-    def is_active(self):
-        """Checks if prescription is active"""
+    def make_dict(self):
+        """Makes dict of prescription info"""
 
-        # return True if end date exists
+        pro = User.query.get(self.pro_id)
+        med_dict = {}
+        med_dict['prescription_id'] = self.prescription_id
+        med_dict['pro_id'] = self.pro_id
+        med_dict['pro_username'] = pro.username
+        med_dict['pro_email'] = pro.email
+        med_dict['drug_id'] = self.drug_id
+        med_dict['start_date'] = datetime.strftime(self.start_date, '%Y-%m-%d')
         if self.end_date:
-            return True
+            med_dict['end_date'] = datetime.strftime(self.end_date, '%Y-%m-%d')
+        else:
+            med_dict['end_date'] = None
+        med_dict['instructions'] = self.instructions
+        med_dict['notes'] = self.notes
 
-        return False
+        return med_dict
 
 
 class Drug(db.Model):

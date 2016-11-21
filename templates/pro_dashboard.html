@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Show basic user info -->
+    <h1>{{ pro.username }}'s Dashboard </h1>
+
+    <label for='client-to-view'>Client:</label>
+    <select id='client-to-view' name='client-id'>
+        <option selected='selected' disabled>Select client</option>
+        {% for client in pro.professional.sort_clients().active %}
+         <option value='{{ client.user_id }}'>{{ client.username }}</option>
+         {% endfor %}
+    </select>
+    <br>
+
+    <div id='client-details' style='display:none'>
+        <h3 id='client-name'></h3>
+        <h5>Client Prescriptions</h5>
+        <ul id='client-meds'></ul>
+    </div>
+
+    <script>
+        $('#client-to-view').on('change', function(evt){
+            $.get('/client_prescriptions.json', {client_id: this.value}, function(data) {
+                $('#client-details').show()
+                $('#client-name').html(data.username)
+                var prescriptions = data.prescriptions
+                var medText = ''
+                for (var key in prescriptions) {
+                    // For each drug type in prescriptions add an unordered list element
+                    // Start an ordered list under that element
+                    medText = medText + '<li>' + key + '</li><ol>';
+                    var prescriptionArray = prescriptions[key];
+                    for (i = 0; i < prescriptionArray.length; i++) {
+                        // For each prescription of a drug, add it as an ordered list element
+                        var prescription = prescriptionArray[i];
+                        medText = medText + '<li>Started ' + prescription.start_date;
+                        // Label if it's active
+                        if (!prescription.end_date) {
+                            medText = medText + ' [ACTIVE]';
+                        }
+                        medText = medText + '</li><ul>';
+
+                        if (prescription.end_date) {
+                            medText = medText + '<li>Ended: ' + prescription.end_date;
+                        }
+                        medText = medText + '<li>Prescribed by: ' + prescription.pro_username;
+                        medText = medText + '</li><li>Instructions: ' + prescription.instructions;
+                        if (prescription.notes) {
+                            medText = medText + '</li><li>Notes: ' + prescription.notes;
+                        }
+                        medText = medText + '</li></ul>'
+                    }
+                medText = medText + '</li></ol>'
+                
+                }
+                medText = medText + '</ul>';
+                $('#client-meds').html(medText);
+            });
+        });
+    </script>
+{% endblock %}

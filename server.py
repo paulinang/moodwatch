@@ -21,9 +21,9 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
-##########################################
-###########   LOGIN MANAGER   ############
-##########################################
+##########################################################################
+###########################   LOGIN MANAGER   ############################
+##########################################################################
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -36,14 +36,16 @@ def user_loader(user_id):
     return User.query.get(user_id)
 
 
+##########################################################################
+############################  GENERAL ROUTES  ############################
+##########################################################################
+
+
 @app.route('/')
 def index():
     """Homepage."""
 
     return render_template('index.html')
-
-####################################################################################
-# USER ACCOUNT RELATED
 
 
 @app.route('/register', methods=['POST'])
@@ -114,8 +116,27 @@ def show_user_profile():
                            )
 
 
-##################################################################################
-# MOOD LOG RELATED -- have to be logged in
+##########################################################################
+########################### PRO USER ROUTES  #############################
+##########################################################################
+
+
+@app.route('/client_prescriptions.json')
+@login_required
+def get_client_prescriptions():
+    """Returns prescriptions for a specific client"""
+
+    pro = db.session.query(User).get(session['user_id'])
+    client_id = request.args.get('client_id')
+    client = db.session.query(User).get(client_id)
+    if pro.professional:
+        return jsonify({'username': client.username,
+                        'prescriptions': client.group_prescriptions_by_drug()})
+
+
+##########################################################################
+###########################  MOOD LOG  ROUTES  ###########################
+##########################################################################
 
 
 @app.route('/log_day_mood', methods=['POST'])
@@ -189,9 +210,9 @@ def get_logs_for_time():
     return jsonify(None)
 
 
-##################################################################################
-# MOOD CHART
-
+##########################################################################
+##########################  MOOD CHART  ROUTES  ##########################
+##########################################################################
 
 @app.route('/user_day_moods')
 @login_required
@@ -356,6 +377,9 @@ def end_prescription():
         return redirect('/add_prescription?drug=%s' % old_prescription.drug_id)
     else:
         return redirect('/user_profile')
+
+
+
 
 
 ###################################################################################
