@@ -140,42 +140,26 @@
         });
     </script>
 
-    <!-- Show event logs -->
-<!--     <h3>Events:</h3>
-    
-    <ul>
-        {% for event in user_info.user.events %}
-        <li>
-            <b>{{ event.event_name }}</b>
-            <ul>
-                {% for day in event.days %}   
-                    <li>{{ day.date }}</li>
-                {% endfor %}
-            </ul>
-        </li>
-        {% endfor %}
-    </ul>       
- -->
+
     <!-- Show prescription logs -->
     <h3>Prescriptions:</h3>
-    <h4><a href='/drugs'>Add prescription from drug list</a></h4>
-
     <ul>
         {% for drug, prescription_list in user_info.prescriptions.items() %}
         <li>
             <b>{{ drug }}</b>
-            <ul>
+            <ol>
                 {% for prescription in prescription_list %}
                 <li>
-                    <a href='prescription_info/{{ prescription.prescription_id }}'>
-                        <!-- Notes whether prescription is active -->
-                        {% if not prescription.end_date %}[ ACTIVE ]<br>{% endif %}
-                        Prescribed by: {{prescription.pro_username}}<br>
-                        Instructions: {{ prescription.instructions }}<br>
-                        Start Date: {{prescription.start_date}}<br>
-                        End Date: {{prescription.end_date}}<br>
-                        Notes: {{prescription.notes}}<br>
-                    </a>
+                    <!-- Notes whether prescription is active -->
+                    Started: {{ prescription.start_date }}
+                    {% if not prescription.end_date %}
+                        [ ACTIVE ]
+                    {% else %}
+                        &nbsp;&nbsp;Ended: {{ prescription.end_date }}
+                    {% endif %}
+                    <ul>
+                        <li>Prescribed by: {{ prescription.pro_username }}</li>
+                        <li>Instructions: {{ prescription.instructions }}</li>
                 </li>
                 {% endfor %}
             </ul>
