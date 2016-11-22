@@ -180,7 +180,7 @@ function createDayChart(day) {
     var minDate = moment(day).subtract(1, 'day').format('YYYY-MM-DD');
     var maxDate = moment(day).add(1, 'day').format('YYYY-MM-DD');
     var options = initializeOptions(minDate, maxDate);
-    // debugger;
+    options.scales.xAxes[0].display = false;
     $.get('/day_chart.json',
         {day: day},
          function (data) {
