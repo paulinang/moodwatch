@@ -5,7 +5,6 @@
     <script src=
       "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js">
     </script>
-    <script src='static/mood_chart.js'></script>
     <button type='button' class='move-time-button' value='backward'>&lt;</button>
     <select id='chart-time-window' name='time-window'>
         <option value='month'>Monthly</option>
@@ -22,6 +21,7 @@
     <div class="mood-chart" style='height: 50vh; width: 75vw'>
       <canvas id="moodChart"></canvas>
     </div>
+    <script src='static/mood_chart.js'></script>
     <script>
         {% if user_info.user.days %}
             // Declare moodChart var outside AJAX request, so can access it outside later
