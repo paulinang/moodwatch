@@ -102,7 +102,7 @@
                 <input id='notes' type='text' name='notes' required><br>
 
                 <input id='start-date' type='hidden'>
-                <input id='old-prescription' type-'hidden'>              
+                clickedPrescriptionId: <input id='old-prescription' type='text'>              
 
                 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
                 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -110,18 +110,12 @@
                     $( function() {
                         var currentDate = moment().format('YYYY-MM-DD');
                         $( "#start-date" ).val(currentDate);
-
-                        $('#client-details').on('change', function (evt) {
-                            alert('works');
-                            console.log($('.change-prescription-button'));
-                        });
                     });
 
-                    function check () {
-                        return $('.change-prescription-button');
-                    }
-
-                    
+                    $('#change-prescription-modal').on('show.bs.modal', function(evt) {
+                        var button = $(evt.relatedTarget);
+                        $('#old-prescription').val(button[0].dataset['prescriptionId']);
+                    })                  
 
                     $('#change-prescription').on('submit', 'button', function(evt) {
                         evt.preventDefault();
