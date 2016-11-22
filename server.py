@@ -289,6 +289,7 @@ def get_smooth_mood_data():
 
     return jsonify({'datasets': [{'data': dataset}]})
 
+
 ###########################################################################################
 # DRUG RELATED
 
@@ -317,54 +318,30 @@ def drug_list():
 # PRESCRIPTION RELATED -- have to be logged in
 
 
-@app.route('/prescription_info/<prescription_id>')
-def show_prescription_info(prescription_id):
-    """ Show details for a prescription"""
+@app.route('/end_prescription.json', methods=['POST'])
+def end_prescription():
+    """ Ends Prescription """
+
+    prescription_id = int(request.form.get('prescriptionId'))
+    end_date = datetime.strptime(request.form.get('currentDate'), '%Y-%m-%d').date()
 
     prescription = Prescription.query.get(prescription_id)
+    prescription.end_date = end_date
+    db.session.commit()
 
-    # Will only show prescription info if logged in user 'owns' that prescription
-    if prescription.user_id == session.get('user_id'):
-        return render_template('prescription_info.html', prescription=prescription)
-    else:
-        flash('You do not have access to this user\'s prescription.')
-        return redirect('/')
+    return jsonify(prescription.make_dict())
 
 
-@app.route('/add_prescription')
-def prescription_form():
-    """ Show add prescription form """
-
-    drug_id = request.args.get('drug', default=None)
-
-    # Gets the prescription with the most recent end date (None end date takes precedence)
-    last_prescription = Prescription.query.filter_by(drug_id=drug_id,
-                                                     user_id=session['user_id']).order_by(Prescription.end_date.desc()).first()
-
-    # If there was no previous prescription, or there is no active prescription
-    if (not last_prescription) or (last_prescription.end_date):
-        # Get drug object of interest
-        drug = Drug.query.get(drug_id)
-        # Show prescription form for that drug, last_prescription is an object or None
-        return render_template('prescription_form.html', drug=drug, last_prescription=last_prescription)
-    else:
-        # Send user to active prescription so they can end it before creating a new one
-        flash('You have an active prescription for this drug. End it before creating a new prescription with updated information.')
-        return redirect('/prescription_info/%s' % last_prescription.prescription_id)
-
-
-@app.route('/add_prescription', methods=['POST'])
+@app.route('/add_prescription.json', methods=['POST'])
 def process_prescription():
     """ Add new prescription """
 
     pro_id = int(session['user_id'])
-    client_id = int(request.form.get('client-id'))
-    print request.form.get('drug-id')
-    drug_id = int(request.form.get('drug-id'))
-    instructions = request.form.get('prescription-instructions')
-    start_date = datetime.strptime(request.form.get('prescription-start-date'), '%Y-%m-%d').date()
-    notes = request.form.get('prescription-notes')
-
+    client_id = int(request.form.get('clientId'))
+    drug_id = int(request.form.get('drugId'))
+    instructions = request.form.get('instructions')
+    start_date = datetime.strptime(request.form.get('startDate'), '%Y-%m-%d').date()
+    notes = request.form.get('notes')
     # create new prescription from form inputs, add to db
     prescription = Prescription(client_id=client_id,
                                 pro_id=pro_id,
@@ -377,28 +354,8 @@ def process_prescription():
     db.session.commit()
 
     flash('Prescription added')
-    return redirect('/user_profile')
 
-
-@app.route('/end_prescription', methods=['POST'])
-def end_prescription():
-    """ Ends an existing prescription """
-
-    prescription_id = request.form.get('prescription-id')
-    end_date = request.form.get('end-date')
-
-    # update existing prescription's end_date
-    old_prescription = Prescription.query.get(prescription_id)
-    old_prescription.end_date = end_date
-    flash('Prescription ended')
-    db.session.commit()
-
-    # if user chose to add new prescription after ending old one
-    # send to add prescription for that drug
-    if request.form.get('add-prescription'):
-        return redirect('/add_prescription?drug=%s' % old_prescription.drug_id)
-    else:
-        return redirect('/user_profile')
+    return jsonify(prescription.make_dict())
 
 
 ###################################################################################

@@ -37,26 +37,26 @@
                     <li id='brand-name'></li>
                     <li id='uses'></li>
                 </ul> 
-                <form id="add-prescription-form" action='/add_prescription' method='POST'>
+                <form id="add-prescription-form" method='POST'>
                     <input id='drug-id' type='hidden' name='drug-id'>
                     <label for='client-name'>Client:</label>
-                    <select id='client' name='client-id'>
+                    <select id='client' name='clientId'>
                         {% for client in pro.professional.sort_clients().active %}
                          <option value='{{ client.user_id }}'>{{ client.username }}</option>
                          {% endfor %}
                     </select>
                     <br>
                     
-                    <label for='prescription-start-date'>Start Date: </label>
-                    <input id='prescription-start-date' type='text' name='prescription-start-date' readonly="true" required>
+                    <label for='start-date'>Start Date: </label>
+                    <input id='start-date' type='text' name='startDate' readonly="true" required>
                     <br>
 
-                    <label for='prescription-instructions'>Instructions: </label>
-                    <input id='prescription-instructions' type='textarea' name='prescription-instructions' required>
+                    <label for='instructions'>Instructions: </label>
+                    <input id='instructions' type='textarea' name='instructions' required>
                     <br>
 
-                    <label for='prescription-notes'>Notes: </label>
-                    <input id='prescription-notes' type='textarea' name='notes'>
+                    <label for='notes'>Notes: </label>
+                    <input id='notes' type='textarea' name='notes'>
                     <br>
                     <br>
 
@@ -73,7 +73,7 @@
             $('#generic-name').html(this.children[0].innerHTML);
             $('#brand-name').html('Brand Name(s): ' + this.children[1].innerHTML);
             $('#uses').html('Known Uses: ' + this.children[2].innerHTML);
-            $('#prescription-start-date').datepicker({
+            $('#start-date').datepicker({
                 changeMonth: true,
                 changeMonth: true,
                 minDate: '-2M',
@@ -83,6 +83,25 @@
             var drugId = this.dataset['drugId'];
             $('#drug-id').val(drugId);
             $('#addPrescriptionModal').modal('toggle');
+
+            $('#add-prescription-form').on('submit', function(evt) {
+                evt.preventDefault();
+                formInputs = {
+                            clientId: $('#client').val(),
+                            drugId: $('#drug-id').val(),
+                            instructions: $('#instructions').val(),
+                            notes: $('#notes').val(),
+                            startDate: $('#start-date').val()
+                        }
+                addPrescription();
+                $('#addPrescriptionModal').modal('hide');
+            });
+            function addPrescription() {
+                    $.post('/add_prescription.json', formInputs, function(data) {
+                        // console.log(data);
+                    });
+                };
+
         });
     </script>
 {% endblock %}    

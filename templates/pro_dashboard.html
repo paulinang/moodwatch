@@ -3,6 +3,7 @@
 {% block content %}
     <!-- Show basic user info -->
     <h1>{{ pro.username }}'s Dashboard </h1>
+    <h3><a href='/drugs'>Psychiatric Medications Database</a></h3>
 
     <label for='client-to-view'>Client:</label>
     <select id='client-to-view' name='client-id'>
@@ -29,15 +30,17 @@
             var ctx = $('#moodChart').get(0).getContext('2d');
             // Declare moodChart var outside AJAX request, so can access it outside later
             var moodChart;
-            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')];
+            var currentYear = [moment().startOf('year').format('YYYY-MM-DD'), moment().endOf('year').format('YYYY-MM-DD')];
             
         </script>
 
     </div>
 
     <script>
-        $('#client-to-view').on('change', function(evt){
-            $.get('/client_prescriptions.json', {client_id: this.value}, function(data) {
+        var currentClient
+
+        function showClientData(clientId) {
+            $.get('/client_prescriptions.json', {client_id: clientId}, function(data) {
                 $('#client-details').show()
                 $('#client-name').html(data.username)
                 var prescriptions = data.prescriptions
@@ -55,7 +58,7 @@
                         if (!prescription.end_date) {
                             medText = medText + ' [ACTIVE]';
                             if (prescription.pro_username == '{{ pro.username }}') {
-                                medText = medText + '&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-primary btn-lg change-prescription-button" data-toggle="modal" data-target="#change-prescription-modal" data-prescription-id="' + prescription.prescription_id + '">Change Prescription</button>';
+                                medText = medText + '&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-primary btn-lg change-prescription-button" data-toggle="modal" data-target="#change-prescription-modal" data-prescription-id="' + prescription.prescription_id + '" data-drug-id="' + prescription.drug_id + '"">Change Prescription</button>';
                             }
                         }
                         medText = medText + '</li><ul>';
@@ -79,12 +82,18 @@
             if (moodChart) {
                 moodChart.destroy();
             }
-            createClientChart(currentQuarter[0], currentQuarter[1], this.value);
+            createClientChart(currentYear[0], currentYear[1], clientId);
             
+        }
+
+        $('#client-to-view').on('change', function(evt){
+            currentClient = this.value;
+            showClientData(currentClient);
         });
+            
     </script>
 
-    <!-- Add Day Modal -->
+    <!-- Add Prescription Modal -->
     <div class="modal fade" id="change-prescription-modal" tabindex="-1" role="dialog" aria-labelledby="change-prescription-modal">
       <div class="modal-dialog" role="document">
 
@@ -95,35 +104,82 @@
           </div>
           <div class="modal-body">
             <form id='change-prescription' action='/add_prescription' method='POST'>
-                <label for='instruction'>Instructions: </label>
-                <input id='instruction' type='text' name='instruction' required><br>
+                <label for='instructions'>Instructions: </label>
+                <input id='instructions' type='text' name='instructions' required><br>
 
                 <label for='notes'>Notes: </label>
                 <input id='notes' type='text' name='notes' required><br>
 
                 <input id='start-date' type='hidden'>
-                clickedPrescriptionId: <input id='old-prescription' type='text'>              
+                clickedPrescriptionId: <input id='old-prescription' type='text'> 
+                <input id='drug-id' type='text'>
+                <input id='client-id' type='text'>
+                <input type='submit' value='Change Prescription'>
 
-                <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-                <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-                <script>
-                    $( function() {
-                        var currentDate = moment().format('YYYY-MM-DD');
-                        $( "#start-date" ).val(currentDate);
-                    });
+            </form>             
 
-                    $('#change-prescription-modal').on('show.bs.modal', function(evt) {
-                        var button = $(evt.relatedTarget);
-                        $('#old-prescription').val(button[0].dataset['prescriptionId']);
-                    })                  
+            <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+            <script>
+                $( function() {
+                    var currentDate = moment().format('YYYY-MM-DD');
+                    $( "#start-date" ).val(currentDate);
+                });
 
-                    $('#change-prescription').on('submit', 'button', function(evt) {
+                $('#change-prescription-modal').on('show.bs.modal', function(evt) {
+                    var button = $(evt.relatedTarget);
+                    $('#old-prescription').val(button[0].dataset['prescriptionId']);
+                    $('#drug-id').val(button[0].dataset['drugId']);
+                    $('#client-id').val(currentClient);
+
+
+                    $('#change-prescription').on('submit', function(evt) {
                         evt.preventDefault();
-                        // endPrescription();
-                        // addPrescription();
+                        // debugger;
+                        formInputs = {
+                            clientId: $('#client-id').val(),
+                            drugId: $('#drug-id').val(),
+                            instructions: $('#instructions').val(),
+                            notes: $('#notes').val(),
+                            startDate: $('#start-date').val()
+                        }
+                        // debugger;
+                        endPrescription($('#old-prescription').val());
+                        addPrescription(formInputs);
+                        showClientData($('#client-id').val());
                     });
-                </script>
-            </form>
+                })
+
+
+                // $('#change-prescription').on('submit', 'button', function(evt) {
+                //     evt.preventDefault();
+                //     debugger;
+                //     formInputs = {
+                //         clientId: $('#client-id').val(),
+                //         drugId: $('#drug-id').val(),
+                //         instructions: $('#instructions').val(),
+                //         notes: $('#notes').val(),
+                //         startDate: $('#start-date').val()
+                //     }
+                //     debugger;
+                //     // endPrescription();
+                //     addPrescription(formInputs);
+                // });
+
+                function addPrescription() {
+                    $.post('/add_prescription.json', formInputs, function(data) {
+                        // console.log(data);
+                        $('#change-prescription-modal').modal('hide');
+                    });
+                };
+
+                function endPrescription(prescriptionId) {
+                    $.post('/end_prescription.json', {prescriptionId: prescriptionId, currentDate: $('#start-date').val()}, function(data){
+                        // console.log(data);
+                    });
+                };
+            </script>
+
           </div>
         </div>
       </div>
