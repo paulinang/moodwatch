@@ -16,8 +16,13 @@ def get_rolling_mean(user_id, r_window=10):
     moods = pd.Series(overall_moods)
     r = moods.rolling(window=r_window)
     r_mean_moods = r.mean()
-    r_mean_mood_list = [int(mean) for mean in r_mean_moods[(r_window-1):]]
+    r_mean_mood_list = [mean for mean in r_mean_moods[(r_window-1):]]
+    if type(r_mean_mood_list[-1]) != int:
+        del r_mean_mood_list[-1]
+        del dates[-1]
     mood_list = list(moods[:(r_window-1)]) + r_mean_mood_list
+    mood_list = [int(mood) for mood in mood_list]
+
     smooth = pd.Series(mood_list, index=dates)
 
     return smooth
