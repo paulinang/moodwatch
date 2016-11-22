@@ -101,7 +101,7 @@ def logout():
 def show_user_profile():
     """Show user profile page"""
 
-    user_id = session.get('user_id')
+    user_id = session['user_id']
 
     # Retrieve user object and pass it into profile template
     user = db.session.query(User).get(user_id)
@@ -120,8 +120,6 @@ def show_user_profile():
 ##########################################################################
 ########################### PRO USER ROUTES  #############################
 ##########################################################################
-
-
 @app.route('/client_prescriptions.json')
 @login_required
 def get_client_prescriptions():

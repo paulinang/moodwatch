@@ -55,7 +55,7 @@
                         if (!prescription.end_date) {
                             medText = medText + ' [ACTIVE]';
                             if (prescription.pro_username == '{{ pro.username }}') {
-                                medText = medText + '&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#change-prescription-modal">Change Prescription</button>';
+                                medText = medText + '&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-primary btn-lg change-prescription-button" data-toggle="modal" data-target="#change-prescription-modal" data-prescription-id="' + prescription.prescription_id + '">Change Prescription</button>';
                             }
                         }
                         medText = medText + '</li><ul>';
@@ -94,21 +94,39 @@
             <h4 class="modal-title" id="change-prescription-title">Change Prescription </h4>
           </div>
           <div class="modal-body">
-            <form id='add-prescription' action='/add_prescription' method='POST'>
+            <form id='change-prescription' action='/add_prescription' method='POST'>
                 <label for='instruction'>Instructions: </label>
                 <input id='instruction' type='text' name='instruction' required><br>
 
                 <label for='notes'>Notes: </label>
                 <input id='notes' type='text' name='notes' required><br>
 
-                <input id='start-date' type='hidden'>              
+                <input id='start-date' type='hidden'>
+                <input id='old-prescription' type-'hidden'>              
 
                 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
                 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
                 <script>
-                    // When DOM is ready, turn date input to datepicker
                     $( function() {
-                        $( "#start-date" ).val(moment().format('YYYY-MM-DD'));
+                        var currentDate = moment().format('YYYY-MM-DD');
+                        $( "#start-date" ).val(currentDate);
+
+                        $('#client-details').on('change', function (evt) {
+                            alert('works');
+                            console.log($('.change-prescription-button'));
+                        });
+                    });
+
+                    function check () {
+                        return $('.change-prescription-button');
+                    }
+
+                    
+
+                    $('#change-prescription').on('submit', 'button', function(evt) {
+                        evt.preventDefault();
+                        // endPrescription();
+                        // addPrescription();
                     });
                 </script>
             </form>
