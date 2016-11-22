@@ -32,7 +32,7 @@ def load_users():
     User.query.delete()
 
     loki = User(username='loki',
-                password=hashpw('fenrir_hel_jormungand', gensalt()),
+                password=hashpw('jormungand', gensalt()),
                 email='loki@jotunheim.com')
 
     tyr = User(username='tyr',
@@ -214,8 +214,8 @@ def rand_day_moods(num_days=1000, tz='US/Pacific'):
     """ Creates a list of days with random moods """
 
     ca_tz = timezone(tz)
-    today = datetime.now(ca_tz).date()
-    first_day = today - timedelta(days=num_days-1)
+    most_recent = datetime.now(ca_tz).date() - timedelta(days=1)
+    first_day = most_recent - timedelta(days=num_days-1)
 
     random_moods = pd.Series((np.random.rand(num_days) * 80).astype(int) - 50)
     mood_list = list(random_moods)

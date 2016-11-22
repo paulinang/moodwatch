@@ -179,7 +179,6 @@ def process_event_mood_log():
     event_date = datetime.strptime(request.form.get('today-event-date'), '%Y-%m-%d').date()
     # end_date = datetime.strptime(request.form.get('end-date'), '%Y-%m-%d').date()
     user_id, overall_mood, min_mood, max_mood, notes = get_mood_rating()
-
     # create event
     event = Event(event_name=event_name,
                   user_id=user_id,
@@ -190,10 +189,8 @@ def process_event_mood_log():
     db.session.add(event)
     db.session.commit()
 
-    # event.associate_days(start_date, end_date)
-    if not event_date in [day.date for day in event.user.days]:
-        event.create_dummy_day(event_date)
-        flash('Event %s on today (%s) successfully created' % (event_name, event_date))
+    event.associate_day(event_date)
+    flash('Event %s on today (%s) successfully created' % (event_name, event_date))
 
     return redirect('/user_profile')
 
@@ -255,9 +252,9 @@ def get_mood_chart_data():
             for event in day.events:
                 if event.overall_mood:
                     event_dataset = [{'x': date, 'y': event.overall_mood}]
-                    if event.min_mood or event.max_mood:
-                        event_dataset.extend([{'x': date, 'y': event.min_mood},
-                                              {'x': date, 'y': event.max_mood}])
+                    # if event.min_mood or event.max_mood:
+                    #     event_dataset.extend([{'x': date, 'y': event.min_mood},
+                    #                           {'x': date, 'y': event.max_mood}])
                     datasets.append({'label': 'event',
                                      'backgroundColor': 'rgba(0,0,0,0)',
                                      'borderColor': 'rgba(0,0,0,0)',
@@ -288,6 +285,41 @@ def get_smooth_mood_data():
             dataset.append({'x': date, 'y': smooth[i]})
 
     return jsonify({'datasets': [{'data': dataset}]})
+
+
+@app.route('/day_chart.json')
+# @login_required
+def get_day_logs():
+    """ Get's all logs (events and day) for a specific day"""
+
+    date_str = request.args.get('day')
+    date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    day = Day.query.filter_by(user_id=session['user_id'], date=date).first()
+    datasets = []
+
+    print day
+
+    if day:
+        print day.events
+        for event in day.events:
+            # event_dataset.append({'x': date_str, 'y': event.overall_mood})
+            datasets.append({'label': '%s' % event.event_name,
+                             'backgroundColor': 'rgba(255,153,0,1)',
+                             'borderColor': 'rgba(0,0,0,0)',
+                             'data': [{'x': date_str, 'y': event.overall_mood}]})
+
+        if day.overall_mood:
+            # initialize dataset with point(date, overall_mood)
+            day_dataset = [{'x': date_str, 'y': day.overall_mood}]
+            # if there is a mood range (check by or, in cases min or max is 0)
+            if day.min_mood or day.max_mood:
+                # extend the day's mood dataset with the range values
+                day_dataset.extend([{'x': date_str, 'y': day.min_mood},
+                                    {'x': date_str, 'y': day.max_mood}])
+            # append day dataset to the master list of datasets
+            datasets.append({'label': 'Day %s' % date_str,
+                             'data': day_dataset})
+    return jsonify({'datasets': datasets})
 
 
 ###########################################################################################

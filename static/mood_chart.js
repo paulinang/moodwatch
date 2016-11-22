@@ -141,6 +141,25 @@ $('.move-time-button').on('click', function () {
         });
 
 
+// function createDayChart(day) {
+//     debugger;
+//     var minDate = moment(day).subtract(1, 'day').format('YYYY-MM-DD');
+//     var maxDate = moment(day).add(1, 'day').format('YYYY-MM-DD');
+//     var options = initializeOptions(minDate, maxDate);
+//     debugger;
+//     $.get('/day_chart.json',
+//         {day: day},
+//          function (data) {
+//             debugger;
+//             moodChart = new Chart(dctx, {
+//                 type: 'line',
+//                 data: data,
+//                 options: options
+//             });
+//         });
+// }
+
+
 // $('#toggle-events').on('click', function () {
 //     var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
 //     for (i=0; i<events.length; i++) {
@@ -153,3 +172,22 @@ $('.move-time-button').on('click', function () {
 //     }
 //     moodChart.update();
 // });
+
+
+// AJAX request for json to create line chart with
+function createDayChart(day) {
+    // debugger;
+    var minDate = moment(day).subtract(1, 'day').format('YYYY-MM-DD');
+    var maxDate = moment(day).add(1, 'day').format('YYYY-MM-DD');
+    var options = initializeOptions(minDate, maxDate);
+    // debugger;
+    $.get('/day_chart.json',
+        {day: day},
+         function (data) {
+            dayChart = new Chart(dCtx, {
+                type: 'line',
+                data: data,
+                options: options
+            });
+        });
+}

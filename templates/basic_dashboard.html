@@ -3,14 +3,14 @@
 {% block content %}
     <!-- Show basic user info -->
     <h1>{{ user_info.user.username }}'s Dashboard </h1>
-    <h3>Email: {{ user_info.user.email }}</h3>
+    <!-- <h3>Email: {{ user_info.user.email }}</h3> -->
 
     <!-- Show mood logs -->
-    <p>Mood logs:</p>
+    <h3> Last 30 days </h3>
     
     <!-- Day Log Mood Chart -->
     <div class="mood-chart" style='height: 50vh; width: 75vw'>
-      <canvas id="moodChart"></canvas>
+       <canvas id="moodChart"></canvas>
     </div>
     <!-- <button type="button" id="toggle-events">Toggle Events</button><br><br> -->
     <script src='static/mood_chart.js'></script>
@@ -20,10 +20,26 @@
             var ctx = $('#moodChart').get(0).getContext('2d');
             // Declare moodChart var outside AJAX request, so can access it outside later
             var moodChart;
-            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')];
-            createMoodChart(currentQuarter[0], currentQuarter[1]);
+            var minDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+            var maxDate = moment().format('YYYY-MM-DD');
+            createMoodChart(minDate, maxDate);
         {% endif %}
 
+    </script>
+
+    <div class='day-chart'>
+        <h3>Logs for Today</h3>
+        <canvas id="dayChart"></canvas>
+    </div>
+
+    <script>
+        var dCtx = $('#dayChart').get(0).getContext('2d');
+        var dayChart;
+        var today = moment().format('YYYY-MM-DD');
+        // debugger;
+        createDayChart(today);
+
+        
     </script>
 
     <div id='today-log-forms'>

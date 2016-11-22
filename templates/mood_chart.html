@@ -41,8 +41,8 @@
         $('#toggle-events').on('click', function (evt) {
             var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
             for (i=0; i<events.length; i++) {
-                if (events[i].borderColor != 'rgba(255,153,0,0.7)') {
-                    events[i].borderColor = 'rgba(255,153,0,0.7)';
+                if (events[i].borderColor != 'rgba(255,153,0,1)') {
+                    events[i].borderColor = 'rgba(255,153,0,1)';
                 }
                 else {
                     events[i].borderColor = 'rgba(0,0,0,0)';

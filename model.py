@@ -223,27 +223,39 @@ class Event(db.Model):
         # It actually gives the earliest and latest dates of days associated with the event.
         return (self.days[0].date, self.days[-1].date)
 
-    def associate_days(self, start_date, end_date):
-        """Create association between event and all logged days within duration"""
+    # def associate_days(self, start_date, end_date):
+    #     """Create association between event and all logged days within duration"""
 
-        # to check if day has already been associated with event
-        # not (day in self.days))
+    #     # to check if day has already been associated with event
+    #     # not (day in self.days))
 
-        # for each day logged by the user owning that event
-        for day in self.user.days:
-            # if the day falls within the event duration
-            if ((start_date <= day.date) and (day.date <= end_date)):
-                event_day = EventDay(event_id=self.event_id,
-                                     day_id=day.day_id)
-                db.session.add(event_day)
-                db.session.commit()
+    #     # for each day logged by the user owning that event
+    #     for day in self.user.days:
+    #         # if the day falls within the event duration
+    #         if ((start_date <= day.date) and (day.date <= end_date)):
+    #             event_day = EventDay(event_id=self.event_id,
+    #                                  day_id=day.day_id)
+    #             db.session.add(event_day)
+    #             db.session.commit()
 
     def create_dummy_day(self, event_date):
         """Creates dummy day log for an event with a date that hasn't been logged by user"""
 
-        day = Day(user_id=self.user.user_id,
+        day = Day(user_id=self.user_id,
                   date=event_date)
         db.session.add(day)
+        db.session.commit()
+
+        return day
+
+    def associate_day(self, date):
+        """Associates event with day"""
+
+        day = Day.query.filter_by(date=date, user_id=self.user_id).first()
+        if not day:
+            day = self.create_dummy_day(date)
+        event_day = EventDay(event_id=self.event_id, day_id=day.day_id)
+        db.session.add(event_day)
         db.session.commit()
 
 
