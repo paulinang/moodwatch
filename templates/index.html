@@ -1,10 +1,32 @@
-{% extends 'base.html' %}
+<!doctype html>
+<html>
+  <head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel='stylesheet' href='/static/main.css' type='text/css'>
+    <title>Paulina's HB Project</title>
+  </head>
+  <body>
+    <script src="https://code.jquery.com/jquery.js"></script>
 
-{% block content %}
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#login-modal">
-      Log Into Existing Account
-    </button>
+    <div class='container-fluid'>
+      <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#login-modal">
+            Log Into Existing Account
+      </button>
+      <div id="img-wrapper">
+        <img id='lighthouse' src='/static/lighthouse_crop.jpg'></img>
+      </div>
+<!--       <div class="row">
+        <div class="text-center col-xs-4 col-xs-offset-4" id='welcome'> -->
+        <!-- Button trigger modal -->
+          
+          <!-- Button trigger modal -->
+  <!--         <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#register-modal">
+            Register New Account
+          </button> -->
+<!--         </div>
+      </div> -->
+    </div>
+    
 
     <!-- Login Modal -->
     <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="login-modal">
@@ -30,10 +52,6 @@
       </div>
     </div>
 
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#register-modal">
-      Register New Account
-    </button>    
 
     <!-- Regiser Modal -->
     <div class="modal fade" id="register-modal" tabindex="-1" role="dialog" aria-labelledby="regster-modal">
@@ -61,6 +79,5 @@
         </div>
       </div>
     </div>
-
-
-{% endblock %}    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </body>

@@ -1,17 +1,73 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <!-- Show basic user info -->
-    <h1>{{ user_info.user.username }}'s Dashboard </h1>
-    <!-- <h3>Email: {{ user_info.user.email }}</h3> -->
+    <div class='container-fluid'>
+        <!-- Show basic user info -->
+        <!-- <h1>{{ user_info.user.username }}'s Dashboard </h1> -->
+        <!-- <h3>Email: {{ user_info.user.email }}</h3> -->
 
-    <!-- Show mood logs -->
-    <h3> Last 30 days </h3>
+        <!-- TODAY FEATURES: log events, day. View day chart -->
+        <div class='row' id='today'>
+            <h3>Hi {{ user_info.user.username }}, How Are You Doing Today?</h3>
+            <div class='col-xs-2 col-xs-offset-3' id='add-logs'>
+                <br><br>
+                <!-- Button trigger for event log modal -->
+                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#todayEvent">
+                    Log Event
+                </button>
+                <br><br>
+                <!-- Button trigger for day log modal -->
+                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#todayLog">
+                  Log Today
+                </button>
+            </div>
+            <div class='col-xs-4'>
+                <h3>Logs for Today</h3>
+                <div id='day-chart'>
+                    <canvas id="dayChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- LAST 30 DAYS MOOD CHART -->
+        <div class='row' id ='summary'>
+            <div class='col-xs-6'>
+                <h3> Last 30 days </h3>
+                <div id='recent-chart'>
+                    <canvas id="moodChart"></canvas>
+                </div>
+            </div>
+            <div class='col-xs-4 col-xs-offset-1'>
+                <h3> Active Prescriptions</h3>
+                <ul>
+                    {% for drug, prescription_list in user_info.prescriptions.items() %}
+                    <li>
+                        <b>{{ drug }}</b>
+                        <ol>
+                            {% for prescription in prescription_list %}
+                            <li>
+                                <!-- Notes whether prescription is active -->
+                                Started: {{ prescription.start_date }}
+                                {% if not prescription.end_date %}
+                                    [ ACTIVE ]
+                                {% else %}
+                                    &nbsp;&nbsp;Ended: {{ prescription.end_date }}
+                                {% endif %}
+                                <ul>
+                                    <li>Prescribed by: {{ prescription.pro_username }}</li>
+                                    <li>Instructions: {{ prescription.instructions }}</li>
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    </li>
+                    {% endfor %}
+                </ul>                
+        </div>
+    </div>
     
     <!-- Day Log Mood Chart -->
-    <div class="mood-chart" style='height: 50vh; width: 75vw'>
-       <canvas id="moodChart"></canvas>
-    </div>
+
     <!-- <button type="button" id="toggle-events">Toggle Events</button><br><br> -->
     <script src='static/mood_chart.js'></script>
     <script>
@@ -27,11 +83,6 @@
 
     </script>
 
-    <div class='day-chart' style='width: 20vw'>
-        <h3>Logs for Today</h3>
-        <canvas id="dayChart"></canvas>
-    </div>
-
     <script>
         var dCtx = $('#dayChart').get(0).getContext('2d');
         var dayChart;
@@ -43,14 +94,6 @@
     </script>
 
     <div id='today-log-forms'>
-            <h3>How Are You Doing Today?</h3>
-            <br><br>
-            <!-- EVENT LOG FOR TODAY MODAL -->
-            <!-- Button trigger for today event log modal -->
-            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#todayEvent">
-              Log Event
-            </button>
-
             <!-- Today event log Modal -->
             <div class="modal fade" id="todayEvent" tabindex="-1" role="dialog" aria-labelledby="todayEventLabel">
               <div class="modal-dialog" role="document">
@@ -94,11 +137,6 @@
             </div>
             <!-- END OF EVENT LOG FOR TODAY MODAL -->
 
-            <!-- DAY LOG FOR TODAY MODAL -->
-            <!-- Button trigger for today event log modal -->
-            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#todayLog">
-              Log Today
-            </button>
             <!-- Today day log Modal -->
             <div class="modal fade" id="todayLog" tabindex="-1" role="dialog" aria-labelledby="todayLogLabel">
               <div class="modal-dialog" role="document">
@@ -150,39 +188,14 @@
             }
             else if ('{{ user_info.daylog_info.lastlog_date }}' == moment().format('YYYY-MM-DD')
                 && '{{ user_info.daylog_info.is_lastlog_valid }}' == 'True')
-                $('#today-log-forms').html('<h1>You Have Already Logged Today</h1>')               
+                $('#today').html('<h1>You Have Already Logged Today</h1>')               
 
             $('.mood-form').on('submit', validateMoodRange);
         });
     </script>
 
 
-    <!-- Show prescription logs -->
-    <h3>Prescriptions:</h3>
-    <ul>
-        {% for drug, prescription_list in user_info.prescriptions.items() %}
-        <li>
-            <b>{{ drug }}</b>
-            <ol>
-                {% for prescription in prescription_list %}
-                <li>
-                    <!-- Notes whether prescription is active -->
-                    Started: {{ prescription.start_date }}
-                    {% if not prescription.end_date %}
-                        [ ACTIVE ]
-                    {% else %}
-                        &nbsp;&nbsp;Ended: {{ prescription.end_date }}
-                    {% endif %}
-                    <ul>
-                        <li>Prescribed by: {{ prescription.pro_username }}</li>
-                        <li>Instructions: {{ prescription.instructions }}</li>
-                    </ul>
-                </li>
-                {% endfor %}
-            </ol>
-        </li>
-        {% endfor %}
-    </ul>
+
 
 
 {% endblock %}    
