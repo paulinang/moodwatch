@@ -1,26 +1,52 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.2/moment.min.js"></script>
-    <script src=
-      "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js">
-    </script>
-    <button type='button' class='move-time-button' value='backward'>&lt;</button>
-    <select id='chart-time-window' name='time-window'>
-        <option value='month'>Monthly</option>
-        <option value='quarter' selected='selected'>Quarterly</option>
-        <option value='bi-annual'>Bi-Annually</option>
-        <option value='year'>Annual</option>
-        <option value='all-time'>All time</option>
-    </select>
-    <button type='button' class='move-time-button' value='forward'>&gt;</button>
-    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-    <button type="button" id="toggle-events">Toggle Events</button><br><br>
+    <div class='container-fluid'>
+        <div class='row'>
+            <div class='col-xs-12'>
+                <button type='button' class='move-time-button' value='backward'>&lt;</button>
+                <select id='chart-time-window' name='time-window'>
+                    <option value='month'>Monthly</option>
+                    <option value='quarter' selected='selected'>Quarterly</option>
+                    <option value='bi-annual'>Bi-Annually</option>
+                    <option value='year'>Annual</option>
+                    <option value='all-time'>All time</option>
+                </select>
+                <button type='button' class='move-time-button' value='forward'>&gt;</button>
+                <span id='toggle-chart-data'>
+                    <button type="button" id="toggle-events">Toggle Events</button>
+                </span>
+                <br><br>
 
-    <!-- Mood Chart -->
-    <div class="mood-chart" style='height: 50vh; width: 75vw'>
-      <canvas id="moodChart"></canvas>
+                <div id="mood-chart">
+                  <canvas id="moodChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class='row'>
+            <label for='start-date'>Day:</label>
+            <input id='start-date' type='text' name='start-date' readonly="true" required>
+            <button type='button' id='clear-search'>Clear Search Results</button>
+            <div class='col-xs-12 col-md-6'>
+                <div class='log-details'>
+                    <div class='main-log'>
+                        <h3>Day: </h3>
+                        <ul>
+                            <li class='overall-mood'>Overall Mood: </li>
+                    </div>
+                    <div class='associated-logs'></div>
+                </div>
+            </div>
+            <div class='col-xs-12 col-md-6'>
+                <h3>Logs for <span id='searched-day'>PLACEHOLDER</span></h3>
+                <div id='day-chart'>
+                    <canvas id="dayChart"></canvas>
+                </div>                
+            </div>
+        </div>
     </div>
+
     <script src='static/mood_chart.js'></script>
     <script>
         {% if user_info.user.days %}
@@ -56,17 +82,10 @@
 
     <!-- Log Details: Search and view details on same page -->
     <div class='log-search'>
-        <!-- <h3>Choose a time period to look at</h3> -->
-        <label for='start-date'>Day:</label>
-        <input id='start-date' type='text' name='start-date' readonly="true" required>
-        <button type='button' id='clear-search'>Clear Search Results</button>
-<!--         <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        <label for='end-date'>End:</label>
-        <input id='end-date' type='text' name='end-date' readonly="true" required><br>
- -->
         <script src='static/datepicker.js'></script>
         <script>
             // When DOM is ready, turn date input to datepicker
+            var dCtx, dayChart;
             $( function() {                 
                 $( "#start-date" ).datepicker({
                     changeMonth: true,
@@ -74,22 +93,18 @@
                     maxDate: new Date(),
                     dateFormat: 'yy-mm-dd'
                 });
-
-                // $( "#end-date" ).datepicker({
-                //     changeMonth: true,
-                //     changeYear: true,
-                //     maxDate: new Date(),
-                //     dateFormat: 'yy-mm-dd'
-                // });
+                dCtx = $('#dayChart').get(0).getContext('2d');
+                debugger;
             } );
 
             $('#start-date').on('change', function(evt) {
-                startDate = this.value;
+                var requestedDay = this.value;
                 $('.main-log').empty();
                 $('.associated-logs').empty();
+                $('.log-details').show();
                 // endDate =
                 $.get('/search_log_results.json',
-                    {startDate: startDate},
+                    {startDate: requestedDay},
                     function(data) {
                         $('.main-log').html('<h3>Day: ' + data.date + '</h3><ul></ul>');
                         $('.main-log ul').append('<li>Overall Mood:' + data.overall_mood + '</li>');
@@ -101,20 +116,15 @@
                             $('.associated-logs').append('<h4>' + assocEvent[1] + '</h4><ul id=\'assocEvent-' + assocEvent[0] + '\'><li>' + event.notes + '</li></ul>');
                         }
                     });
+                
+                createDayChart(requestedDay);
             });
 
             $('#clear-search').on('click', function(evt) {
+                $('.log-details').hide();
                 $('.main-log').empty();
                 $('.associated-logs').empty();
             });
         </script>
-    </div>
-    <div class='log-details'>
-        <div class='main-log'>
-<!--             <h3>Day: </h3>
-            <ul>
-                <li class='overall-mood'>Overall Mood: </li> -->
-        </div>
-        <div class='associated-logs'></div>
     </div>
 {% endblock %}

@@ -23,3 +23,10 @@ body {
     height: 40vh;
 }
 
+#mood-chart {
+    height: 40vh;
+}
+
+.log-details {
+    display: none;
+}
