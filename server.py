@@ -80,12 +80,12 @@ def process_login():
     password = request.form.get('password')
     user = User.query.filter_by(username=username).first()
 
-    if (user) and (hashpw(str(password), str(user.password)) == user.password):
-        login_user(user)
-        return redirect('/user_profile')
-    else:
+    if not (user) or (hashpw(str(password), str(user.password)) != user.password):
         flash('Username and/or password invalid')
         return redirect('/')
+    else:
+        login_user(user)
+        return redirect('/user_profile')
 
 
 @app.route('/logout')
