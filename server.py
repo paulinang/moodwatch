@@ -46,6 +46,9 @@ def user_loader(user_id):
 def index():
     """Homepage."""
 
+    if 'user_id' in session:
+        return redirect('/user_dashboard')
+
     return render_template('index.html')
 
 
@@ -85,7 +88,7 @@ def process_login():
         return redirect('/')
     else:
         login_user(user)
-        return redirect('/user_profile')
+        return redirect('/user_dashboard')
 
 
 @app.route('/logout')
@@ -96,9 +99,9 @@ def logout():
     return redirect('/')
 
 
-@app.route('/user_profile')
+@app.route('/user_dashboard')
 @login_required
-def show_user_profile():
+def show_user_dashboard():
     """Show user profile page"""
 
     user_id = session['user_id']
@@ -166,7 +169,7 @@ def process_day_mood_log():
     # day_datapoint = {'date': datetime.strftime(day.date, '%Y-%m-%d'),
     #                  'overall_mood': day.overall_mood}
 
-    return redirect('/user_profile')
+    return redirect('/user_dashboard')
 
 
 @app.route('/log_event_mood', methods=['POST'])
@@ -192,7 +195,7 @@ def process_event_mood_log():
     event.associate_day(event_date)
     flash('Event %s on today (%s) successfully created' % (event_name, event_date))
 
-    return redirect('/user_profile')
+    return redirect('/user_dashboard')
 
 
 @app.route('/search_log_results.json')
@@ -343,7 +346,7 @@ def drug_list():
         return render_template('drugs.html', drugs=drugs, pro=user)
 
     flash('Only healthcare professionals can access drug database')
-    return redirect('/user_profile')
+    return redirect('/user_dashboard')
 
 
 ##################################################################################
