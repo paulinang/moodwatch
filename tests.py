@@ -260,31 +260,50 @@ class ProUserFlaskTests(unittest.TestCase):
         result = self.client.get('/drugs')
 
         self.assertIn('Psychiatric Medication Database', result.data)
-        self.assertIn('Test drug', result.data)
-        self.assertIn('Test drug brand', result.data)
-        self.assertIn('Test drug uses', result.data)
+        self.assertIn('Example drug', result.data)
+        self.assertIn('Example drug brand', result.data)
+        self.assertIn('Example drug uses', result.data)
 
     def test_add_prescription(self):
-        """ Test adding a prescription for test drug """
+        """ Test adding a prescription for example drug """
 
         result = self.client.post('/add_prescription.json',
                                   data={'clientId': 1,
                                         'drugId': 1,
-                                        'instructions': 'Test drug instructions',
+                                        'instructions': 'Test prescription instructions',
                                         'notes': 'Test prescription',
                                         'startDate': '2016-05-06'})
 
         test_med = json.loads(result.data)
         assert test_med is not None, 'Prescription was bit created'
-        assert ({'prescription_id': 1,
+        assert ({'prescription_id': 2,
                  'pro_id': 3,
                  'pro_username': 'user3',
                  'pro_email': 'user3@email.com',
                  'drug_id': 1,
                  'start_date': '2016-05-06',
                  'end_date': None,
-                 'instructions': 'Test drug instructions',
+                 'instructions': 'Test prescription instructions',
                  'notes': 'Test prescription'} == test_med)
+
+    def test_end_prescription(self):
+        """ Test ending an example prescription """
+
+        result = self.client.post('/end_prescription.json',
+                                  data={'prescriptionId': 1,
+                                        'currentDate': '2016-11-10'})
+
+        test_med = json.loads(result.data)
+        assert test_med is not None, 'Prescription exists'
+        assert ({'prescription_id': 1,
+                 'pro_id': 3,
+                 'pro_username': 'user3',
+                 'pro_email': 'user3@email.com',
+                 'drug_id': 1,
+                 'start_date': '2016-04-16',
+                 'end_date': '2016-11-10',
+                 'instructions': 'Example prescription instructions',
+                 'notes': 'Example prescription'} == test_med)
 
 
 if __name__ == '__main__':

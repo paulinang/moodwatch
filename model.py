@@ -299,10 +299,20 @@ def example_data():
     db.session.commit()
 
     # Make drug
-    drug = Drug(generic_name='Test drug',
-                brand_name='Test drug brand',
-                uses='Test drug uses')
+    drug = Drug(generic_name='Example drug',
+                brand_name='Example drug brand',
+                uses='Example drug uses')
     db.session.add(drug)
+    db.session.commit()
+
+    # Make prescription for user2, prescribed by user3
+    prescription = Prescription(client_id=2,
+                                pro_id=3,
+                                drug_id=1,
+                                start_date='2016-04-16',
+                                instructions='Example prescription instructions',
+                                notes='Example prescription')
+    db.session.add(prescription)
     db.session.commit()
 
 
