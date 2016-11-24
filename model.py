@@ -265,7 +265,7 @@ def example_data():
     """Create some sample data."""
 
     # Make users
-    for i in range(1, 3):
+    for i in range(1, 4):
         user = User(username='user%s' % i,
                     password=hashpw('password%s' % i, gensalt()),
                     email='user%s@email.com' % i)
@@ -273,7 +273,7 @@ def example_data():
 
     db.session.commit()
 
-    # Make a day with associated event
+    # Make a day with associated event for user1
     day = Day(user_id=1,
               date='2016-08-09',
               overall_mood=10)
@@ -286,6 +286,17 @@ def example_data():
     db.session.commit()
 
     event.associate_day('2016-08-09')
+
+    # Make user3 professional
+    pro = Professional(user_id=3)
+    db.session.add(pro)
+    db.session.commit()
+
+    # Make active contracts between pro and user1, user2
+    for i in range(1, 3):
+        contract = Contract(pro_id=3, client_id=i, active=True)
+        db.session.add(contract)
+    db.session.commit()
 
     # Make drug
     drug = Drug(generic_name='Test drug',

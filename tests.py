@@ -60,7 +60,7 @@ class NotLoggedInFlaskTests(unittest.TestCase):
         self.assertIn('<h3>Active Prescription', result.data)
 
 
-class LoggedInFlaskTests(unittest.TestCase):
+class BasicUserFlaskTests(unittest.TestCase):
     """Testing routes when user1 is logged in"""
 
     def setUp(self):
@@ -218,6 +218,41 @@ class LoggedInFlaskTests(unittest.TestCase):
                 'data': [{'x': '2016-08-09', 'y': 15}]} in datasets['datasets']
         assert {'label': 'Day 2016-08-09',
                 'data': [{'x': '2016-08-09', 'y': 10}]} in datasets['datasets']
+
+
+class ProUserFlaskTests(unittest.TestCase):
+    """Testing routes when user3 (professional) is logged in"""
+
+    def setUp(self):
+        """ Stuff to do before every test."""
+
+        app.config['TESTING'] = True
+        app.config['SECRET_KEY'] = 'abc'
+        self.client = app.test_client()
+
+        connect_to_db(app, 'testdb')
+        db.create_all()
+        example_data()
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = 3
+
+    def tearDown(self):
+        """ Do at end of every test. """
+
+        db.session.close()
+        db.drop_all()
+
+    def test_pro_dashboard(self):
+        """ Test professional dashboard """
+
+        result = self.client.get('/user_dashboard')
+
+        self.assertIn('user3', result.data)
+        self.assertIn('Psychiatric Medications Database', result.data)
+        self.assertIn('<option value=\'1\'>user1', result.data)
+        self.assertIn('<option value=\'2\'>user2', result.data)
 
 
 if __name__ == '__main__':
