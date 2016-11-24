@@ -71,6 +71,12 @@
     <!-- <button type="button" id="toggle-events">Toggle Events</button><br><br> -->
     <script src='static/mood_chart.js'></script>
     <script>
+
+        var dCtx = $('#dayChart').get(0).getContext('2d');
+        var dayChart;
+        var today = moment().format('YYYY-MM-DD');
+        // debugger;
+        createDayChart(today);
         {% if user_info.user.days %}
             // Select canvas for mood chart
             var ctx = $('#moodChart').get(0).getContext('2d');
@@ -81,16 +87,6 @@
             createMoodChart(minDate, maxDate);
         {% endif %}
 
-    </script>
-
-    <script>
-        var dCtx = $('#dayChart').get(0).getContext('2d');
-        var dayChart;
-        var today = moment().format('YYYY-MM-DD');
-        // debugger;
-        createDayChart(today);
-
-        
     </script>
 
     <div id='today-log-forms'>

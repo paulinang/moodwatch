@@ -1,5 +1,5 @@
 from model import User
-# import numpy as np
+import numpy as np
 import pandas as pd
 
 
@@ -17,9 +17,11 @@ def get_rolling_mean(user_id, r_window=10):
     r = moods.rolling(window=r_window)
     r_mean_moods = r.mean()
     r_mean_mood_list = [mean for mean in r_mean_moods[(r_window-1):]]
-    if type(r_mean_mood_list[-1]) != int:
+
+    while (np.isnan(r_mean_mood_list[-1])):
         del r_mean_mood_list[-1]
         del dates[-1]
+
     mood_list = list(moods[:(r_window-1)]) + r_mean_mood_list
     mood_list = [int(mood) for mood in mood_list]
 

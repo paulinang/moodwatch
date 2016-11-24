@@ -6,11 +6,12 @@
             <div class='col-xs-12'>
                 <button type='button' class='move-time-button' value='backward'>&lt;</button>
                 <select id='chart-time-window' name='time-window'>
+                    <option selected='selected' disabled>Select A Time Window</option>
                     <option value='month'>Monthly</option>
-                    <option value='quarter' selected='selected'>Quarterly</option>
-                    <option value='bi-annual'>Bi-Annually</option>
+                    <option value='quarter'>Quarterly</option>
+                    <option value='bi-annual'>Semi-Annually</option>
                     <option value='year'>Annual</option>
-                    <option value='all-time'>All time</option>
+                    <option value='all-time'>All Logs</option>
                 </select>
                 <button type='button' class='move-time-button' value='forward'>&gt;</button>
                 <span id='toggle-chart-data'>
@@ -54,9 +55,13 @@
             var moodChart;
             var ctx = $('#moodChart').get(0).getContext('2d');
 
+            // Get earliest log to set as minDate if all-logs window selected
             var firstLog = '{{ user_info.daylog_info.firstlog_date}}';
-            var currentQuarter = [moment().startOf('quarter').format('YYYY-MM-DD'), moment().endOf('quarter').format('YYYY-MM-DD')];
-            createMoodChart(currentQuarter[0], currentQuarter[1]);
+
+            // Mood chart first shows last 30 days when page is loaded
+            var minDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+            var maxDate = moment().format('YYYY-MM-DD');
+            createMoodChart(minDate, maxDate);
         {% endif %}
 
         $('#chart-time-window').on('change', function () {
@@ -64,18 +69,7 @@
             changeTimeWindow(timeWindow);
         });
 
-        $('#toggle-events').on('click', function (evt) {
-            var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
-            for (i=0; i<events.length; i++) {
-                if (events[i].borderColor != 'rgba(255,153,0,1)') {
-                    events[i].borderColor = 'rgba(255,153,0,1)';
-                }
-                else {
-                    events[i].borderColor = 'rgba(0,0,0,0)';
-                }
-            }
-            moodChart.update();
-        });
+        $('#toggle-events').on('click', toggleEvents);
 
     </script>
     <br>
@@ -94,7 +88,6 @@
                     dateFormat: 'yy-mm-dd'
                 });
                 dCtx = $('#dayChart').get(0).getContext('2d');
-                debugger;
             } );
 
             $('#start-date').on('change', function(evt) {
