@@ -254,6 +254,16 @@ class ProUserFlaskTests(unittest.TestCase):
         self.assertIn('<option value=\'1\'>user1', result.data)
         self.assertIn('<option value=\'2\'>user2', result.data)
 
+    def test_drugs(self):
+        """ Test drugs database """
+
+        result = self.client.get('/drugs')
+
+        self.assertIn('Psychiatric Medication Database', result.data)
+        self.assertIn('Test drug', result.data)
+        self.assertIn('Test drug brand', result.data)
+        self.assertIn('Test drug uses', result.data)
+
 
 if __name__ == '__main__':
     unittest.main()

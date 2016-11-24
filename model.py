@@ -301,7 +301,7 @@ def example_data():
     # Make drug
     drug = Drug(generic_name='Test drug',
                 brand_name='Test drug brand',
-                uses='Testing drug')
+                uses='Test drug uses')
     db.session.add(drug)
     db.session.commit()
 
