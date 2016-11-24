@@ -191,6 +191,20 @@ class LoggedInFlaskTests(unittest.TestCase):
         assert 'You also logged event(s):' in logs_html['event_html']
         assert 'Test event 1 rated 15' in logs_html['event_html']
 
+    def test_day_chart_json(self):
+        """ Test getting user1's logs as json for day chart """
+
+        result = self.client.get('/day_chart.json',
+                                 query_string={'day': '2016-08-09'})
+
+        datasets = json.loads(result.data)
+        assert {'label': 'Test event 1',
+                'backgroundColor': 'rgba(255,153,0,1)',
+                'borderColor': 'rgba(0,0,0,0)',
+                'data': [{'x': '2016-08-09', 'y': 15}]} in datasets['datasets']
+        assert {'label': 'Day 2016-08-09',
+                'data': [{'x': '2016-08-09', 'y': 10}]} in datasets['datasets']
+
 
 if __name__ == '__main__':
     unittest.main()

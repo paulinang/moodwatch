@@ -330,7 +330,6 @@ def get_day_logs():
     print day
 
     if day:
-        print day.events
         for event in day.events:
             # event_dataset.append({'x': date_str, 'y': event.overall_mood})
             datasets.append({'label': '%s' % event.event_name,
