@@ -73,8 +73,8 @@ class Professional(db.Model):
         for contract in self.contracts:
             if contract.active:
                 clients['active'].append(contract.client)
-            else:
-                clients['inactive'].append(contract.client)
+            # else:
+            #     clients['inactive'].append(contract.client)
         return clients
 
 
@@ -176,7 +176,7 @@ class Day(db.Model):
     def __repr__(self):
         """Gives date and user of record"""
 
-        return "<Day user_id =%s date=%s>" % (self.user_id, self.date)
+        return "<Day user_id=%s date=%s>" % (self.user_id, datetime.strftime(self.date, '%Y-%m-%d'))
 
     def get_info_dict(self):
         info = {'date': datetime.strftime(self.date, '%Y-%m-%d'),
@@ -212,7 +212,7 @@ class Event(db.Model):
     def __repr__(self):
         """Gives name and user of record"""
 
-        return "<Event user_id =%s event=%s>" % (self.user_id, self.event_name)
+        return "<Event user_id=%s event=%s>" % (self.user_id, self.event_name)
 
     def create_dummy_day(self, event_date):
         """Creates dummy day log for an event with a date that hasn't been logged by user"""
@@ -316,7 +316,7 @@ def example_data():
     db.session.commit()
 
 
-if __name__ == "__main__":
-    from server import app
-    connect_to_db(app, 'asgard_db')
-    print "Connected to DB."
+# if __name__ == "__main__":
+#     from server import app
+#     connect_to_db(app, 'asgard_db')
+#     print "Connected to DB."

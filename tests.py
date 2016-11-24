@@ -1,7 +1,7 @@
 import unittest
 from server import app
 from flask import session
-from model import connect_to_db, db, example_data, Day, Event, Prescription, Drug
+from model import connect_to_db, db, example_data, User, Professional, Contract, Prescription, Drug, Day, Event
 from datetime import datetime
 import json
 
@@ -25,6 +25,24 @@ class NotLoggedInFlaskTests(unittest.TestCase):
 
         db.session.close()
         db.drop_all()
+
+    def test_model_reprs(self):
+        """ Test __repr__ of models """
+
+        user_str = User.query.get(1).__repr__()
+        assert ('<User user_id=1 username=user1 email=user1@email.com>' == user_str)
+        pro_str = Professional.query.get(3).__repr__()
+        assert ('<Professional user_id=3 username=user3>' == pro_str)
+        contract_str = Contract.query.get(1).__repr__()
+        assert ('<Contract pro=3 client=1 active=True>' == contract_str)
+        prescription_str = Prescription.query.get(1).__repr__()
+        assert ('<Prescription client_id=2 drug_id=1>' == prescription_str)
+        drug_str = Drug.query.get(1).__repr__()
+        assert ('<Drug drug_id=1 generic_name=Example drug uses=Example drug uses>' == drug_str)
+        day_str = Day.query.get(1).__repr__()
+        assert ('<Day user_id=1 date=2016-08-09>' == day_str)
+        event_str = Event.query.get(1).__repr__()
+        assert ('<Event user_id=1 event=Test event 1>' == event_str)
 
     def test_index(self):
         """ Test homepage """
@@ -304,6 +322,24 @@ class ProUserFlaskTests(unittest.TestCase):
                  'end_date': '2016-11-10',
                  'instructions': 'Example prescription instructions',
                  'notes': 'Example prescription'} == test_med)
+
+    def test_client_meds_json(self):
+        """ Test getting client user2's meds for pro user3 """
+
+        result = self.client.get('/client_prescriptions.json',
+                                 query_string={'client_id': 2})
+
+        client_meds = json.loads(result.data)
+        assert ({'username': 'user2',
+                 'prescriptions': {'Example drug': [{'prescription_id': 1,
+                                                     'pro_id': 3,
+                                                     'pro_username': 'user3',
+                                                     'pro_email': 'user3@email.com',
+                                                     'drug_id': 1,
+                                                     'start_date': '2016-04-16',
+                                                     'end_date': None,
+                                                     'instructions': 'Example prescription instructions',
+                                                     'notes': 'Example prescription'}]}} == client_meds)
 
 
 if __name__ == '__main__':
