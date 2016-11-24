@@ -1,7 +1,7 @@
 import unittest
 from server import app
 from flask import session
-from model import connect_to_db, db, example_data, Day, Event
+from model import connect_to_db, db, example_data, Day, Event, Prescription, Drug
 from datetime import datetime
 import json
 
@@ -263,6 +263,28 @@ class ProUserFlaskTests(unittest.TestCase):
         self.assertIn('Test drug', result.data)
         self.assertIn('Test drug brand', result.data)
         self.assertIn('Test drug uses', result.data)
+
+    def test_add_prescription(self):
+        """ Test adding a prescription for test drug """
+
+        result = self.client.post('/add_prescription.json',
+                                  data={'clientId': 1,
+                                        'drugId': 1,
+                                        'instructions': 'Test drug instructions',
+                                        'notes': 'Test prescription',
+                                        'startDate': '2016-05-06'})
+
+        test_med = json.loads(result.data)
+        assert test_med is not None, 'Prescription was bit created'
+        assert ({'prescription_id': 1,
+                 'pro_id': 3,
+                 'pro_username': 'user3',
+                 'pro_email': 'user3@email.com',
+                 'drug_id': 1,
+                 'start_date': '2016-05-06',
+                 'end_date': None,
+                 'instructions': 'Test drug instructions',
+                 'notes': 'Test prescription'} == test_med)
 
 
 if __name__ == '__main__':
