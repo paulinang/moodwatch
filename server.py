@@ -67,7 +67,7 @@ def process_registration():
     elif db.session.query(User).filter(User.username == username).first():
         flash('That username has already been taken')
     else:
-        user = User(username=username, email=email, password=hashed, user_type='basic')
+        user = User(username=username, email=email, password=hashed)
         db.session.add(user)
         db.session.commit()
         flash('Account successfully created.')
@@ -240,7 +240,7 @@ def get_logs_for_day():
 ##########################  MOOD CHART ROUTES  ###########################
 ##########################################################################
 
-@app.route('/user_day_moods')
+@app.route('/user_logs')
 @login_required
 def display_day_mood_chart():
     user = User.query.get(session['user_id'])

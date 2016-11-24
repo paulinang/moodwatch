@@ -1,9 +1,65 @@
 import unittest
 from server import app
+from flask import session
 from model import connect_to_db, db, example_data
 
 
-class FlaskTests(unittest.TestCase):
+class NotLoggedInFlaskTests(unittest.TestCase):
+    """Testing routes when there is no user logged in"""
+
+    def setUp(self):
+        """ Stuff to do before every test."""
+
+        app.config['TESTING'] = True
+        app.config['SECRET_KEY'] = 'abc'
+        self.client = app.test_client()
+
+        connect_to_db(app, 'testdb')
+        db.create_all()
+        example_data()
+
+    def tearDown(self):
+        """ Do at end of every test. """
+
+        db.session.close()
+        db.drop_all()
+
+    def test_index(self):
+        """ Test homepage """
+
+        result = self.client.get('/',
+                                 follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Log In', result.data)
+
+    def test_user_registration(self):
+        """ Test user registration form """
+
+        result = self.client.post('/register',
+                                  data={'new-username': 'test_user',
+                                        'new-password': 'test_password',
+                                        'email': 'test@email.com'},
+                                  follow_redirects=True)
+
+        self.assertIn('Log In', result.data)
+
+    def test_user_login(self):
+        """ Test user login form with user1"""
+
+        result = self.client.post('/login',
+                                  data={'username': 'user1',
+                                        'password': 'password1'},
+                                  follow_redirects=True)
+
+        self.assertIn('<h3>Hi user1, How Are You Doing Today?</h3>', result.data)
+        self.assertIn('Log Event', result.data)
+        self.assertIn('Log Today', result.data)
+        self.assertIn('<canvas id="moodChart"></canvas>', result.data)
+        self.assertIn('<h3>Active Prescription', result.data)
+
+
+class LoggedInFlaskTests(unittest.TestCase):
+    """Testing routes when user1 is logged in"""
 
     def setUp(self):
         """ Stuff to do before every test."""
@@ -18,7 +74,7 @@ class FlaskTests(unittest.TestCase):
 
         with self.client as c:
             with c.session_transaction() as sess:
-                sess['user_id'] = 2
+                sess['user_id'] = 1
 
     def tearDown(self):
         """ Do at end of every test. """
@@ -26,47 +82,36 @@ class FlaskTests(unittest.TestCase):
         db.session.close()
         db.drop_all()
 
-    def test_index(self):
-        """ Test homepage """
+    def test_user_dashboard(self):
+        """ Test user dashboard with user1"""
 
-        result = self.client.get('/')
-        self.assertEqual(result.status_code, 200)
-        # Check that there is login / register forms
-        self.assertIn('Log Into Existing Account', result.data)
-        self.assertIn('Register New Account', result.data)
+        result = self.client.get('/user_dashboard',
+                                 follow_redirects=True)
 
-    def test_user_registration(self):
-        """ Test user registration form """
+        self.assertIn('<h3>Hi user1, How Are You Doing Today?</h3>', result.data)
+        self.assertIn('Log Event', result.data)
+        self.assertIn('Log Today', result.data)
+        self.assertIn('<canvas id="moodChart"></canvas>', result.data)
+        self.assertIn('<h3>Active Prescription', result.data)
 
-        result = self.client.post('/register',
-                                  data={'new-username': 'test_user',
-                                        'new-password': 'test_password',
-                                        'email': 'test@email.com'},
-                                  follow_redirects=True)
+    def test_user_logs(self):
+        """ Test user logs page with user1"""
 
-        self.assertIn('Account successfully created.', result.data)
+        result = self.client.get('/user_logs')
 
-    def test_user_login(self):
-        """ Test user login form """
+        self.assertIn('Select A Time Window', result.data)
+        self.assertIn('Toggle Events', result.data)
+        self.assertIn('Clear Search Results', result.data)
+        self.assertIn('canvas id="dayChart">', result.data)
 
-        result = self.client.post('/login',
-                                  data={'username': 'user1',
-                                        'password': 'password'},
-                                  follow_redirects=True)
+    def test_logout(self):
+        """ Test user logged out"""
 
-        # assert session['user_id'] == 1
-        self.assertIn('<h1>user1\'s Profile </h1>', result.data)
-        # self.assertIn('<h1>user1 Dashboard</h1>', result.data)
-
-    def testUserDashboard(self):
-        """ Test user dashboard for preset user2"""
-
-        result = self.client.get('/user_profile')
-        self.assertEqual(result.status_code, 200)
-        self.assertIn('<h1>user2\'s Profile </h1>', result.data)
-        self.assertIn('<canvas', result.data)
-        # self.assertIn('Log An Event For Today</button>', result.data)
-        # self.assertIn('Log Today</button>', result.data)
+        with self.client as c:
+            result = c.get('/logout',
+                           follow_redirects=True)
+            self.assertNotIn('user_id', session)
+            self.assertIn('Log In', result.data)
 
 
 if __name__ == '__main__':
