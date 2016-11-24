@@ -327,8 +327,6 @@ def get_day_logs():
     day = Day.query.filter_by(user_id=session['user_id'], date=date).first()
     datasets = []
 
-    print day
-
     if day:
         for event in day.events:
             # event_dataset.append({'x': date_str, 'y': event.overall_mood})

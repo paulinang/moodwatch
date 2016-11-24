@@ -205,6 +205,20 @@ class LoggedInFlaskTests(unittest.TestCase):
         assert {'label': 'Day 2016-08-09',
                 'data': [{'x': '2016-08-09', 'y': 10}]} in datasets['datasets']
 
+    def test_mood_chart_json(self):
+        """ Test getting user1's logs as json for mood chart """
+
+        result = self.client.get('/mood_chart.json',
+                                 query_string={'minDate': '2016-07-10',
+                                               'maxDate': '2016-08-20'})
+        datasets = json.loads(result.data)
+        assert {'label': 'event',
+                'backgroundColor': 'rgba(0,0,0,0)',
+                'borderColor': 'rgba(0,0,0,0)',
+                'data': [{'x': '2016-08-09', 'y': 15}]} in datasets['datasets']
+        assert {'label': 'Day 2016-08-09',
+                'data': [{'x': '2016-08-09', 'y': 10}]} in datasets['datasets']
+
 
 if __name__ == '__main__':
     unittest.main()

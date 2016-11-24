@@ -264,7 +264,8 @@ def connect_to_db(app, dbname):
 def example_data():
     """Create some sample data."""
 
-    for i in range(1, 5):
+    # Make users
+    for i in range(1, 3):
         user = User(username='user%s' % i,
                     password=hashpw('password%s' % i, gensalt()),
                     email='user%s@email.com' % i)
@@ -272,6 +273,7 @@ def example_data():
 
     db.session.commit()
 
+    # Make a day with associated event
     day = Day(user_id=1,
               date='2016-08-09',
               overall_mood=10)
@@ -284,6 +286,13 @@ def example_data():
     db.session.commit()
 
     event.associate_day('2016-08-09')
+
+    # Make drug
+    drug = Drug(generic_name='Test drug',
+                brand_name='Test drug brand',
+                uses='Testing drug')
+    db.session.add(drug)
+    db.session.commit()
 
 
 if __name__ == "__main__":
