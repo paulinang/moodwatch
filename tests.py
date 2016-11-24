@@ -1,7 +1,7 @@
 import unittest
 from server import app
 from flask import session
-from model import connect_to_db, db, example_data
+from model import connect_to_db, db, example_data, Day
 
 
 class NotLoggedInFlaskTests(unittest.TestCase):
@@ -83,7 +83,7 @@ class LoggedInFlaskTests(unittest.TestCase):
         db.drop_all()
 
     def test_user_dashboard(self):
-        """ Test user dashboard with user1"""
+        """ Test user1 dashboard"""
 
         result = self.client.get('/user_dashboard',
                                  follow_redirects=True)
@@ -95,7 +95,7 @@ class LoggedInFlaskTests(unittest.TestCase):
         self.assertIn('<h3>Active Prescription', result.data)
 
     def test_user_logs(self):
-        """ Test user logs page with user1"""
+        """ Test user1 logs page"""
 
         result = self.client.get('/user_logs')
 
@@ -105,13 +105,41 @@ class LoggedInFlaskTests(unittest.TestCase):
         self.assertIn('canvas id="dayChart">', result.data)
 
     def test_logout(self):
-        """ Test user logged out"""
+        """ Test user1 logged out"""
 
         with self.client as c:
             result = c.get('/logout',
                            follow_redirects=True)
             self.assertNotIn('user_id', session)
             self.assertIn('Log In', result.data)
+
+    def test_log_day(self):
+        """ Test user1 logging a day"""
+
+        result = self.client.post('/log_day_mood',
+                                  data={'today-date': '2016-11-01',
+                                        'overall-mood': 0,
+                                        'min-mood': -15,
+                                        'max-mood': 15,
+                                        'notes': 'Test log day'},
+                                  follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('<h3>Hi user1, How Are You Doing Today?</h3>', result.data)
+        self.assertIn('Log Event', result.data)
+        self.assertIn('Log Today', result.data)
+        self.assertIn('<canvas id="moodChart"></canvas>', result.data)
+        self.assertIn('<h3>Active Prescription', result.data)
+
+        test_day = Day.query.filter_by(date='2016-11-01').first()
+        assert test_day is not None, 'Day was not created'
+        assert ({'date': '2016-11-01',
+                 'overall_mood': 0,
+                 'min_mood': -15,
+                 'max_mood': 15,
+                 'notes': 'Test log day',
+                 'events': []}
+                == test_day.get_info_dict()), 'Day did not have the right info'
 
 
 if __name__ == '__main__':
