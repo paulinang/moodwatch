@@ -214,27 +214,6 @@ class Event(db.Model):
 
         return "<Event user_id =%s event=%s>" % (self.user_id, self.event_name)
 
-    def get_duration(self):
-        """Get start and end date of event"""
-
-        # It actually gives the earliest and latest dates of days associated with the event.
-        return (self.days[0].date, self.days[-1].date)
-
-    # def associate_days(self, start_date, end_date):
-    #     """Create association between event and all logged days within duration"""
-
-    #     # to check if day has already been associated with event
-    #     # not (day in self.days))
-
-    #     # for each day logged by the user owning that event
-    #     for day in self.user.days:
-    #         # if the day falls within the event duration
-    #         if ((start_date <= day.date) and (day.date <= end_date)):
-    #             event_day = EventDay(event_id=self.event_id,
-    #                                  day_id=day.day_id)
-    #             db.session.add(event_day)
-    #             db.session.commit()
-
     def create_dummy_day(self, event_date):
         """Creates dummy day log for an event with a date that hasn't been logged by user"""
 
@@ -265,8 +244,7 @@ class EventDay(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('events.event_id'), nullable=False)
     day_id = db.Column(db.Integer, db.ForeignKey('days.day_id'), nullable=False)
 
-    # Prevent event from being associate with a unique day more than once
-
+# Prevent event from being associate with a unique day more than once
 db.Index('event_day', EventDay.event_id, EventDay.day_id, unique=True)
 
 
@@ -293,6 +271,19 @@ def example_data():
         db.session.add(user)
 
     db.session.commit()
+
+    day = Day(user_id=1,
+              date='2016-08-09',
+              overall_mood=10)
+    db.session.add(day)
+
+    event = Event(user_id=1,
+                  event_name='Test event 1',
+                  overall_mood=15)
+    db.session.add(event)
+    db.session.commit()
+
+    event.associate_day('2016-08-09')
 
 
 if __name__ == "__main__":

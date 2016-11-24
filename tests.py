@@ -3,6 +3,7 @@ from server import app
 from flask import session
 from model import connect_to_db, db, example_data, Day, Event
 from datetime import datetime
+import json
 
 
 class NotLoggedInFlaskTests(unittest.TestCase):
@@ -176,6 +177,19 @@ class LoggedInFlaskTests(unittest.TestCase):
         dummy_day_info = [datetime.strftime(dummy_day.date, '%Y-%m-%d'), dummy_day.user_id, dummy_day.overall_mood]
         assert (['2016-11-01', 1, None]
                 == dummy_day_info), 'Dummy day did not have right info'
+
+    def test_log_html_json(self):
+        """ Test getting user1's logs as html """
+
+        result = self.client.get('/logs_html.json',
+                                 query_string={'searchDate': '2016-08-09'})
+
+        logs_html = json.loads(result.data)
+        assert '<h3>On 2016-08-09, you rated' in logs_html['day_html']
+        assert '<li>Overall at 10' in logs_html['day_html']
+        assert 'Notes' not in logs_html['day_html']
+        assert 'You also logged event(s):' in logs_html['event_html']
+        assert 'Test event 1 rated 15' in logs_html['event_html']
 
 
 if __name__ == '__main__':

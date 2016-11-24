@@ -212,7 +212,7 @@ def get_logs_for_day():
         if day_info.get('max_mood'):
             day_html += '<li>Highest at {}</li>'.format(day_info['max_mood'])
 
-        day_html += '<li> Overall at {}</li>'.format(day_info['overall_mood'])
+        day_html += '<li>Overall at {}</li>'.format(day_info['overall_mood'])
 
         if day_info.get('min_mood'):
             day_html += '<li>Lowest at {}</li>'.format(day_info['min_mood'])
