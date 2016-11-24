@@ -1,3 +1,16 @@
+// Return current day's date as a string to set a html elemnt attribute
+function currentDate() {   
+    var d = new Date();
+    var day = d.getDate();
+    if (day < 10) {
+        day = '0' + day;
+    }
+    var dStr = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + day;
+
+    return dStr
+}
+
+// VALIDATE MOOD RANGE BEFORE SUBMISSION OF LOG
 function validateMoodRange(evt){
     var overallMood = $(this).find('.overall-mood').val()
     var minMood = $(this).find('.min-mood').val()

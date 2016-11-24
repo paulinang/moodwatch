@@ -9,7 +9,9 @@
         <!-- TODAY FEATURES: log events, day. View day chart -->
         <div class='row' id='today'>
             <h3>Hi {{ user_info.user.username }}, How Are You Doing Today?</h3>
-            <div class='col-xs-2 col-xs-offset-3' id='add-logs'>
+
+            <!-- Add logs for today -->
+            <div class='col-xs-12 col-md-2 col-md-offset-3' id='add-logs'>
                 <br><br>
                 <!-- Button trigger for event log modal -->
                 <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#todayEvent">
@@ -21,7 +23,9 @@
                   Log Today
                 </button>
             </div>
-            <div class='col-xs-4'>
+
+            <!-- Chart of logs for today -->
+            <div class='col-md-12 col-md-4'>
                 <h3>Logs for Today</h3>
                 <div id='day-chart'>
                     <canvas id="dayChart"></canvas>
@@ -29,15 +33,19 @@
             </div>
         </div>
 
-        <!-- LAST 30 DAYS MOOD CHART -->
+        <!-- USER RESOURCES AT A GLANCE: logs in last 30 days. Active prescriptions -->
         <div class='row' id ='summary'>
-            <div class='col-xs-6'>
+
+            <!-- last 30 day moodchart -->
+            <div class='col-xs-12 col-md-6'>
                 <h3> Last 30 days </h3>
                 <div id='recent-chart'>
                     <canvas id="moodChart"></canvas>
                 </div>
             </div>
-            <div class='col-xs-4 col-xs-offset-1'>
+
+            <!-- active prescriptions -->
+            <div class='col-xs-12 col-md-4 col-md-offset-1'>
                 <h3> Active Prescriptions</h3>
                 <ul>
                     {% for drug, prescription_list in user_info.prescriptions.items() %}
@@ -65,29 +73,6 @@
                 </ul>                
         </div>
     </div>
-    
-    <!-- Day Log Mood Chart -->
-
-    <!-- <button type="button" id="toggle-events">Toggle Events</button><br><br> -->
-    <script src='static/mood_chart.js'></script>
-    <script>
-
-        var dCtx = $('#dayChart').get(0).getContext('2d');
-        var dayChart;
-        var today = moment().format('YYYY-MM-DD');
-        // debugger;
-        createDayChart(today);
-        {% if user_info.user.days %}
-            // Select canvas for mood chart
-            var ctx = $('#moodChart').get(0).getContext('2d');
-            // Declare moodChart var outside AJAX request, so can access it outside later
-            var moodChart;
-            var minDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
-            var maxDate = moment().format('YYYY-MM-DD');
-            createMoodChart(minDate, maxDate);
-        {% endif %}
-
-    </script>
 
     <div id='today-log-forms'>
             <!-- Today event log Modal -->
@@ -96,7 +81,7 @@
                 <div class="modal-content">
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="todayEventLabel">What Happened Today?</h4>
+                    <h4 class="modal-title" id="todayEventLabel">Log Event</h4>
                   </div>
                   <div class="modal-body">
                     <form class="event mood-form" action='/log_event_mood' method='POST'>
@@ -111,16 +96,6 @@
 
                         <label for='event-overall-mood'>Overall Mood: </label>
                         <input class='event overall-mood' type='number' name='overall-mood' min='-50' max='50' required><br>
-
-                        <!-- <p id='event-mood-range'>Range of Mood: 
-                        <label for='event-min-mood'>Min: </label>
-                        <input class='event min-mood' type='number' name='min-mood' min='-50' max='50'>
-
-                        <label for='event-max-mood'>Max: </label>
-                        <input class='event max-mood' type='number' name='max-mood' min='-50' max='50'><span class="event alert-msg" style='color:red;'></span><br>
-                        </p> -->
-                        <input name='max-mood' type='hidden'>
-                        <input name='min-mood' type='hidden'>
 
                         <label for='event-notes'>Notes About This Event:</label>
                         <input class='event notes' type='textarea' name='notes'><br>
@@ -139,7 +114,7 @@
                 <div class="modal-content">
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="todayLogLabel">How Did Your Day Go?</h4>
+                    <h4 class="modal-title" id="todayLogLabel">Log Day</h4>
                   </div>
                   <div class="modal-body">
                     <form class="day mood-form" action='/log_day_mood' method='POST'>
@@ -173,25 +148,31 @@
             <!-- END OF DAY LOG FOR TODAY MODAL -->
     </div>
 
-
-    <!-- js for datepickers -->
-    <script src='static/datepicker.js'></script>
+    <script src='static/main.js'></script>
+    <script src='static/mood_chart.js'></script>
     <script>
-        // When DOM is ready
-        $( function() {
-            if ('{{ user_info.daylog_info.firstlog_date }}' == 'None') {
-                $('.mood-chart').hide();
-            }
-            else if ('{{ user_info.daylog_info.lastlog_date }}' == moment().format('YYYY-MM-DD')
-                && '{{ user_info.daylog_info.is_lastlog_valid }}' == 'True')
-                $('#today').html('<h1>You Have Already Logged Today</h1>')               
 
-            $('.mood-form').on('submit', validateMoodRange);
-        });
+        // Create day chart for today
+        var dCtx = $('#dayChart').get(0).getContext('2d');
+        var dayChart;
+        var today = moment().format('YYYY-MM-DD');
+        createDayChart(today);
+
+        // Remove add log buttons if day has already been logged
+        if ('{{ user_info.daylog_info.lastlog_date }}' == moment().format('YYYY-MM-DD') && '{{ user_info.daylog_info.is_lastlog_valid }}' == 'True') {
+            $('#add-logs').html('<h1>You Have Already Logged Today</h1>');
+        }
+                               
+        // Validate mood form before submission
+        $('.mood-form').on('submit', validateMoodRange);
+
+        // Create mood chart for last 30 days
+        var ctx = $('#moodChart').get(0).getContext('2d');
+        var moodChart;
+        var minDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+        var maxDate = moment().format('YYYY-MM-DD');
+        createMoodChart(minDate, maxDate);
+
     </script>
-
-
-
-
 
 {% endblock %}    
