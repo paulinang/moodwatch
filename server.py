@@ -198,13 +198,40 @@ def process_event_mood_log():
     return redirect('/user_dashboard')
 
 
-@app.route('/search_log_results.json')
+@app.route('/logs_html.json')
 @login_required
-def get_logs_for_time():
-    start_date = datetime.strptime(request.args.get('startDate'), '%Y-%m-%d').date()
-    day = Day.query.filter_by(user_id=session['user_id'], date=start_date).first()
+def get_logs_for_day():
+    """ Returns info of logs formatted in html to display as search results"""
+
+    requested_date = datetime.strptime(request.args.get('searchDate'), '%Y-%m-%d').date()
+    day = Day.query.filter_by(user_id=session['user_id'], date=requested_date).first()
     if day:
-        return jsonify(day.get_info_dict())
+        day_info = day.get_info_dict()
+        day_html = '<h3>On {}, you rated your moods: </h3><ul>'.format(day_info['date'])
+
+        if day_info.get('max_mood'):
+            day_html += '<li>Highest at {}</li>'.format(day_info['max_mood'])
+
+        day_html += '<li> Overall at {}</li>'.format(day_info['overall_mood'])
+
+        if day_info.get('min_mood'):
+            day_html += '<li>Lowest at {}</li>'.format(day_info['min_mood'])
+
+        if day_info['notes']:
+            day_html += '<li>Notes: {}</li>'.format(day_info['notes'])
+        day_html += '</ul>'
+
+        event_html = ''
+        for event in day.events:
+            event_html += '<li>{} rated {}'.format(event.event_name, event.overall_mood)
+            if event.notes:
+                event_html += '<p>&nbsp;&nbsp;&nbsp;&nbsp;{}</p>'.format(event.notes)
+            event_html += '</li>'
+
+        if event_html:
+            event_html = '<h3>You also logged event(s):</h3><ul>' + event_html + '</ul>'
+
+        return jsonify({'day_html': day_html, 'event_html': event_html})
 
     return jsonify(None)
 

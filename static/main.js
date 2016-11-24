@@ -1,15 +1,3 @@
-// Return current day's date as a string to set a html elemnt attribute
-function currentDate() {   
-    var d = new Date();
-    var day = d.getDate();
-    if (day < 10) {
-        day = '0' + day;
-    }
-    var dStr = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + day;
-
-    return dStr
-}
-
 // VALIDATE MOOD RANGE BEFORE SUBMISSION OF LOG
 function validateMoodRange(evt){
     var overallMood = $(this).find('.overall-mood').val()
@@ -41,4 +29,29 @@ function validateMoodRange(evt){
         evt.preventDefault();
         $('.alert-msg').html(msg);
     }
+}
+
+
+// GET LOGS FOR A DAY
+function displaySearchResults(requestedDay) {
+    // Empty log details if previously populated
+    $('.main-log').empty();
+    $('.associated-logs').empty();
+
+    // Show log detail div if previously hidden
+    $('.log-details').show();
+
+    // Populate log detail div with search results
+    $.get('/logs_html.json', {searchDate: requestedDay}, function(data) {
+        if (data) {
+            $('.main-log').html(data.day_html);
+
+            if (data.event_html) {
+                $('.associated-logs').html(data.event_html);
+            }
+        }
+        else {
+            $('.main-log').html('<h4>There are no logs for this day</h4>');
+        }
+    });
 }

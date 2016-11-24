@@ -26,43 +26,40 @@
         </div>
 
         <div class='row'>
-            <label for='start-date'>Day:</label>
-            <input id='start-date' type='text' name='start-date' readonly="true" required>
+            <label for='search-date'>Day:</label>
+            <input id='search-date' type='text' name='search-date' readonly="true" required>
             <button type='button' id='clear-search'>Clear Search Results</button>
-            <div class='col-xs-12 col-md-6'>
-                <div class='log-details'>
-                    <div class='main-log'>
-                        <h3>Day: </h3>
-                        <ul>
-                            <li class='overall-mood'>Overall Mood: </li>
+            <div class='log-details'>
+                <div class='col-xs-12 col-md-6'>
+                <!-- Log Details: Search and view details on same page -->
+                    
+                        <div class='main-log'></div>
+                        <div class='associated-logs'></div>
                     </div>
-                    <div class='associated-logs'></div>
                 </div>
-            </div>
-            <div class='col-xs-12 col-md-6'>
-                <h3>Logs for <span id='searched-day'>PLACEHOLDER</span></h3>
-                <div id='day-chart'>
-                    <canvas id="dayChart"></canvas>
-                </div>                
+                <div class='col-xs-12 col-md-6'>
+                    <!-- <h3>Logs for <span id='searched-day'>PLACEHOLDER</span></h3> -->
+                    <div id='day-chart'>
+                        <canvas id="dayChart"></canvas>
+                    </div>                
+                </div>
             </div>
         </div>
     </div>
+     <br>
 
-    <script src='static/mood_chart.js'></script>
+    <script src='/static/mood_chart.js'></script>
+    <script src='/static/main.js'></script>
     <script>
-        {% if user_info.user.days %}
-            // Declare moodChart var outside AJAX request, so can access it outside later
-            var moodChart;
-            var ctx = $('#moodChart').get(0).getContext('2d');
+        // Create mood chart for last 30 days (default when page loads)
+        var ctx = $('#moodChart').get(0).getContext('2d');
+        var moodChart;
+        var minDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+        var maxDate = moment().format('YYYY-MM-DD');
+        createMoodChart(minDate, maxDate);
 
-            // Get earliest log to set as minDate if all-logs window selected
-            var firstLog = '{{ user_info.daylog_info.firstlog_date}}';
-
-            // Mood chart first shows last 30 days when page is loaded
-            var minDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
-            var maxDate = moment().format('YYYY-MM-DD');
-            createMoodChart(minDate, maxDate);
-        {% endif %}
+        // Get earliest log to set as minDate if all-logs window selected
+        var firstLog = '{{ user_info.daylog_info.firstlog_date}}';
 
         $('#chart-time-window').on('change', function () {
             var timeWindow = this.value;
@@ -71,53 +68,36 @@
 
         $('#toggle-events').on('click', toggleEvents);
 
+        // declare chart variables as global
+        var dCtx = $('#dayChart').get(0).getContext('2d');
+        var dayChart;
+
+        // When DOM is ready, turn date input to datepicker
+        $( function() {                 
+            $( "#search-date" ).datepicker({
+                changeMonth: true,
+                changeYear: true,
+                maxDate: new Date(),
+                dateFormat: 'yy-mm-dd'
+            });
+        } );
+
+        // When user changes datepicker, search for logs of date picked
+        $('#search-date').on('change', function(evt) {
+            var requestedDay = this.value;                
+            displaySearchResults(requestedDay);                
+            createDayChart(requestedDay);
+        });
+
+        // When user clicks clear search, empty html of log details
+        // destroy day chart if there is one
+        $('#clear-search').on('click', function(evt) {
+            $('.main-log').empty();
+            $('.associated-logs').empty();
+            if (dayChart) {
+                dayChart.destroy();                
+            }
+        });
     </script>
-    <br>
-
-    <!-- Log Details: Search and view details on same page -->
-    <div class='log-search'>
-        <script src='static/datepicker.js'></script>
-        <script>
-            // When DOM is ready, turn date input to datepicker
-            var dCtx, dayChart;
-            $( function() {                 
-                $( "#start-date" ).datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    maxDate: new Date(),
-                    dateFormat: 'yy-mm-dd'
-                });
-                dCtx = $('#dayChart').get(0).getContext('2d');
-            } );
-
-            $('#start-date').on('change', function(evt) {
-                var requestedDay = this.value;
-                $('.main-log').empty();
-                $('.associated-logs').empty();
-                $('.log-details').show();
-                // endDate =
-                $.get('/search_log_results.json',
-                    {startDate: requestedDay},
-                    function(data) {
-                        $('.main-log').html('<h3>Day: ' + data.date + '</h3><ul></ul>');
-                        $('.main-log ul').append('<li>Overall Mood:' + data.overall_mood + '</li>');
-                        $('.main-log ul').append('<li>Mood Range: ' + data.min_mood + ' to ' + data.max_mood + '</li>');
-                        $('.main-log ul').append('<li>Notes: ' + data.notes + '</li>');
-                        // debugger;
-                        for (i = 0; i < data.events.length; i++){
-                            var assocEvent = data.events[i]
-                            $('.associated-logs').append('<h4>' + assocEvent[1] + '</h4><ul id=\'assocEvent-' + assocEvent[0] + '\'><li>' + event.notes + '</li></ul>');
-                        }
-                    });
-                
-                createDayChart(requestedDay);
-            });
-
-            $('#clear-search').on('click', function(evt) {
-                $('.log-details').hide();
-                $('.main-log').empty();
-                $('.associated-logs').empty();
-            });
-        </script>
-    </div>
+   
 {% endblock %}
