@@ -1,7 +1,8 @@
 import unittest
 from server import app
 from flask import session
-from model import connect_to_db, db, example_data, Day
+from model import connect_to_db, db, example_data, Day, Event
+from datetime import datetime
 
 
 class NotLoggedInFlaskTests(unittest.TestCase):
@@ -124,6 +125,7 @@ class LoggedInFlaskTests(unittest.TestCase):
                                         'notes': 'Test log day'},
                                   follow_redirects=True)
 
+        # Make sure redirected page is user dashboard
         self.assertEqual(result.status_code, 200)
         self.assertIn('<h3>Hi user1, How Are You Doing Today?</h3>', result.data)
         self.assertIn('Log Event', result.data)
@@ -131,8 +133,10 @@ class LoggedInFlaskTests(unittest.TestCase):
         self.assertIn('<canvas id="moodChart"></canvas>', result.data)
         self.assertIn('<h3>Active Prescription', result.data)
 
+        # Make sure day is created and has right info
         test_day = Day.query.filter_by(date='2016-11-01').first()
         assert test_day is not None, 'Day was not created'
+        assert (test_day.user_id == 1), 'User_id for day not user1'
         assert ({'date': '2016-11-01',
                  'overall_mood': 0,
                  'min_mood': -15,
@@ -140,6 +144,38 @@ class LoggedInFlaskTests(unittest.TestCase):
                  'notes': 'Test log day',
                  'events': []}
                 == test_day.get_info_dict()), 'Day did not have the right info'
+
+    def test_log_event(self):
+        """ Test user1 logging a event"""
+
+        result = self.client.post('/log_event_mood',
+                                  data={'event-name': 'Test event',
+                                        'today-event-date': '2016-11-01',
+                                        'overall-mood': 0,
+                                        'notes': 'Test log event'},
+                                  follow_redirects=True)
+
+        # Make sure redirected page is user dashboard
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('<h3>Hi user1, How Are You Doing Today?</h3>', result.data)
+        self.assertIn('Log Event', result.data)
+        self.assertIn('Log Today', result.data)
+        self.assertIn('<canvas id="moodChart"></canvas>', result.data)
+        self.assertIn('<h3>Active Prescription', result.data)
+
+        # Make sure event is created and has right info
+        test_event = Event.query.filter_by(event_name='Test event').first()
+        assert test_event is not None, 'Event was not created'
+        test_event_info = [test_event.event_name, test_event.overall_mood, test_event.notes, test_event.user_id]
+        assert (['Test event', 0, 'Test log event', 1]
+                == test_event_info), 'Event did not have the right info'
+
+        # Make sure there was a dummy day created and had right info
+        assert (len(test_event.days) == 1), 'Event did not have only 1 day associated with it'
+        dummy_day = test_event.days[0]
+        dummy_day_info = [datetime.strftime(dummy_day.date, '%Y-%m-%d'), dummy_day.user_id, dummy_day.overall_mood]
+        assert (['2016-11-01', 1, None]
+                == dummy_day_info), 'Dummy day did not have right info'
 
 
 if __name__ == '__main__':
