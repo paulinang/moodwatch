@@ -50,6 +50,8 @@ class User(db.Model, UserMixin):
         for prescription in self.prescriptions:
             if not prescription.end_date:
                 prescription = {'drug': prescription.drug.generic_name,
+                                'drug_id': prescription.drug.drug_id,
+                                'prescription_id': prescription.prescription_id,
                                 'pro': prescription.professional.user.username,
                                 'instructions': prescription.instructions,
                                 'start_date': datetime.strftime(prescription.start_date, '%Y-%m-%d')}

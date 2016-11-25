@@ -127,11 +127,37 @@ def get_client_prescriptions():
     """Returns prescriptions for a specific client"""
 
     pro = db.session.query(User).get(session['user_id'])
-    client_id = request.args.get('client_id')
+    client_id = int(request.args.get('clientId'))
     client = db.session.query(User).get(client_id)
     if pro.professional:
+        meds_html = ''
+        for med in client.get_active_prescriptions():
+            button = '<button type="button" \
+                      class="btn btn-primary \
+                      btn-lg change-prescription-button" \
+                      data-toggle="modal" \
+                      data-target="#change-prescription-modal" \
+                      data-prescription-id="%s" \
+                      data-drug-id="%s"> \
+                      Change Prescription \
+                      </button>' % (med['prescription_id'], med['drug_id'])
+            med_html = ('<li><h4>%s started by %s on %s</h4> \
+                         <p>Instructions %s</p>'
+                        % (med['drug'].capitalize(),
+                           med['pro'],
+                           med['start_date'],
+                           med['instructions']))
+            if (med['pro'] == pro.username):
+                med_html += '%s</li>' % button
+            else:
+                med_html += '<button>Contact %s</button></li>' % med['pro']
+
+            meds_html += med_html
+
         return jsonify({'username': client.username,
-                        'prescriptions': client.group_prescriptions_by_drug()})
+                        'active_meds': meds_html,
+                        'all_meds': client.group_prescriptions_by_drug()})
+    return jsonify(None)
 
 
 ##########################################################################

@@ -59,44 +59,12 @@ function displaySearchResults(requestedDay) {
 
 /// GET CLIENT DATA
  function showClientData(clientId, proUsername) {
-    $.get('/client_prescriptions.json', {client_id: clientId}, function(data) {
-        $('.client-details').show()
-        $('#client-name').html(data.username)
-        var prescriptions = data.prescriptions
-        var medText = ''
-        for (var key in prescriptions) {
-            // For each drug type in prescriptions add an unordered list element
-            // Start an ordered list under that element
-            medText = medText + '<li>' + key + '</li><ol>';
-            var prescriptionArray = prescriptions[key];
-            for (i = 0; i < prescriptionArray.length; i++) {
-                // For each prescription of a drug, add it as an ordered list element
-                var prescription = prescriptionArray[i];
-                medText = medText + '<li>Started ' + prescription.start_date;
-                // Label if it's active
-                if (!prescription.end_date) {
-                    medText = medText + ' [ACTIVE]';
-                    if (prescription.pro_username == proUsername) {
-                        medText = medText + '&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-primary btn-lg change-prescription-button" data-toggle="modal" data-target="#change-prescription-modal" data-prescription-id="' + prescription.prescription_id + '" data-drug-id="' + prescription.drug_id + '"">Change Prescription</button>';
-                    }
-                }
-                medText = medText + '</li><ul>';
-
-                if (prescription.end_date) {
-                    medText = medText + '<li>Ended: ' + prescription.end_date;
-                }
-                medText = medText + '<li>Prescribed by: ' + prescription.pro_username;
-                medText = medText + '</li><li>Instructions: ' + prescription.instructions;
-                if (prescription.notes) {
-                    medText = medText + '</li><li>Notes: ' + prescription.notes;
-                }
-                medText = medText + '</li></ul>'
-            }
-        medText = medText + '</li></ol>'
-        
-        }
-        medText = medText + '</ul>';
-        $('#client-meds').html(medText);
+    $.get('/client_prescriptions.json', {clientId: clientId}, function(data) {
+        $('.client-details').show();
+        $('#client-name').html(data.username);
+        var activeMeds = data.active_meds;
+        debugger;
+        $('#client-active-meds').html(activeMeds);
     });
     if (moodChart) {
         moodChart.destroy();
