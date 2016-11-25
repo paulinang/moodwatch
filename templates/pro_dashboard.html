@@ -1,97 +1,39 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <!-- Show basic user info -->
-    <h1>{{ pro.username }}'s Dashboard </h1>
-    <h3><a href='/drugs'>Psychiatric Medications Database</a></h3>
+    <div class='container-fluid'>
+        <h1>{{ pro.username }}'s Dashboard </h1>
+        <h3><a href='/drugs'>Psychiatric Medications Database</a></h3>
 
-    <label for='client-to-view'>Client:</label>
-    <select id='client-to-view' name='client-id'>
-        <option selected='selected' disabled>Select client</option>
-        {% for client in pro.professional.sort_clients().active %}
-         <option value='{{ client.user_id }}'>{{ client.username }}</option>
-         {% endfor %}
-    </select>
-    <br>
-
-    <div id='client-details' style='display:none'>
-        <h3 id='client-name'></h3>
-        <h5>Client Prescriptions</h5>
-        <ul id='client-meds'></ul>
-
-        <!-- Day Log Mood Chart -->
-        <div class="mood-chart" style='height: 50vh; width: 75vw'>
-          <canvas id="moodChart"></canvas>
+        <div class='row' id='select-client'>
+            <div class='col-xs-12'>
+                <label for='client-to-view'>Client:</label>
+                <select id='client-to-view' name='client-id'>
+                    <option selected='selected' disabled>Select client</option>
+                    {% for client in pro.professional.sort_clients().active %}
+                        <option value='{{ client.user_id }}'>{{ client.username }}</option>
+                    {% endfor %}
+            </select>
+            </div>
         </div>
-        <!-- <button type="button" id="toggle-events">Toggle Events</button><br><br> -->
-        <script src='static/mood_chart.js'></script>
-        <script>
-            // Select canvas for mood chart
-            var ctx = $('#moodChart').get(0).getContext('2d');
-            // Declare moodChart var outside AJAX request, so can access it outside later
-            var moodChart;
-            var currentYear = [moment().startOf('year').format('YYYY-MM-DD'), moment().endOf('year').format('YYYY-MM-DD')];
-            
-        </script>
 
+        <div class='row client-details' id='client-chart'>
+            <div class='col-xs-12'>
+                <h3>Client Logs</h3>
+                <div class="mood-chart" style='height: 50vh; width: 75vw'>
+                  <canvas id="moodChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class='row client-details' id='client-meds'>
+            <div class='col-xs-12'>
+                <h3 id='client-name'></h3>
+                <h5>Client Prescriptions</h5>
+                <ul id='client-meds'></ul>
+            </div>
+        </div>
     </div>
-
-    <script>
-        var currentClient
-
-        function showClientData(clientId) {
-            $.get('/client_prescriptions.json', {client_id: clientId}, function(data) {
-                $('#client-details').show()
-                $('#client-name').html(data.username)
-                var prescriptions = data.prescriptions
-                var medText = ''
-                for (var key in prescriptions) {
-                    // For each drug type in prescriptions add an unordered list element
-                    // Start an ordered list under that element
-                    medText = medText + '<li>' + key + '</li><ol>';
-                    var prescriptionArray = prescriptions[key];
-                    for (i = 0; i < prescriptionArray.length; i++) {
-                        // For each prescription of a drug, add it as an ordered list element
-                        var prescription = prescriptionArray[i];
-                        medText = medText + '<li>Started ' + prescription.start_date;
-                        // Label if it's active
-                        if (!prescription.end_date) {
-                            medText = medText + ' [ACTIVE]';
-                            if (prescription.pro_username == '{{ pro.username }}') {
-                                medText = medText + '&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-primary btn-lg change-prescription-button" data-toggle="modal" data-target="#change-prescription-modal" data-prescription-id="' + prescription.prescription_id + '" data-drug-id="' + prescription.drug_id + '"">Change Prescription</button>';
-                            }
-                        }
-                        medText = medText + '</li><ul>';
-
-                        if (prescription.end_date) {
-                            medText = medText + '<li>Ended: ' + prescription.end_date;
-                        }
-                        medText = medText + '<li>Prescribed by: ' + prescription.pro_username;
-                        medText = medText + '</li><li>Instructions: ' + prescription.instructions;
-                        if (prescription.notes) {
-                            medText = medText + '</li><li>Notes: ' + prescription.notes;
-                        }
-                        medText = medText + '</li></ul>'
-                    }
-                medText = medText + '</li></ol>'
-                
-                }
-                medText = medText + '</ul>';
-                $('#client-meds').html(medText);
-            });
-            if (moodChart) {
-                moodChart.destroy();
-            }
-            createClientChart(currentYear[0], currentYear[1], clientId);
-            
-        }
-
-        $('#client-to-view').on('change', function(evt){
-            currentClient = this.value;
-            showClientData(currentClient);
-        });
-            
-    </script>
 
     <!-- Add Prescription Modal -->
     <div class="modal fade" id="change-prescription-modal" tabindex="-1" role="dialog" aria-labelledby="change-prescription-modal">
@@ -121,67 +63,56 @@
             <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
             <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
             <script>
-                $( function() {
-                    var currentDate = moment().format('YYYY-MM-DD');
-                    $( "#start-date" ).val(currentDate);
-                });
-
-                $('#change-prescription-modal').on('show.bs.modal', function(evt) {
-                    var button = $(evt.relatedTarget);
-                    $('#old-prescription').val(button[0].dataset['prescriptionId']);
-                    $('#drug-id').val(button[0].dataset['drugId']);
-                    $('#client-id').val(currentClient);
 
 
-                    $('#change-prescription').on('submit', function(evt) {
-                        evt.preventDefault();
-                        // debugger;
-                        formInputs = {
-                            clientId: $('#client-id').val(),
-                            drugId: $('#drug-id').val(),
-                            instructions: $('#instructions').val(),
-                            notes: $('#notes').val(),
-                            startDate: $('#start-date').val()
-                        }
-                        // debugger;
-                        endPrescription($('#old-prescription').val());
-                        addPrescription(formInputs);
-                        showClientData($('#client-id').val());
-                    });
-                })
-
-
-                // $('#change-prescription').on('submit', 'button', function(evt) {
-                //     evt.preventDefault();
-                //     debugger;
-                //     formInputs = {
-                //         clientId: $('#client-id').val(),
-                //         drugId: $('#drug-id').val(),
-                //         instructions: $('#instructions').val(),
-                //         notes: $('#notes').val(),
-                //         startDate: $('#start-date').val()
-                //     }
-                //     debugger;
-                //     // endPrescription();
-                //     addPrescription(formInputs);
-                // });
-
-                function addPrescription() {
-                    $.post('/add_prescription.json', formInputs, function(data) {
-                        // console.log(data);
-                        $('#change-prescription-modal').modal('hide');
-                    });
-                };
-
-                function endPrescription(prescriptionId) {
-                    $.post('/end_prescription.json', {prescriptionId: prescriptionId, currentDate: $('#start-date').val()}, function(data){
-                        // console.log(data);
-                    });
-                };
             </script>
-
           </div>
         </div>
       </div>
     </div>
+
+
+    <script src='static/main.js'></script>
+    <script src='static/mood_chart.js'></script>
+    <script>
+
+        // Set vars for client chart
+        var ctx = $('#moodChart').get(0).getContext('2d');
+        var moodChart;
+
+        var currentClient;
+        $('#client-to-view').on('change', function(evt){
+            currentClient = this.value;
+            showClientData(currentClient, '{{ pro.username }}');
+        });
+
+        $( function() {
+            var currentDate = moment().format('YYYY-MM-DD');
+            $( "#start-date" ).val(currentDate);
+        });
+
+        $('#change-prescription-modal').on('show.bs.modal', function(evt) {
+            var button = $(evt.relatedTarget);
+            $('#old-prescription').val(button[0].dataset['prescriptionId']);
+            $('#drug-id').val(button[0].dataset['drugId']);
+            $('#client-id').val(currentClient);
+
+
+            $('#change-prescription').on('submit', function(evt) {
+                evt.preventDefault();
+                // debugger;
+                formInputs = {
+                    clientId: $('#client-id').val(),
+                    drugId: $('#drug-id').val(),
+                    instructions: $('#instructions').val(),
+                    notes: $('#notes').val(),
+                    startDate: $('#start-date').val()
+                }
+                // debugger;
+                endPrescription($('#old-prescription').val());
+                addPrescription(formInputs);
+                showClientData($('#client-id').val(), '{{ pro.username }}');
+            });
+        });
+    </script>
 {% endblock %}

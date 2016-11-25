@@ -30,3 +30,7 @@ body {
 .log-details {
     display: none;
 }
+
+.client-details {
+    display: none;
+}
