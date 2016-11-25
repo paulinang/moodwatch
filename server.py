@@ -11,8 +11,6 @@ from mood_analysis import get_rolling_mean
 
 from bcrypt import hashpw, gensalt
 
-# import json
-# import requests
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
@@ -114,7 +112,7 @@ def show_user_dashboard():
 
     return render_template('basic_dashboard.html',
                            user_info={'user': user,
-                                      'prescriptions': user.group_prescriptions_by_drug(),
+                                      'prescriptions': user.get_active_prescriptions(),
                                       'daylog_info': user.get_daylog_info()
                                       }
                            )

@@ -43,6 +43,20 @@ class User(db.Model, UserMixin):
 
         return prescription_dict
 
+    def get_active_prescriptions(self):
+        """Returns list of active prescriptions"""
+
+        active = []
+        for prescription in self.prescriptions:
+            if not prescription.end_date:
+                prescription = {'drug': prescription.drug.generic_name,
+                                'pro': prescription.professional.user.username,
+                                'instructions': prescription.instructions,
+                                'start_date': datetime.strftime(prescription.start_date, '%Y-%m-%d')}
+                active.append(prescription)
+
+        return active
+
     def get_daylog_info(self):
         """Returns pertinent info of user day logs"""
         daylog_info = {'firstlog_date': None, 'lastlog_date': None, 'is_lastlog_valid': None}
@@ -316,6 +330,7 @@ def example_data():
     db.session.commit()
 
 
+# UNCOMMENT THIS TO ENTER DB WHEN THIS FILE IS RUN
 # if __name__ == "__main__":
 #     from server import app
 #     connect_to_db(app, 'asgard_db')

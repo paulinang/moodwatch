@@ -2,9 +2,6 @@
 
 {% block content %}
     <div class='container-fluid'>
-        <!-- Show basic user info -->
-        <!-- <h1>{{ user_info.user.username }}'s Dashboard </h1> -->
-        <!-- <h3>Email: {{ user_info.user.email }}</h3> -->
 
         <!-- TODAY FEATURES: log events, day. View day chart -->
         <div class='row' id='today'>
@@ -48,26 +45,14 @@
             <div class='col-xs-12 col-md-4 col-md-offset-1'>
                 <h3>Active Prescriptions</h3>
                 <ul>
-                    {% for drug, prescription_list in user_info.prescriptions.items() %}
+                    {% for prescription in user_info.prescriptions %}
                     <li>
-                        <b>{{ drug }}</b>
-                        <ol>
-                            {% for prescription in prescription_list %}
-                            <li>
-                                <!-- Notes whether prescription is active -->
-                                Started: {{ prescription.start_date }}
-                                {% if not prescription.end_date %}
-                                    [ ACTIVE ]
-                                {% else %}
-                                    &nbsp;&nbsp;Ended: {{ prescription.end_date }}
-                                {% endif %}
-                                <ul>
-                                    <li>Prescribed by: {{ prescription.pro_username }}</li>
-                                    <li>Instructions: {{ prescription.instructions }}</li>
-                                </ul>
-                            </li>
-                            {% endfor %}
-                        </ol>
+                        <b>{{ prescription.drug }}</b>
+                        <ul>
+                            <li>Started {{ prescription.start_date }}</li>
+                            <li>Prescribed by {{ prescription.pro }}</li>
+                            <li>Instructions {{ prescription.instructions }}</li>
+                        </ul>
                     </li>
                     {% endfor %}
                 </ul>                
