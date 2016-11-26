@@ -121,17 +121,17 @@ def show_user_dashboard():
 ##########################################################################
 ########################### PRO USER ROUTES  #############################
 ##########################################################################
-@app.route('/client_prescriptions.json')
+@app.route('/client_active_meds.json')
 @login_required
 def get_client_prescriptions():
-    """Returns prescriptions for a specific client"""
+    """Returns active prescriptions for a specific client"""
 
     pro = db.session.query(User).get(session['user_id'])
     client_id = int(request.args.get('clientId'))
     client = db.session.query(User).get(client_id)
     if pro.professional:
         meds_html = ''
-        for med in client.get_active_prescriptions():
+        for drug, info in client.get_active_prescriptions().iteritems():
             button = '<button type="button" \
                       class="btn btn-primary \
                       btn-lg change-prescription-button" \
@@ -140,24 +140,49 @@ def get_client_prescriptions():
                       data-prescription-id="%s" \
                       data-drug-id="%s"> \
                       Change Prescription \
-                      </button>' % (med['prescription_id'], med['drug_id'])
-            med_html = ('<li><h4>%s started by %s on %s</h4> \
+                      </button>' % (info['prescription_id'], info['drug_id'])
+            info_html = ('<li><h4>%s started by %s on %s</h4> \
                          <p>Instructions %s</p>'
-                        % (med['drug'].capitalize(),
-                           med['pro'],
-                           med['start_date'],
-                           med['instructions']))
-            if (med['pro'] == pro.username):
-                med_html += '%s</li>' % button
-            else:
-                med_html += '<button>Contact %s</button></li>' % med['pro']
+                         % (drug.capitalize(),
+                            info['pro'],
+                            info['start_date'],
+                            info['instructions']))
+            if info['has_old']:
+                info_html += '<button id=\'view-old\' data-drug-id=\'%s\'>View Past Prescriptions</button>' % info['drug_id']
 
-            meds_html += med_html
+            if (info['pro'] == pro.username):
+                info_html += '%s</li>' % button
+            else:
+                info_html += '<button>Contact %s</button></li>' % info['pro']
+
+            meds_html += info_html
 
         return jsonify({'username': client.username,
-                        'active_meds': meds_html,
-                        'all_meds': client.group_prescriptions_by_drug()})
-    return jsonify(None)
+                        'active_meds': meds_html})
+
+
+@app.route('/client_prescriptions_for_drug.json')
+@login_required
+def get_drug_prescriptions():
+    """Returns all prescriptions of a drug for a specific client"""
+
+    pro = db.session.query(User).get(session['user_id'])
+    client_id = int(request.args.get('clientId'))
+    drug_id = int(request.args.get('drugId'))
+    meds = db.session.query(User).get(client_id).get_prescriptions_for_drug(drug_id)
+    if pro.professional:
+        meds_html = ''
+        for med in meds:
+            med_html = ('<tr>\
+                         <td>%s</td>\
+                         <td>%s</td>\
+                         <td>%s</td>\
+                         <td>%s</td>\
+                         </tr>'
+                        % (med['start_date'], med['end_date'], med['pro'], med['instructions']))
+            meds_html += med_html
+
+        return jsonify({'meds_html': meds_html})
 
 
 ##########################################################################

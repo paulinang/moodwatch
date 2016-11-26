@@ -17,22 +17,36 @@
             </div>
         </div>
 
-        <div class='row client-details' id='client-chart'>
+        <div class='row client-info' id='client-meds'>
+            <div class='col-xs-12 col-md-6'>
+                <h5>Client's Active Prescriptions</h5>
+                <ul id='client-active-meds'></ul>
+            </div>
+            <div class='col-xs-12 col-md-6'>
+                <table class='table table-hover' style='display: none'>
+                    <thead>
+                        <tr>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Physician</th>
+                            <th>Instructions</th>
+                        </tr>
+                    </thead>
+                    <tbody id='client-prescriptions-for-drug'>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class='row client-info' id='client-chart'>
             <div class='col-xs-12'>
-                <h3>Client Logs</h3>
-                <div class="mood-chart" style='height: 50vh; width: 75vw'>
+                <h3>Client Logs <button id='toggle-client-logs'>Toggle</button></h3>
+                <div class="mood-chart" style='height: 40vh; display: None;'>
                   <canvas id="moodChart"></canvas>
                 </div>
             </div>
         </div>
-        
-        <div class='row client-details' id='client-meds'>
-            <div class='col-xs-12'>
-                <h3 id='client-name'></h3>
-                <h5>Client's Active Prescriptions</h5>
-                <ul id='client-active-meds'></ul>
-            </div>
-        </div>
+
     </div>
 
     <!-- Add Prescription Modal -->
@@ -84,6 +98,14 @@
         $('#client-to-view').on('change', function(evt){
             currentClient = this.value;
             showClientData(currentClient, '{{ pro.username }}');
+        });
+
+        $(document).on('click', '#view-old', function(evt) {
+            showPrescriptions(currentClient, this.dataset['drugId']);
+        });
+
+        $('#toggle-client-logs').on('click', function(evt) {
+            $('.mood-chart').toggle();
         });
 
         $( function() {
