@@ -117,9 +117,17 @@ def load_days():
 
     dates, overall_moods = rand_day_moods()
 
+    DAY_STEPS = range(1, 16)
+    EXTREME_MOODS = [49, 47, 36, -38, -42, -43, -44, - 45, -48]
+    day_step = choice(DAY_STEPS)
+
     # give tyr random moods
     for i, date in enumerate(dates):
-        overall_mood = overall_moods[i]
+        if i == day_step:
+            overall_mood = choice(EXTREME_MOODS)
+            day_step += choice(DAY_STEPS)
+        else:
+            overall_mood = overall_moods[i]
         day = Day(user_id=2,
                   date=date,
                   overall_mood=overall_mood)
@@ -210,17 +218,17 @@ def get_meds_from_txt(txt_file):
     return drugs
 
 
-def rand_day_moods(num_days=1000, tz='US/Pacific'):
+def rand_day_moods(range=10, num_days=1000, tz='US/Pacific'):
     """ Creates a list of days with random moods """
 
     ca_tz = timezone(tz)
     most_recent = datetime.now(ca_tz).date() - timedelta(days=1)
     first_day = most_recent - timedelta(days=num_days-1)
 
-    random_moods = pd.Series((np.random.rand(num_days) * 80).astype(int) - 50)
+    random_moods = pd.Series((np.random.rand(num_days) * range).astype(int) - (range/2))
     mood_list = list(random_moods)
 
-    pd_dates = pd.date_range(first_day, periods=1000)
+    pd_dates = pd.date_range(first_day, periods=num_days)
     dates_str = [datetime.strftime(date, '%Y-%m-%d') for date in pd_dates]
 
     # moods = pd.Series(random_moods)

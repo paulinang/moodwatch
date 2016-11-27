@@ -45,9 +45,9 @@
             <div class='col-xs-12 col-md-4 col-md-offset-1'>
                 <h3>Active Prescriptions</h3>
                 <ul>
-                    {% for prescription in user_info.prescriptions %}
+                    {% for drug, prescription in user_info.prescriptions.iteritems() %}
                     <li>
-                        <b>{{ prescription.drug }}</b>
+                        <b>{{ drug }}</b>
                         <ul>
                             <li>Started {{ prescription.start_date }}</li>
                             <li>Prescribed by {{ prescription.pro }}</li>

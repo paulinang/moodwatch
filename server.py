@@ -7,8 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager, login_user, logout_user, login_required
 
 from model import connect_to_db, db, User, Drug, Prescription, Day, Event
-from mood_analysis import get_rolling_mean
-
+from mood_analysis import rolling_analysis, find_outliers
 from bcrypt import hashpw, gensalt
 
 app = Flask(__name__)
@@ -338,6 +337,20 @@ def get_mood_chart_data():
                                      'backgroundColor': 'rgba(0,0,0,0)',
                                      'borderColor': 'rgba(0,0,0,0)',
                                      'data': event_dataset})
+    outliers = find_outliers(session['user_id'])
+    outlier_dataset = []
+    for i, date in enumerate(outliers.index):
+
+        if (min_date <= date) and (date <= max_date):
+            date = datetime.strftime(date, '%Y-%m-%d')
+            outlier_dataset.append({'x': date, 'y': outliers[i]})
+
+    datasets.append({'label': 'outliers',
+                     'backgroundColor': 'rgba(0,0,0,0)',
+                     'borderColor': 'rgba(0,0,0,0)',
+                     'pointBackgroundColor': 'rgba(255,0,0,1)',
+                     'pointBorderColor': 'rgba(255,0,0,1)',
+                     'data': outlier_dataset})
 
     return jsonify({'datasets': datasets})
 
@@ -348,10 +361,10 @@ def get_smooth_mood_data():
     """ Return 'smoothened' moods for a user"""
 
     client_id = request.args.get('clientId')
-    smooth = get_rolling_mean(client_id)
+    analysis_type = request.args.get('analysisType')
+    smooth = rolling_analysis(client_id, analysis_type)
     min_date = datetime.strptime(request.args.get('minDate'), '%Y-%m-%d').date()
     max_date = datetime.strptime(request.args.get('maxDate'), '%Y-%m-%d').date()
-
     # initialize master list of datasets
     dataset = []
     # create a dataset for each day's range

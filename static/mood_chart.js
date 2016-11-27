@@ -64,13 +64,14 @@ function createMoodChart(minDate, maxDate) {
 
 
 // CREATE HIGH LEVEL MOOD CHART OF CLIENT FOR PRO USER
-function createClientChart(minDate, maxDate, clientId) {
+function createClientChart(minDate, maxDate, clientId, analysisType) {
     var options = initializeOptions(minDate, maxDate);
     //AJAX get request for specfic client's 'smooth' mood data
     $.get('/smooth_mood_data.json',
         {minDate: minDate,
          maxDate: maxDate,
-         clientId: clientId},
+         clientId: clientId,
+         analysisType: analysisType},
          function (data) {
             moodChart = new Chart(ctx, {
                 type: 'line',

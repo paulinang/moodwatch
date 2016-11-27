@@ -40,7 +40,13 @@
 
         <div class='row client-info' id='client-chart'>
             <div class='col-xs-12'>
-                <h3>Client Logs <button id='toggle-client-logs'>Toggle</button></h3>
+                <h3>Client Logs</h3>
+                <select id='analysis-type'>
+                    <option value='mean'>Rolling mean</option>
+                    <option value='std'>Rolling standard deviation</option>
+                    <option value='test'>Testing</option>
+                </select>
+                 <button id='toggle-client-logs'>Toggle</button>
                 <div class="mood-chart" style='height: 40vh; display: None;'>
                   <canvas id="moodChart"></canvas>
                 </div>
@@ -98,6 +104,18 @@
         $('#client-to-view').on('change', function(evt){
             currentClient = this.value;
             showClientData(currentClient, '{{ pro.username }}');
+        });
+
+        $(document).on('change', '#analysis-type', function(evt) {
+            if (moodChart) {
+                moodChart.destroy();
+            }
+            var currentYear = [
+                moment().startOf('year').format('YYYY-MM-DD'),
+                moment().endOf('year').format('YYYY-MM-DD')
+            ];
+            alert(this.value);
+            createClientChart(currentYear[0], currentYear[1], currentClient, this.value);
         });
 
         $(document).on('click', '#view-old', function(evt) {

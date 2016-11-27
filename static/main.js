@@ -73,7 +73,7 @@ function displaySearchResults(requestedDay) {
         moment().startOf('year').format('YYYY-MM-DD'),
         moment().endOf('year').format('YYYY-MM-DD')
         ];
-    createClientChart(currentYear[0], currentYear[1], clientId);
+    createClientChart(currentYear[0], currentYear[1], clientId, 'mean');
 }
 
 
