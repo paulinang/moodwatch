@@ -1,0 +1,18 @@
+html { 
+  background: url("/static/lighthouse.jpg") no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.navbar-brand {
+    font-family: lato;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+#login {
+    font-family: lato;
+    font-size: 20px;
+}

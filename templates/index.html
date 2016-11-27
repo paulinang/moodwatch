@@ -2,31 +2,40 @@
 <html>
   <head>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link rel='stylesheet' href='/static/main.css' type='text/css'>
-    <title>Paulina's HB Project</title>
+    <link rel='stylesheet' href='/static/home.css' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:500" rel="stylesheet">
+    <title>MoodWatch</title>
   </head>
   <body>
     <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- BOOTSTRAP NAVBAR -->
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">MoodWatch</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href='#' id='login' data-toggle="modal" data-target="#login-modal">Log In</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
 
     <div class='container-fluid'>
-      <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#login-modal">
-            Log Into Existing Account
-      </button>
-      <div id="img-wrapper">
-        <img id='lighthouse' src='/static/lighthouse_crop.jpg'></img>
-      </div>
-<!--       <div class="row">
-        <div class="text-center col-xs-4 col-xs-offset-4" id='welcome'> -->
-        <!-- Button trigger modal -->
-          
-          <!-- Button trigger modal -->
-  <!--         <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#register-modal">
-            Register New Account
-          </button> -->
-<!--         </div>
-      </div> -->
+      <blockquote class="blockquote">
+      <p class="mb-0">Keep a calendar… and every night when you go to bed, mark in that calendar whether the day was a one, which was as bad as the day you heard the news, or a ten… you won’t have tens for a long time but measure. Just mark it down. After two months, take out that calendar and put it on a graph. You’ll find that your down days are just as bad as the first day, but here’s what happens… they get further and further apart. That’s when you know you’re gonna make it… when you realize the measure of your progress.</p>
+      <footer class="blockquote-footer">Joe Biden in  <cite title="Source Title"><a href='https://youtu.be/GwZ6UfXm410?t=10m10s'>a discussion on grief</a></cite></footer>
+      </blockquote>
     </div>
-    
 
     <!-- Login Modal -->
     <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="login-modal">
