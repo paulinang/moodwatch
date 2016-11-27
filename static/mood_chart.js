@@ -144,8 +144,12 @@ function changeTimeWindow(timeWindow) {
         var minDate = moment().startOf(timeWindow).format('YYYY-MM-DD');
         var maxDate = moment().endOf(timeWindow).format('YYYY-MM-DD');
     }
-
-    createMoodChart(minDate, maxDate);
+    if (currentClient) {
+        createClientChart(minDate, maxDate, currentClient, 'mean');
+    }
+    else {
+        createMoodChart(minDate, maxDate);
+    }
 }
 
 
@@ -186,14 +190,24 @@ $('.move-time-button').on('click', function () {
                 var newMinDate = currentMinDate.add(step, 'month').startOf('month').format('YYYY-MM-DD');
                 var newMaxDate = currentMaxDate.add(step, 'month').endOf('month').format('YYYY-MM-DD');
                 moodChart.destroy();
-                createMoodChart(newMinDate, newMaxDate);                
+                if (currentClient) {
+                    createClientChart(newMinDate, newMaxDate, currentClient, 'mean');
+                }
+                else {
+                    createMoodChart(newMinDate, newMaxDate);
+                }            
             }
             // If user requests going backward
             if ((this.value == 'backward')) {              
                 var newMinDate = currentMinDate.subtract(step, 'month').startOf('month').format('YYYY-MM-DD');
                 var newMaxDate = currentMaxDate.subtract(step, 'month').endOf('month').format('YYYY-MM-DD');
                 moodChart.destroy();
-                createMoodChart(newMinDate, newMaxDate);               
+                if (currentClient) {
+                    createClientChart(newMinDate, newMaxDate, currentClient, 'mean');
+                }
+                else {
+                    createMoodChart(newMinDate, newMaxDate);
+                }                
             }
         });
 

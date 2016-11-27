@@ -7,8 +7,9 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager, login_user, logout_user, login_required
 
 from model import connect_to_db, db, User, Drug, Prescription, Day, Event
-from mood_analysis import rolling_analysis, find_outliers
+from mood_analysis import analyze_moods
 from bcrypt import hashpw, gensalt
+import numpy as np
 
 app = Flask(__name__)
 
@@ -306,22 +307,29 @@ def get_mood_chart_data():
     user = User.query.get(session['user_id'])
     min_date = datetime.strptime(request.args.get('minDate'), '%Y-%m-%d').date()
     max_date = datetime.strptime(request.args.get('maxDate'), '%Y-%m-%d').date()
+    roll_avg, roll_std = analyze_moods(session['user_id'])
+    roll_avg_dataset = []
+    roll_std_dataset = []
 
     # initialize master list of datasets
     datasets = []
     # create a dataset for each day's range
-    for day in user.days:
+    for i, day in enumerate(user.days):
         # only for days between requested time window that have an overall mood
         if (day.overall_mood) and (min_date <= day.date) and (day.date <= max_date):
             # format date into moment.js format to be plottable on chart.js
             date = datetime.strftime(day.date, '%Y-%m-%d')
             # initialize dataset with point(date, overall_mood)
             day_dataset = [{'x': date, 'y': day.overall_mood}]
+
+            if (not np.isnan(roll_avg[i])):
+                roll_avg_dataset.append({'x': date, 'y': roll_avg[i]})
+                roll_std_dataset.append({'x': date, 'y': roll_std[i]})
             # if there is a mood range (check by or, in cases min or max is 0)
-            if day.min_mood or day.max_mood:
-                # extend the day's mood dataset with the range values
-                day_dataset.extend([{'x': date, 'y': day.min_mood},
-                                    {'x': date, 'y': day.max_mood}])
+            # if day.min_mood or day.max_mood:
+            #     # extend the day's mood dataset with the range values
+            #     day_dataset.extend([{'x': date, 'y': day.min_mood},
+            #                         {'x': date, 'y': day.max_mood}])
             # append day dataset to the master list of datasets
             datasets.append({'label': 'Day %s' % date,
                              'data': day_dataset})
@@ -330,27 +338,24 @@ def get_mood_chart_data():
             for event in day.events:
                 if event.overall_mood:
                     event_dataset = [{'x': date, 'y': event.overall_mood}]
-                    # if event.min_mood or event.max_mood:
-                    #     event_dataset.extend([{'x': date, 'y': event.min_mood},
-                    #                           {'x': date, 'y': event.max_mood}])
                     datasets.append({'label': 'event',
                                      'backgroundColor': 'rgba(0,0,0,0)',
                                      'borderColor': 'rgba(0,0,0,0)',
                                      'data': event_dataset})
-    outliers = find_outliers(session['user_id'])
-    outlier_dataset = []
-    for i, date in enumerate(outliers.index):
 
-        if (min_date <= date) and (date <= max_date):
-            date = datetime.strftime(date, '%Y-%m-%d')
-            outlier_dataset.append({'x': date, 'y': outliers[i]})
-
-    datasets.append({'label': 'outliers',
+    datasets.append({'label': 'roll_avg',
                      'backgroundColor': 'rgba(0,0,0,0)',
-                     'borderColor': 'rgba(0,0,0,0)',
-                     'pointBackgroundColor': 'rgba(255,0,0,1)',
-                     'pointBorderColor': 'rgba(255,0,0,1)',
-                     'data': outlier_dataset})
+                     'borderColor': 'rgba(0,0,255,1)',
+                     'pointBackgroundColor': 'rgba(255,0,0,0)',
+                     'pointBorderColor': 'rgba(255,0,0,0)',
+                     'data': roll_avg_dataset})
+
+    datasets.append({'label': 'roll_std',
+                     'backgroundColor': 'rgba(0,0,0,0)',
+                     'borderColor': 'rgba(0,255,0,1)',
+                     'pointBackgroundColor': 'rgba(255,0,0,0)',
+                     'pointBorderColor': 'rgba(255,0,0,0)',
+                     'data': roll_std_dataset})
 
     return jsonify({'datasets': datasets})
 
@@ -361,22 +366,24 @@ def get_smooth_mood_data():
     """ Return 'smoothened' moods for a user"""
 
     client_id = request.args.get('clientId')
-    analysis_type = request.args.get('analysisType')
-    smooth = rolling_analysis(client_id, analysis_type)
+    client = User.query.get(client_id)
     min_date = datetime.strptime(request.args.get('minDate'), '%Y-%m-%d').date()
     max_date = datetime.strptime(request.args.get('maxDate'), '%Y-%m-%d').date()
     # initialize master list of datasets
-    dataset = []
+    datasets = []
     # create a dataset for each day's range
-    for i, date in enumerate(smooth.index):
+    for day in client.days:
         # only for days between requested time window that have an overall mood
-        if (smooth[i] is not None) and (min_date <= date) and (date <= max_date):
+        if (day.overall_mood) and (min_date <= day.date) and (day.date <= max_date):
             # format date into moment.js format to be plottable on chart.js
-            date = datetime.strftime(date, '%Y-%m-%d')
+            date = datetime.strftime(day.date, '%Y-%m-%d')
             # initialize dataset with point(date, overall_mood)
-            dataset.append({'x': date, 'y': smooth[i]})
+            day_dataset = [{'x': date, 'y': day.overall_mood}]
+            # append day dataset to the master list of datasets
+            datasets.append({'label': 'Day %s' % date,
+                             'data': day_dataset})
 
-    return jsonify({'datasets': [{'data': dataset}]})
+    return jsonify({'datasets': datasets})
 
 
 @app.route('/day_chart.json')

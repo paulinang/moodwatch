@@ -51,16 +51,16 @@
     <script src='/static/mood_chart.js'></script>
     <script src='/static/main.js'></script>
     <script>
+
+        var currentClient;
         // Create mood chart for last 30 days (default when page loads)
         var ctx = $('#moodChart').get(0).getContext('2d');
         var moodChart;
-        var minDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
-        var maxDate = moment().format('YYYY-MM-DD');
-        createMoodChart(minDate, maxDate);
 
         // Get earliest log to set as minDate if all-logs window selected
         var firstLog = '{{ user_info.daylog_info.firstlog_date}}';
-
+        var maxDate = moment().format('YYYY-MM-DD');
+        createMoodChart(firstLog, maxDate);
         $('#chart-time-window').on('change', function () {
             var timeWindow = this.value;
             changeTimeWindow(timeWindow);

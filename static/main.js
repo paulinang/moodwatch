@@ -69,11 +69,9 @@ function displaySearchResults(requestedDay) {
         moodChart.destroy();
     }
 
-    var currentYear = [
-        moment().startOf('year').format('YYYY-MM-DD'),
-        moment().endOf('year').format('YYYY-MM-DD')
-        ];
-    createClientChart(currentYear[0], currentYear[1], clientId, 'mean');
+    var minDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+    var maxDate = moment().format('YYYY-MM-DD');
+    createClientChart(minDate, maxDate, clientId, 'mean');
 }
 
 
