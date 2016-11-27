@@ -64,18 +64,16 @@ function createMoodChart(minDate, maxDate) {
 
 
 // CREATE HIGH LEVEL MOOD CHART OF CLIENT FOR PRO USER
-function createClientChart(minDate, maxDate, clientId, analysisType) {
+function createClientChart(minDate, maxDate, clientId) {
     var options = initializeOptions(minDate, maxDate);
     //AJAX get request for specfic client's 'smooth' mood data
-    $.get('/smooth_mood_data.json',
-        {minDate: minDate,
-         maxDate: maxDate,
-         clientId: clientId,
-         analysisType: analysisType},
+    $.get('/client_log_overview.json',
+        {clientId: clientId},
          function (data) {
+            options.scales.xAxes[0].time.min = data['min_date'];
             moodChart = new Chart(ctx, {
                 type: 'line',
-                data: data,
+                data: {'datasets': data.datasets},
                 options: options
             });
         });
@@ -144,12 +142,7 @@ function changeTimeWindow(timeWindow) {
         var minDate = moment().startOf(timeWindow).format('YYYY-MM-DD');
         var maxDate = moment().endOf(timeWindow).format('YYYY-MM-DD');
     }
-    if (currentClient) {
-        createClientChart(minDate, maxDate, currentClient, 'mean');
-    }
-    else {
-        createMoodChart(minDate, maxDate);
-    }
+    createMoodChart(minDate, maxDate);
 }
 
 
@@ -190,32 +183,24 @@ $('.move-time-button').on('click', function () {
                 var newMinDate = currentMinDate.add(step, 'month').startOf('month').format('YYYY-MM-DD');
                 var newMaxDate = currentMaxDate.add(step, 'month').endOf('month').format('YYYY-MM-DD');
                 moodChart.destroy();
-                if (currentClient) {
-                    createClientChart(newMinDate, newMaxDate, currentClient, 'mean');
-                }
-                else {
-                    createMoodChart(newMinDate, newMaxDate);
-                }            
+                createMoodChart(newMinDate, newMaxDate);    
             }
             // If user requests going backward
             if ((this.value == 'backward')) {              
                 var newMinDate = currentMinDate.subtract(step, 'month').startOf('month').format('YYYY-MM-DD');
                 var newMaxDate = currentMaxDate.subtract(step, 'month').endOf('month').format('YYYY-MM-DD');
                 moodChart.destroy();
-                if (currentClient) {
-                    createClientChart(newMinDate, newMaxDate, currentClient, 'mean');
-                }
-                else {
-                    createMoodChart(newMinDate, newMaxDate);
-                }                
+                createMoodChart(newMinDate, newMaxDate);        
             }
         });
 
 
 // TOGGLE EVENT VISIBILITY
-function toggleEvents(){
+function toggleEvents() {
     // Get datasets that are events
-    var events = moodChart.data.datasets.filter(function (dataset) {return dataset.label == 'event'});
+    var events = moodChart.data.datasets.filter(function (dataset) {
+            return dataset.label == 'event';
+        });
         for (i=0; i<events.length; i++) {
             // Show event if previously invisible
             if (events[i].borderColor != 'rgba(255,153,0,1)') {
@@ -228,4 +213,20 @@ function toggleEvents(){
     moodChart.update();
 }
 
+
+// TOGGLE MOOD ANALYSIS VISIBILITY
+function toggleAnalysis(analysisType){
+    var colorRef = {'roll_avg': 'rgba(0,0,255,1)',
+                    'roll_std': 'rgba(0,255,0,1)'};
+    var analysis = moodChart.data.datasets.filter(function (dataset) {
+        return dataset.label == analysisType;
+    });
+    if (analysis[0].borderColor != colorRef[analysisType]) {
+        analysis[0].borderColor = colorRef[analysisType];
+    }
+    else {
+        analysis[0].borderColor = 'rgba(0,0,0,0)';
+    }
+    moodChart.update();
+}
 

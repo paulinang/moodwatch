@@ -71,7 +71,7 @@ function displaySearchResults(requestedDay) {
 
     var minDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
     var maxDate = moment().format('YYYY-MM-DD');
-    createClientChart(minDate, maxDate, clientId, 'mean');
+    createClientChart(minDate, maxDate, clientId);
 }
 
 

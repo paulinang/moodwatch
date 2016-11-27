@@ -16,6 +16,8 @@
                 <button type='button' class='move-time-button' value='forward' disabled>&gt;</button>
                 <span id='toggle-chart-data'>
                     <button type="button" id="toggle-events">Toggle Events</button>
+                    <button type="button" class="toggle-analysis" value ='roll_avg'>Toggle Moving Average</button>
+                    <button type="button" class="toggle-analysis" value='roll_std'>Toggle Standard Deviation</button>
                 </span>
                 <br><br>
 
@@ -52,7 +54,6 @@
     <script src='/static/main.js'></script>
     <script>
 
-        var currentClient;
         // Create mood chart for last 30 days (default when page loads)
         var ctx = $('#moodChart').get(0).getContext('2d');
         var moodChart;
@@ -67,6 +68,9 @@
         });
 
         $('#toggle-events').on('click', toggleEvents);
+        $('.toggle-analysis').on('click', function(evt) {
+            toggleAnalysis(this.value);
+        });
 
         // declare chart variables as global
         var dCtx = $('#dayChart').get(0).getContext('2d');

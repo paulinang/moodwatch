@@ -97,6 +97,11 @@ def logout():
     return redirect('/')
 
 
+##########################################################################
+#############################   PAGE ROUTES   ############################
+##########################################################################
+
+
 @app.route('/user_dashboard')
 @login_required
 def show_user_dashboard():
@@ -116,6 +121,36 @@ def show_user_dashboard():
                                       'daylog_info': user.get_daylog_info()
                                       }
                            )
+
+
+@app.route('/user_logs')
+@login_required
+def display_day_mood_chart():
+    user = User.query.get(session['user_id'])
+    return render_template('mood_chart.html',
+                           user_info={'user': user,
+                                      'daylog_info': user.get_daylog_info()}
+                           )
+
+
+@app.route('/drugs')
+@login_required
+def drug_list():
+    """ Show a list of all drugs in database"""
+
+    user_id = session.get('user_id')
+
+    # Retrieve user object and pass it into profile template
+    user = db.session.query(User).get(user_id)
+    # today = datetime.today().date()
+    if user.professional:
+        # Get a list of all drug objects
+        drugs = Drug.query.all()
+
+        return render_template('drugs.html', drugs=drugs, pro=user)
+
+    flash('Only healthcare professionals can access drug database')
+    return redirect('/user_dashboard')
 
 
 ##########################################################################
@@ -148,7 +183,8 @@ def get_client_prescriptions():
                             info['start_date'],
                             info['instructions']))
             if info['has_old']:
-                info_html += '<button id=\'view-old\' data-drug-id=\'%s\'>View Past Prescriptions</button>' % info['drug_id']
+                info_html += '<button id=\'view-old\' data-drug-id=\'%s\'>\
+                              All Prescriptions</button>' % info['drug_id']
 
             if (info['pro'] == pro.username):
                 info_html += '%s</li>' % button
@@ -179,10 +215,53 @@ def get_drug_prescriptions():
                          <td>%s</td>\
                          <td>%s</td>\
                          </tr>'
-                        % (med['start_date'], med['end_date'], med['pro'], med['instructions']))
+                        % (med['start_date'],
+                           med['end_date'],
+                           med['pro'],
+                           med['instructions']))
             meds_html += med_html
 
         return jsonify({'meds_html': meds_html})
+
+
+@app.route('/end_prescription.json', methods=['POST'])
+def end_prescription():
+    """ Ends Prescription """
+
+    prescription_id = int(request.form.get('prescriptionId'))
+    end_date = datetime.strptime(request.form.get('currentDate'), '%Y-%m-%d').date()
+
+    prescription = Prescription.query.get(prescription_id)
+    prescription.end_date = end_date
+    db.session.commit()
+
+    return jsonify(prescription.make_dict())
+
+
+@app.route('/add_prescription.json', methods=['POST'])
+def process_prescription():
+    """ Add new prescription """
+
+    pro_id = int(session['user_id'])
+    client_id = int(request.form.get('clientId'))
+    drug_id = int(request.form.get('drugId'))
+    instructions = request.form.get('instructions')
+    start_date = datetime.strptime(request.form.get('startDate'), '%Y-%m-%d').date()
+    notes = request.form.get('notes')
+    # create new prescription from form inputs, add to db
+    prescription = Prescription(client_id=client_id,
+                                pro_id=pro_id,
+                                drug_id=drug_id,
+                                start_date=start_date,
+                                instructions=instructions,
+                                notes=notes)
+
+    db.session.add(prescription)
+    db.session.commit()
+
+    flash('Prescription added')
+
+    return jsonify(prescription.make_dict())
 
 
 ##########################################################################
@@ -289,15 +368,6 @@ def get_logs_for_day():
 ##########################  MOOD CHART ROUTES  ###########################
 ##########################################################################
 
-@app.route('/user_logs')
-@login_required
-def display_day_mood_chart():
-    user = User.query.get(session['user_id'])
-    return render_template('mood_chart.html',
-                           user_info={'user': user,
-                                      'daylog_info': user.get_daylog_info()}
-                           )
-
 
 @app.route('/mood_chart.json')
 @login_required
@@ -319,12 +389,9 @@ def get_mood_chart_data():
         if (day.overall_mood) and (min_date <= day.date) and (day.date <= max_date):
             # format date into moment.js format to be plottable on chart.js
             date = datetime.strftime(day.date, '%Y-%m-%d')
+
             # initialize dataset with point(date, overall_mood)
             day_dataset = [{'x': date, 'y': day.overall_mood}]
-
-            if (not np.isnan(roll_avg[i])):
-                roll_avg_dataset.append({'x': date, 'y': roll_avg[i]})
-                roll_std_dataset.append({'x': date, 'y': roll_std[i]})
             # if there is a mood range (check by or, in cases min or max is 0)
             # if day.min_mood or day.max_mood:
             #     # extend the day's mood dataset with the range values
@@ -333,6 +400,10 @@ def get_mood_chart_data():
             # append day dataset to the master list of datasets
             datasets.append({'label': 'Day %s' % date,
                              'data': day_dataset})
+
+            if (not np.isnan(roll_avg[i])):
+                roll_avg_dataset.append({'x': date, 'y': roll_avg[i]})
+                roll_std_dataset.append({'x': date, 'y': roll_std[i]})
 
             # also append events for logged (no dummy) days
             for event in day.events:
@@ -345,45 +416,46 @@ def get_mood_chart_data():
 
     datasets.append({'label': 'roll_avg',
                      'backgroundColor': 'rgba(0,0,0,0)',
-                     'borderColor': 'rgba(0,0,255,1)',
-                     'pointBackgroundColor': 'rgba(255,0,0,0)',
-                     'pointBorderColor': 'rgba(255,0,0,0)',
+                     'borderColor': 'rgba(0,0,0,0)',
+                     'pointBackgroundColor': 'rgba(0,0,0,0)',
+                     'pointBorderColor': 'rgba(0,0,0,0)',
                      'data': roll_avg_dataset})
 
     datasets.append({'label': 'roll_std',
                      'backgroundColor': 'rgba(0,0,0,0)',
-                     'borderColor': 'rgba(0,255,0,1)',
-                     'pointBackgroundColor': 'rgba(255,0,0,0)',
-                     'pointBorderColor': 'rgba(255,0,0,0)',
+                     'borderColor': 'rgba(0,0,0,0)',
+                     'pointBackgroundColor': 'rgba(0,0,0,0)',
+                     'pointBorderColor': 'rgba(0,0,0,0)',
                      'data': roll_std_dataset})
 
     return jsonify({'datasets': datasets})
 
 
-@app.route('/smooth_mood_data.json')
+@app.route('/client_log_overview.json')
 @login_required
-def get_smooth_mood_data():
+def get_client_log_overview():
     """ Return 'smoothened' moods for a user"""
 
     client_id = request.args.get('clientId')
     client = User.query.get(client_id)
-    min_date = datetime.strptime(request.args.get('minDate'), '%Y-%m-%d').date()
-    max_date = datetime.strptime(request.args.get('maxDate'), '%Y-%m-%d').date()
-    # initialize master list of datasets
+    roll_avg, roll_std = analyze_moods(client_id)
+    roll_avg_dataset = []
     datasets = []
     # create a dataset for each day's range
-    for day in client.days:
-        # only for days between requested time window that have an overall mood
-        if (day.overall_mood) and (min_date <= day.date) and (day.date <= max_date):
-            # format date into moment.js format to be plottable on chart.js
-            date = datetime.strftime(day.date, '%Y-%m-%d')
-            # initialize dataset with point(date, overall_mood)
-            day_dataset = [{'x': date, 'y': day.overall_mood}]
-            # append day dataset to the master list of datasets
-            datasets.append({'label': 'Day %s' % date,
-                             'data': day_dataset})
+    for i, day in enumerate(client.days):
+        date = datetime.strftime(day.date, '%Y-%m-%d')
 
-    return jsonify({'datasets': datasets})
+        if (not np.isnan(roll_avg[i])):
+            roll_avg_dataset.append({'x': date, 'y': roll_avg[i]})
+
+    datasets.append({'label': 'roll_avg',
+                     'backgroundColor': 'rgba(0,0,0,0)',
+                     'borderColor': 'rgba(0,0,255,1)',
+                     'pointBackgroundColor': 'rgba(0,0,0,0)',
+                     'pointBorderColor': 'rgba(0,0,0,0)',
+                     'data': roll_avg_dataset})
+
+    return jsonify({'datasets': datasets, 'min_ate': datetime.strftime(client.days[0].date, '%Y-%m-%d')})
 
 
 @app.route('/day_chart.json')
@@ -418,74 +490,6 @@ def get_day_logs():
     return jsonify({'datasets': datasets})
 
 
-###########################################################################################
-# DRUG RELATED
-
-
-@app.route('/drugs')
-@login_required
-def drug_list():
-    """ Show a list of all drugs in database"""
-
-    user_id = session.get('user_id')
-
-    # Retrieve user object and pass it into profile template
-    user = db.session.query(User).get(user_id)
-    # today = datetime.today().date()
-    if user.professional:
-        # Get a list of all drug objects
-        drugs = Drug.query.all()
-
-        return render_template('drugs.html', drugs=drugs, pro=user)
-
-    flash('Only healthcare professionals can access drug database')
-    return redirect('/user_dashboard')
-
-
-##################################################################################
-# PRESCRIPTION RELATED -- have to be logged in
-
-
-@app.route('/end_prescription.json', methods=['POST'])
-def end_prescription():
-    """ Ends Prescription """
-
-    prescription_id = int(request.form.get('prescriptionId'))
-    end_date = datetime.strptime(request.form.get('currentDate'), '%Y-%m-%d').date()
-
-    prescription = Prescription.query.get(prescription_id)
-    prescription.end_date = end_date
-    db.session.commit()
-
-    return jsonify(prescription.make_dict())
-
-
-@app.route('/add_prescription.json', methods=['POST'])
-def process_prescription():
-    """ Add new prescription """
-
-    pro_id = int(session['user_id'])
-    client_id = int(request.form.get('clientId'))
-    drug_id = int(request.form.get('drugId'))
-    instructions = request.form.get('instructions')
-    start_date = datetime.strptime(request.form.get('startDate'), '%Y-%m-%d').date()
-    notes = request.form.get('notes')
-    # create new prescription from form inputs, add to db
-    prescription = Prescription(client_id=client_id,
-                                pro_id=pro_id,
-                                drug_id=drug_id,
-                                start_date=start_date,
-                                instructions=instructions,
-                                notes=notes)
-
-    db.session.add(prescription)
-    db.session.commit()
-
-    flash('Prescription added')
-
-    return jsonify(prescription.make_dict())
-
-
 ###################################################################################
 # HELPER FUNCTIONS
 
@@ -507,12 +511,6 @@ def get_mood_rating():
         max_mood = request.form.get('max-mood')
 
     return [user_id, overall_mood, min_mood, max_mood, notes]
-
-
-# def parse_date(form_input_name):
-#     """Parses date input from web form into datetime object"""
-
-#     return datetime.strptime(request.args.get(form_input_name), '%Y-%m-%d').date()
 
 
 if __name__ == "__main__":
