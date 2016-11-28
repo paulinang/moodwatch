@@ -335,7 +335,7 @@ def get_logs_for_day():
     day = Day.query.filter_by(user_id=session['user_id'], date=requested_date).first()
     if day:
         day_info = day.get_info_dict()
-        day_html = '<h3>On {}, you rated your moods: </h3><ul>'.format(day_info['date'])
+        day_html = '<h3>On this day, you rated your moods: </h3><ul>'
 
         if day_info.get('max_mood'):
             day_html += '<li>Highest at {}</li>'.format(day_info['max_mood'])
@@ -386,7 +386,7 @@ def get_mood_chart_data():
     # create a dataset for each day's range
     for i, day in enumerate(user.days):
         # only for days between requested time window that have an overall mood
-        if (day.overall_mood) and (min_date <= day.date) and (day.date <= max_date):
+        if (day.overall_mood is not None) and (min_date <= day.date) and (day.date <= max_date):
             # format date into moment.js format to be plottable on chart.js
             date = datetime.strftime(day.date, '%Y-%m-%d')
 
@@ -399,6 +399,9 @@ def get_mood_chart_data():
             #                         {'x': date, 'y': day.max_mood}])
             # append day dataset to the master list of datasets
             datasets.append({'label': 'Day %s' % date,
+                             'pointBackgroundColor': 'rgba(67,124,234,0.3)',
+                             'pointBorderColor': 'rgba(67,124,234,0.7)',
+                             # 'pointRadius': 6,
                              'data': day_dataset})
 
             if (not np.isnan(roll_avg[i])):
@@ -410,18 +413,19 @@ def get_mood_chart_data():
                 if event.overall_mood:
                     event_dataset = [{'x': date, 'y': event.overall_mood}]
                     datasets.append({'label': 'event',
+                                     'pointRadius': 5,
                                      'backgroundColor': 'rgba(0,0,0,0)',
                                      'borderColor': 'rgba(0,0,0,0)',
                                      'data': event_dataset})
 
-    datasets.append({'label': 'roll_avg',
+    datasets.append({'label': 'roll-avg',
                      'backgroundColor': 'rgba(0,0,0,0)',
                      'borderColor': 'rgba(0,0,0,0)',
                      'pointBackgroundColor': 'rgba(0,0,0,0)',
                      'pointBorderColor': 'rgba(0,0,0,0)',
                      'data': roll_avg_dataset})
 
-    datasets.append({'label': 'roll_std',
+    datasets.append({'label': 'roll-std',
                      'backgroundColor': 'rgba(0,0,0,0)',
                      'borderColor': 'rgba(0,0,0,0)',
                      'pointBackgroundColor': 'rgba(0,0,0,0)',
@@ -472,11 +476,12 @@ def get_day_logs():
         for event in day.events:
             # event_dataset.append({'x': date_str, 'y': event.overall_mood})
             datasets.append({'label': '%s' % event.event_name,
+                             'pointRadius': 5,
                              'backgroundColor': 'rgba(255,153,0,1)',
                              'borderColor': 'rgba(0,0,0,0)',
                              'data': [{'x': date_str, 'y': event.overall_mood}]})
 
-        if day.overall_mood:
+        if day.overall_mood is not None:
             # initialize dataset with point(date, overall_mood)
             day_dataset = [{'x': date_str, 'y': day.overall_mood}]
             # if there is a mood range (check by or, in cases min or max is 0)
@@ -486,6 +491,8 @@ def get_day_logs():
                                     {'x': date_str, 'y': day.max_mood}])
             # append day dataset to the master list of datasets
             datasets.append({'label': 'Day %s' % date_str,
+                             'pointBackgroundColor': 'rgba(67,124,234,0.3)',
+                             'pointBorderColor': 'rgba(67,124,234,0.7)',
                              'data': day_dataset})
     return jsonify({'datasets': datasets})
 

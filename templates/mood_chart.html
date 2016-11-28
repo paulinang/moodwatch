@@ -2,9 +2,8 @@
 
 {% block content %}
     <div class='container-fluid'>
-        <div class='row'>
-            <div class='col-xs-12'>
-                <button type='button' class='move-time-button' value='backward' disabled>&lt;</button>
+        <div class='row top-row'>
+            <div class='col-xs-12 col-md-9' id='interactive-chart'>
                 <select id='chart-time-window' name='time-window'>
                     <option selected='selected' disabled>Select A Time Window</option>
                     <option value='month'>Monthly</option>
@@ -13,33 +12,40 @@
                     <option value='year'>Annual</option>
                     <option value='all-time'>All Logs</option>
                 </select>
-                <button type='button' class='move-time-button' value='forward' disabled>&gt;</button>
-                <span id='toggle-chart-data'>
-                    <button type="button" id="toggle-events">Toggle Events</button>
-                    <button type="button" class="toggle-analysis" value ='roll_avg'>Toggle Moving Average</button>
-                    <button type="button" class="toggle-analysis" value='roll_std'>Toggle Standard Deviation</button>
-                </span>
+                <button type='button' class='move-time-button btn btn-primary' value='backward' disabled>&lt;</button>
+                <span id='current-time-window'>All Logs</span>
+                <button type='button' class='move-time-button btn btn-primary' value='forward' disabled>&gt;</button>
                 <br><br>
-
-                <div id="mood-chart">
+                <div class='mood-chart'>
                   <canvas id="moodChart"></canvas>
+                </div>        
+            </div>
+
+            <div class='col-xs-12 col-md-3'>
+                <div id='toggle-chart-data'>
+                    <h3>Show/Hide: </h3>
+                    <button type="button" class='btn custom-button' id="toggle-events">Events</button>
+                    <button type="button" class="toggle-analysis btn custom-button" value ='roll-avg' id='roll-avg'>Moving Average</button>
+                    <button type="button" class="toggle-analysis btn custom-button" value='roll-std' id='roll-std'>Standard Deviation</button>
                 </div>
             </div>
         </div>
 
-        <div class='row'>
-            <label for='search-date'>Day:</label>
-            <input id='search-date' type='text' name='search-date' readonly="true" required>
-            <button type='button' id='clear-search'>Clear Search Results</button>
-            <div class='log-details'>
-                <div class='col-xs-12 col-md-6'>
+        <div class='row bottom-row' id='search-logs'>
+            <div>
+                <div class='col-xs-12 col-md-5'>
+                    <div class='search-date-interactions'>
+                        <label for='search-date'>Day:</label>
+                        <input id='search-date' type='text' name='search-date' readonly="true" required>
+                        <button type='button' id='clear-search'>Clear Search Results</button>
+                    </div>
+                    <div>
                 <!-- Log Details: Search and view details on same page -->
-                    
-                        <div class='main-log'></div>
-                        <div class='associated-logs'></div>
+                        <div class='log-details main-log'></div>
+                        <div class='log-details associated-logs'></div>
                     </div>
                 </div>
-                <div class='col-xs-12 col-md-6'>
+                <div class='col-xs-12 col-md-4 col-md-offset-1' id='day-chart-col'>
                     <!-- <h3>Logs for <span id='searched-day'>PLACEHOLDER</span></h3> -->
                     <div id='day-chart'>
                         <canvas id="dayChart"></canvas>
@@ -98,6 +104,7 @@
         $('#clear-search').on('click', function(evt) {
             $('.main-log').empty();
             $('.associated-logs').empty();
+            $('#day-chart').css('visibility', 'hidden');
             if (dayChart) {
                 dayChart.destroy();                
             }

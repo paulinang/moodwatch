@@ -1,9 +1,35 @@
 body {
-    background-color: gray;
+    background-color: rgba(0,58,97,0.6);
 }
 
+.navbar-brand {
+    font-family: lato;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.navbar-nav>li {
+    font-family: lato;
+    font-size: 20px;
+}
+
+h2, h3, h4 {
+    font-family: lato;
+}
+
+#add-logs, #hi-message, #today-logs {
+    text-align: center;
+}
+
+canvas {
+    background-color: rgba(255,255,255,.5);
+    border-style: solid;
+    border-radius: 5px;
+    border-width: 15px 15px 15px 0px;
+    border-color: rgba(255,255,255,0);
+}
 .row {
-    padding: 20px;
+    padding: 0px 20px 20px 20px;
     border-style: solid;
     border-radius: 10px;
     border-color: white;
@@ -11,26 +37,87 @@ body {
     background-color: lightgray;
 }
 
-#today {
-    margin-top: 0px;
+.top-row {
+    margin-top: 10px;
 }
 
 #day-chart {
-   width: 20vw; 
+    visibility: hidden;
+    height: 30vh; 
 }
 
-#recent-chart {
+.mood-chart {
+    visibility: hidden;
     height: 40vh;
 }
 
-#mood-chart {
-    height: 40vh;
+#interactive-chart {
+    padding-top: 5px;
 }
 
-.log-details {
-    display: none;
+select, .custom-button, .search-date-interactions {
+    border-radius: 10px;
+    margin: 5px;
+    padding: 10px;
+    font-size: 20px;
+    font-family: lato;
 }
+
+#chart-time-window {
+    padding: 11px 10px;
+}
+
+.move-time-button {
+    margin: 0px 0px 6px 0px;
+    font-size: 24px;
+    font-weight: 700;
+}
+/*.log-details {
+    visibility: hidden;
+}*/
 
 .client-info {
     display: none;
+}
+
+.custom-button {
+    width: 200px;
+    background-color: rgb(255,255,255);
+    border-radius: 10px;
+    border-style: solid;
+    border-color: rgba(0,0,0,.4);
+}
+
+#current-time-window {
+    display: inline-block;
+    width: 400px;
+    padding: 10px 0px;
+    text-align: center;
+    font-size: 20px;
+    font-family: lato;
+    background-color: rgb(255,255,255);
+    border-width: 1px;
+    border-radius: 10px;
+    border-style: solid;
+    border-color: rgba(0,0,0,.4);
+}
+
+#toggle-chart-data {
+    text-align: center;
+    padding: 110px 0px;
+}
+
+#day-chart-col {
+    padding: 20px 15px 0px;
+}
+
+.log-details, .active-meds {
+    font-family: 'Open Sans';
+    font-size: 18px;
+    padding: 0px 0px 0px 20px;
+}
+
+.bottom-row {
+    padding: 0px 20px 18px 20px;
+    margin: 20px 20px 0px;
 }

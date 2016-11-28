@@ -4,26 +4,27 @@
     <div class='container-fluid'>
 
         <!-- TODAY FEATURES: log events, day. View day chart -->
-        <div class='row' id='today'>
-            <h3>Hi {{ user_info.user.username }}, How Are You Doing Today?</h3>
+        <div class='row top-row'>
 
             <!-- Add logs for today -->
-            <div class='col-xs-12 col-md-2 col-md-offset-3' id='add-logs'>
-                <br><br>
+            <div class='col-xs-12 col-md-4 col-md-offset-1'>
+                <h3 id='hi-message'>Hi {{ user_info.user.username }}, How Are You Doing Today?</h3><br><br>
                 <!-- Button trigger for event log modal -->
-                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#todayEvent">
+                <div  id='add-logs'>
+                    <br>
+                    <button type="button" class="btn custom-button btn-lg text" data-toggle="modal" data-target="#todayEvent">
                     Log Event
-                </button>
-                <br><br>
-                <!-- Button trigger for day log modal -->
-                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#todayLog">
-                  Log Today
-                </button>
+                    </button><br><br>
+                    <!-- Button trigger for day log modal -->
+                    <button type="button" class="btn custom-button btn-lg" data-toggle="modal" data-target="#todayLog">
+                      Log Today
+                    </button>
+                </div>
             </div>
 
             <!-- Chart of logs for today -->
-            <div class='col-md-12 col-md-4'>
-                <h3>Logs for Today</h3>
+            <div class='col-xs-12 col-md-4 col-md-offset-1'>
+                <h3 id="today-logs">Logs for <span id='today-date-str'></span></h3>
                 <div id='day-chart'>
                     <canvas id="dayChart"></canvas>
                 </div>
@@ -31,31 +32,28 @@
         </div>
 
         <!-- USER RESOURCES AT A GLANCE: logs in last 30 days. Active prescriptions -->
-        <div class='row' id ='summary'>
+        <div class='row bottom-row' id ='summary'>
 
             <!-- last 30 day moodchart -->
             <div class='col-xs-12 col-md-6'>
                 <h3> Last 30 days </h3>
-                <div id='recent-chart'>
+                <div class='mood-chart'>
                     <canvas id="moodChart"></canvas>
                 </div>
             </div>
 
             <!-- active prescriptions -->
-            <div class='col-xs-12 col-md-4 col-md-offset-1'>
+            <div class='col-xs-12 col-md-4 col-md-offset-1 active-meds'>
                 <h3>Active Prescriptions</h3>
-                <ul>
                     {% for drug, prescription in user_info.prescriptions.iteritems() %}
-                    <li>
-                        <b>{{ drug }}</b>
+                        <b>{{ drug.capitalize() }}</b>
                         <ul>
                             <li>Started {{ prescription.start_date }}</li>
                             <li>Prescribed by {{ prescription.pro }}</li>
-                            <li>Instructions {{ prescription.instructions }}</li>
+                            <li>Instructions: {{ prescription.instructions }}</li>
                         </ul>
-                    </li>
-                    {% endfor %}
-                </ul>                
+                    {% endfor %}               
+            </div>
         </div>
     </div>
 
