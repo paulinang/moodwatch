@@ -60,10 +60,9 @@ function displaySearchResults(requestedDay) {
 /// GET CLIENT DATA
  function showClientData(clientId, proUsername) {
     $.get('/client_active_meds.json', {clientId: clientId}, function(data) {
-        $('.client-info').show();
         // $('#client-name').html(data.username);
         var activeMeds = data.active_meds;
-        $('#client-active-meds').html(activeMeds);
+        $('#client-med-btns').html(activeMeds);
     });
     if (moodChart) {
         moodChart.destroy();
@@ -78,25 +77,13 @@ function displaySearchResults(requestedDay) {
 // END PRESCRIPTION
 function endPrescription(prescriptionId) {
     $.post('/end_prescription.json',
-        {prescriptionId: prescriptionId, currentDate: $('#start-date').val()},
+        {prescriptionId: prescriptionId, currentDate: currentDate},
         function(data) {});
 }
 
 //ADD PRESCRIPTION
 function addPrescription() {
     $.post('/add_prescription.json', formInputs, function(data) {
-        $('#change-prescription-modal').modal('hide');
+        $('#prescriptionModal').modal('hide');
     });
-}
-
-//SHOW ALL PRESCRIPTIONS FOR DRUG
-function showPrescriptions(clientId, drugId) {
-    $('.table').show();
-    var medTable = $('#client-prescriptions-for-drug');
-    medTable.empty();
-    $.get('/client_prescriptions_for_drug.json',
-        {clientId: clientId, drugId: drugId},
-        function(data){
-            medTable.html(data.meds_html);
-        });
 }

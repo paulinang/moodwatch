@@ -77,6 +77,7 @@ function createMoodChart(minDate, maxDate) {
 // CREATE HIGH LEVEL MOOD CHART OF CLIENT FOR PRO USER
 function createClientChart(minDate, maxDate, clientId) {
     var options = initializeOptions(minDate, maxDate);
+    $('.mood-chart').css('visibility', 'hidden');
     //AJAX get request for specfic client's 'smooth' mood data
     $.get('/client_log_overview.json',
         {clientId: clientId},
@@ -86,7 +87,9 @@ function createClientChart(minDate, maxDate, clientId) {
                 type: 'line',
                 data: {'datasets': data.datasets},
                 options: options
-            });
+                });
+            $('.mood-chart').css('visibility', 'visible');
+            
         });
 }
 

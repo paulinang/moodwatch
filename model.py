@@ -52,9 +52,11 @@ class User(db.Model, UserMixin):
                 active[prescription.drug.generic_name] \
                     = {'drug_id': prescription.drug.drug_id,
                        'prescription_id': prescription.prescription_id,
+                       'pro_id': prescription.professional.user_id,
                        'pro': prescription.professional.user.username,
                        'instructions': prescription.instructions,
                        'start_date': datetime.strftime(prescription.start_date, '%Y-%m-%d'),
+                       'notes': prescription.notes,
                        'has_old': False}
             elif active.get(prescription.drug.generic_name):
                 active[prescription.drug.generic_name]['has_old'] = True

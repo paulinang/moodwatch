@@ -2,95 +2,70 @@
 
 {% block content %}
     <div class='container-fluid'>
-        <h1>{{ pro.username }}'s Dashboard </h1>
         <div class='row' id='select-client'>
             <div class='col-xs-12 col-md-4'>
-                <h4><label for='client-to-view'>Client:</label>
                 <select id='client-to-view' name='client-id'>
-                    <option selected='selected' disabled>Select client</option>
+                    <option selected='selected' disabled>Select patient</option>
                     {% for client in pro.professional.sort_clients().active %}
                         <option value='{{ client.user_id }}'>{{ client.username }}</option>
                     {% endfor %}
             </select></h4>
             </div>
-            <div class='col-xs-12 col-md-3 col-md-offset-5'>
-                <h4><a href='/drugs'>Psychiatric Medications Database</a></h4>
-            </div>
         </div>
 
-        <div class='row client-info' id='client-meds'>
-            <div class='col-xs-12 col-md-6'>
-                <h4>Client's Active Prescriptions</h4>
-                <ul id='client-active-meds'></ul>
-            </div>
-            <div class='col-xs-12 col-md-6'>
-                <table class='table table-hover' style='display: none'>
-                    <thead>
-                        <tr>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Physician</th>
-                            <th>Instructions</th>
-                        </tr>
-                    </thead>
-                    <tbody id='client-prescriptions-for-drug'>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class='row client-info' id='client-chart'>
-            <div class='col-xs-12'>
-                <h3>Client Logs</h3>
+        <div class='row client-info' id='client-info'>
+            <div class='col-xs-12 col-md-9'>
+                <h3>Patient Logs At A Glance</h3>
                 <div class="mood-chart" style='height: 40vh;'>
                   <canvas id="moodChart"></canvas>
                 </div>
             </div>
-        </div>
+            <div class='col-xs-12 col-md-3 active-client-meds'>
+                <h3>Active Prescriptions</h3>
+                <div id='client-med-btns'></div>
+            </div>
 
+        </div>
     </div>
 
-    <!-- Add Prescription Modal -->
-    <div class="modal fade" id="change-prescription-modal" tabindex="-1" role="dialog" aria-labelledby="change-prescription-modal">
-      <div class="modal-dialog" role="document">
-
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="change-prescription-title">Change Prescription </h4>
-          </div>
-          <div class="modal-body">
-            <form id='change-prescription' action='/add_prescription' method='POST'>
-                <label for='instructions'>Instructions: </label>
-                <input id='instructions' type='text' name='instructions' required><br>
-
-                <label for='notes'>Notes: </label>
-                <input id='notes' type='text' name='notes' required><br>
-
-                <input id='start-date' type='hidden'>
-                clickedPrescriptionId: <input id='old-prescription' type='text'> 
-                <input id='drug-id' type='text'>
-                <input id='client-id' type='text'>
-                <input type='submit' value='Change Prescription'>
-
-            </form>             
-
-            <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-            <script>
-
-
-            </script>
-          </div>
+    <!-- Prescription Modal -->
+    <div class="modal fade" id="prescriptionModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title" id="prescriptionModalTitle"></h3>
+                </div>
+                <form id='change-prescription' action='add_prescription' method='POST'>
+                    <div class="modal-body">
+                            <div class='form-group'>
+                                Prescribed by <span id='prescribing-pro'></span>
+                                <div id='contact-pro'></div>
+                            </div>                        
+                            <div class='form-group'>
+                                Started on <span id='med-start-date'></span>
+                            </div>                        
+                            <div class='form-group'>
+                                Instructions: <span id='med-instructions'></span>
+                                <div id='prompt-instructions'></div>
+                            </div>                        
+                            <div class='form-group'>
+                                <span id='med-notes'></span>
+                                <div id='prompt-notes'></div>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </form>
+              </div>
+            </div>
         </div>
-      </div>
     </div>
-
 
     <script src='static/main.js'></script>
     <script src='static/mood_chart.js'></script>
     <script>
-
+        $('#user-specific-page').html('<li><a href=\'/drugs\'>Medications Database</a></li>');
         // Set vars for client chart
         var ctx = $('#moodChart').get(0).getContext('2d');
         var moodChart;
@@ -106,49 +81,64 @@
             changeTimeWindow(timeWindow);
         });
 
-        // $(document).on('change', '#analysis-type', function(evt) {
-        //     if (moodChart) {
-        //         moodChart.destroy();
-        //     }
-        //     var currentYear = [
-        //         moment().startOf('year').format('YYYY-MM-DD'),
-        //         moment().endOf('year').format('YYYY-MM-DD')
-        //     ];
-        //     alert(this.value);
-        //     createClientChart(currentYear[0], currentYear[1], currentClient, this.value);
-        // });
-
-        $(document).on('click', '#view-old', function(evt) {
-            showPrescriptions(currentClient, this.dataset['drugId']);
+        var targetMed;
+        var currentDate;
+        $(document).on('click', '.med-button', function(evt) {
+            targetMed = evt.currentTarget;
+            $('#prescriptionModal').modal('toggle');
         });
 
         $( function() {
-            var currentDate = moment().format('YYYY-MM-DD');
-            $( "#start-date" ).val(currentDate);
+            currentDate = moment().format('YYYY-MM-DD');
         });
 
-        $('#change-prescription-modal').on('show.bs.modal', function(evt) {
-            var button = $(evt.relatedTarget);
-            $('#old-prescription').val(button[0].dataset['prescriptionId']);
-            $('#drug-id').val(button[0].dataset['drugId']);
-            $('#client-id').val(currentClient);
+        $('#prescriptionModal').on('show.bs.modal', function(evt) {
+            $('#prescriptionModalTitle').html(targetMed.innerText);
+            $('#prescribing-pro').html(targetMed.dataset['proUsername']);
+            $('#med-start-date').html(targetMed.dataset['startDate']);
+            $('#med-instructions').html(targetMed.dataset['instructions']);
+            if (targetMed.dataset['notes'] != 'None') {
+                $('#med-notes').html('Notes: ' + targetMed.dataset['notes']);
+            }
 
+            if (targetMed.dataset['proId'] == '{{ session["user_id"] }}') {
+                $('#contact-pro').empty();
+                $('#prompt-instructions').html('<input type="text" class="form-control" id="new-instructions" placeholder="Enter new instructions" required></input>');
+                $('#prompt-notes').html('<input type="text" class="form-control" id="new-notes" placeholder="Enter notes if any"></input>');
+                $('.modal-footer').html('<button class="btn btn-primary" type="submit">Change</button><button class="btn btn-primary" id="end-med" type="button">End</button>');
+            }
+            else {
+                $('#prompt-instructions').empty();
+                $('#prompt-notes').empty();
+                $('.modal-footer').empty();
+                $('#contact-pro').html('<a href="#">Contact ' + targetMed.dataset['proUsername'] + '</a>');
+            }
 
             $('#change-prescription').on('submit', function(evt) {
                 evt.preventDefault();
-                // debugger;
+                debugger;
                 formInputs = {
-                    clientId: $('#client-id').val(),
-                    drugId: $('#drug-id').val(),
-                    instructions: $('#instructions').val(),
-                    notes: $('#notes').val(),
-                    startDate: $('#start-date').val()
+                    clientId: currentClient,
+                    drugId: targetMed.dataset['drugId'],
+                    instructions: $('#new-instructions').val(),
+                    notes: $('#new-notes').val(),
+                    startDate: currentDate
                 }
                 // debugger;
-                endPrescription($('#old-prescription').val());
+                endPrescription(targetMed.dataset['prescriptionId']);
                 addPrescription(formInputs);
-                showClientData($('#client-id').val(), '{{ pro.username }}');
+                showClientData(currentClient, '{{ pro.username }}');
+            });
+
+            $('#end-med').on('click', function(evt) {
+                var endMed = confirm('Are you sure you want to end this prescription?');
+                if (endMed) {
+                    endPrescription(targetMed.dataset['prescriptionId']);
+                    $('#prescriptionModal').modal('hide');
+                    showClientData(currentClient, '{{ pro.username }}');
+                }
             });
         });
+            
     </script>
 {% endblock %}

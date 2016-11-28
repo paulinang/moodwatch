@@ -167,61 +167,22 @@ def get_client_prescriptions():
     if pro.professional:
         meds_html = ''
         for drug, info in client.get_active_prescriptions().iteritems():
-            button = '<button type="button" \
-                      class="btn btn-primary \
-                      btn-lg change-prescription-button" \
-                      data-toggle="modal" \
-                      data-target="#change-prescription-modal" \
-                      data-prescription-id="%s" \
-                      data-drug-id="%s"> \
-                      Change Prescription \
-                      </button>' % (info['prescription_id'], info['drug_id'])
-            info_html = ('<li><h4>%s started by %s on %s</h4> \
-                         <p>Instructions %s</p>'
-                         % (drug.capitalize(),
-                            info['pro'],
-                            info['start_date'],
-                            info['instructions']))
-            if info['has_old']:
-                info_html += '<button id=\'view-old\' data-drug-id=\'%s\'>\
-                              All Prescriptions</button>' % info['drug_id']
+            prescription = '<div><button type="button" class="btn med-button prescription" \
+                            data-toggle="modal" \
+                            data-target="prescriptionModal" \
+                            data-prescription-id="%s" \
+                            data-drug-id="%s" \
+                            data-pro-id="%s" \
+                            data-instructions="%s" \
+                            data-notes="%s" \
+                            data-start-date="%s" \
+                            data-pro-username="%s">%s</button></div>' \
+                            % (info['prescription_id'], info['drug_id'], info['pro_id'], info['instructions'], info['notes'], info['start_date'], info['pro'], drug.capitalize())
 
-            if (info['pro'] == pro.username):
-                info_html += '%s</li>' % button
-            else:
-                info_html += '<button>Contact %s</button></li>' % info['pro']
-
-            meds_html += info_html
+            meds_html += prescription
 
         return jsonify({'username': client.username,
                         'active_meds': meds_html})
-
-
-@app.route('/client_prescriptions_for_drug.json')
-@login_required
-def get_drug_prescriptions():
-    """Returns all prescriptions of a drug for a specific client"""
-
-    pro = db.session.query(User).get(session['user_id'])
-    client_id = int(request.args.get('clientId'))
-    drug_id = int(request.args.get('drugId'))
-    meds = db.session.query(User).get(client_id).get_prescriptions_for_drug(drug_id)
-    if pro.professional:
-        meds_html = ''
-        for med in meds:
-            med_html = ('<tr>\
-                         <td>%s</td>\
-                         <td>%s</td>\
-                         <td>%s</td>\
-                         <td>%s</td>\
-                         </tr>'
-                        % (med['start_date'],
-                           med['end_date'],
-                           med['pro'],
-                           med['instructions']))
-            meds_html += med_html
-
-        return jsonify({'meds_html': meds_html})
 
 
 @app.route('/end_prescription.json', methods=['POST'])
@@ -259,7 +220,7 @@ def process_prescription():
     db.session.add(prescription)
     db.session.commit()
 
-    flash('Prescription added')
+    # flash('Prescription added')
 
     return jsonify(prescription.make_dict())
 
@@ -321,7 +282,7 @@ def process_event_mood_log():
     db.session.commit()
 
     event.associate_day(event_date)
-    flash('Event %s on today (%s) successfully created' % (event_name, event_date))
+    # flash('Event %s on today (%s) successfully created' % (event_name, event_date))
 
     return redirect('/user_dashboard')
 

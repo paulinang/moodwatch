@@ -17,6 +17,10 @@ body {
     font-size: 20px;
 }
 
+.navbar {
+  margin-bottom: 0px;
+}
+
 h2, h3, h4 {
     font-family: lato;
 }
@@ -76,15 +80,13 @@ select, .custom-button, .search-date-interactions {
     font-size: 24px;
     font-weight: 700;
 }
-/*.log-details {
-    visibility: hidden;
-}*/
+
 
 .client-info {
-    display: none;
+    height: 500px;
 }
 
-.custom-button {
+.custom-button, .med-button {
     width: 200px;
     background-color: rgb(255,255,255);
     border-radius: 10px;
@@ -134,4 +136,29 @@ select, .custom-button, .search-date-interactions {
 .tooltip-inner {
     max-width: 500px;
     font-size: 14px;
+}
+
+#client-to-view {
+    margin: 20px 10px 0px;
+}
+
+.active-client-meds {
+    text-align: center;
+}
+
+.med-button {
+    margin-top: 10px
+}
+
+#drugs-table {
+    margin-top: 2vh;
+    height: 80vh;
+    overflow: auto;
+    font-size: 16px;
+    font-family: 'Open Sans';
+}
+
+#drugs-table thead {
+    font-size: 18px;
+    font-family: lato;
 }

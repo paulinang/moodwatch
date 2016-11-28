@@ -1,26 +1,32 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container">
-      <h2>Psychiatric Medication Database</h2>
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>Generic Name</th>
-            <th>Brand Name(s)</th>
-            <th>Current Uses</th>
-          </tr>
-        </thead>
-        <tbody>
-            {% for drug in drugs %}
-            <tr class='drug-record' data-drug-id='{{ drug.drug_id }}'>
-                <td>{{ drug.generic_name }}</td>
-                <td>{{ drug.brand_name }}</td>
-                <td>{{ drug.uses }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-      </table>
+    <div class="container-fluid">
+        <div class="row drug-database">
+            <div class="col-xs-12">
+              <h2>Psychiatric Medication Database</h2>
+              <div id="drugs-table">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Generic Name</th>
+                        <th>Brand Name(s)</th>
+                        <th>Current Uses</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for drug in drugs %}
+                        <tr class='drug-record' data-drug-id='{{ drug.drug_id }}'>
+                            <td>{{ drug.generic_name.capitalize() }}</td>
+                            <td>{{ drug.brand_name }}</td>
+                            <td>{{ drug.uses }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
     </div>
 
     <!-- ADD PRESCRIPTION FOR DRUG MODAL -->
@@ -29,38 +35,41 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="addPrescriptionTitle">Add Prescription</h4>
+                <h3 class="modal-title" id="addPrescriptionTitle">Add Prescription</h3>
               </div>
-              <div class="modal-body">
-                <h3 id='generic-name'></h3>
-                <ul>
-                    <li id='brand-name'></li>
-                    <li id='uses'></li>
-                </ul> 
-                <form id="add-prescription-form" method='POST'>
-                    <input id='drug-id' type='hidden' name='drug-id'>
-                    <label for='client-name'>Client:</label>
-                    <select id='client' name='clientId'>
-                        {% for client in pro.professional.sort_clients().active %}
-                         <option value='{{ client.user_id }}'>{{ client.username }}</option>
-                         {% endfor %}
-                    </select>
-                    <br>
+              <form id="add-prescription-form" method='POST'>
+                  <div class="modal-body">
+                    <h3 id='generic-name'></h3>
+                    <ul>
+                        <li id='brand-name'></li>
+                        <li id='uses'></li>
+                    </ul> 
                     
-                    <label for='start-date'>Start Date: </label>
-                    <input id='start-date' type='text' name='startDate' readonly="true" required>
-                    <br>
-
-                    <label for='instructions'>Instructions: </label>
-                    <input id='instructions' type='textarea' name='instructions' required>
-                    <br>
-
-                    <label for='notes'>Notes: </label>
-                    <input id='notes' type='textarea' name='notes'>
-                    <br>
-                    <br>
-
-                    <input type='submit' value='Add Prescription'>
+                        <input id='drug-id' type='hidden' name='drug-id'>
+                        <div class="form-group">
+                            <label for='client-name'>Client:</label>
+                            <select id='client' name='clientId'>
+                                {% for client in pro.professional.sort_clients().active %}
+                                 <option value='{{ client.user_id }}'>{{ client.username }}</option>
+                                 {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for='start-date'>Start Date: </label>
+                            <input class='form-control' id='start-date' type='text' name='startDate' readonly="true" required>
+                        </div>
+                        <div class="form-group">
+                            <label for='instructions'>Instructions: </label>
+                            <input class='form-control' id='instructions' type='textarea' name='instructions' required>
+                        </div>
+                        <div class="form-group">
+                            <label for='notes'>Notes: </label>
+                        <input class='form-control' id='notes' type='textarea' name='notes'>
+                        </div>                    
+                    </div>
+                    <div class='modal-footer'>
+                        <button class='btn btn-primary' type='submit'>Submit</button>
+                    </div>
                 </form>
               </div>
             </div>
@@ -70,7 +79,8 @@
 
     <script>
         $('.drug-record').on('dblclick', function(evt){
-            $('#generic-name').html(this.children[0].innerHTML);
+            var genericName = this.children[0].innerHTML;
+            $('#generic-name').html(genericName.charAt(0).toUpperCase() + genericName.slice(1));
             $('#brand-name').html('Brand Name(s): ' + this.children[1].innerHTML);
             $('#uses').html('Known Uses: ' + this.children[2].innerHTML);
             $('#start-date').datepicker({
