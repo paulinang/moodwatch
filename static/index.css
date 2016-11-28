@@ -6,13 +6,47 @@ html {
   background-size: cover;
 }
 
+body {
+  font-family: 'Open Sans';
+  background: rgba(0,0,0,0);
+}
+
 .navbar-brand {
     font-family: lato;
     font-size: 30px;
     font-weight: 700;
 }
 
+.navbar {
+  margin-bottom: 0px;
+}
+
 #login {
     font-family: lato;
     font-size: 20px;
+}
+
+.modal, input[type='text'], .btn {
+    font-family: lato;
+    font-size: 18px;
+}
+
+p {
+    font-size: 18px;
+}
+
+.blockquote-footer {
+    text-align: right;
+    font-size: 20px;
+}
+
+#biden-quote {
+    padding-top: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.7);
+}
+
+blockquote {
+  border-left-color: rgba(255,255,255,0.4);
 }
