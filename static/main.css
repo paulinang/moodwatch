@@ -1,3 +1,7 @@
+html {
+    overflow: hidden;
+}
+
 body {
     background-color: rgba(0,58,97,0.6);
 }
@@ -120,4 +124,14 @@ select, .custom-button, .search-date-interactions {
 .bottom-row {
     padding: 0px 20px 18px 20px;
     margin: 20px 20px 0px;
+}
+
+.modal, input[type='text'], input[type='number'], input[type='textarea'], .btn {
+    font-family: lato;
+    font-size: 18px;
+}
+
+.tooltip-inner {
+    max-width: 500px;
+    font-size: 14px;
 }

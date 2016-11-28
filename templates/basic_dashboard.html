@@ -9,7 +9,7 @@
             <!-- Add logs for today -->
             <div class='col-xs-12 col-md-4 col-md-offset-1'>
                 <h3 id='hi-message'>Hi {{ user_info.user.username }}, How Are You Doing Today?</h3>
-                
+
                 <div>
                 <!-- Log Details: Search and view details on same page -->
                     <div class='log-details main-log'></div>
@@ -71,28 +71,38 @@
                 <div class="modal-content">
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="todayEventLabel">Log Event</h4>
+                    <h3 class="modal-title" id="todayEventLabel">Log Event</h3>
                   </div>
-                  <div class="modal-body">
-                    <form class="event mood-form" action='/log_event_mood' method='POST'>
-                        <label for='event-name'>Event Name:</label>
-                        <input id='event-name' type='text' name='event-name' required><br>
-                       
-                        <input id='today-event-date' type='hidden' name='today-event-date'>
+                  
+                <form class="event mood-form" action='/log_event_mood' method='POST'>
+                    <div class="modal-body">
+                        <div id='mood-rating-guide'>
+                            <h3 data-toggle='tooltip' title='Suggested interpretation: Negative moods are rated less than zero, positive moods are rated more than zero, a neutral disposition is rated zero.'>
+                            Moods can be rated on a scale from -50 to +50.</h3><br>
+                            
+                        </div>
+                        <input class='form-control' id='today-event-date' type='hidden' name='today-event-date'>
                         <script>
                             // Get today's date and assign it to a hidden input
                             $('#today-event-date').val(moment().format('YYYY-MM-DD'))
                         </script>
-
-                        <label for='event-overall-mood'>Overall Mood: </label>
-                        <input class='event overall-mood' type='number' name='overall-mood' min='-50' max='50' required><br>
-
-                        <label for='event-notes'>Notes About This Event:</label>
-                        <input class='event notes' type='textarea' name='notes'><br>
-
-                        <input type='submit' value='Add Event Mood Log'>
-                    </form>
-                  </div>
+                        <div class='form-group'>                        
+                            <label for='event-name'>Event Name:</label>
+                            <input class='form-control' id='event-name' type='text' name='event-name' required>
+                        </div>
+                        <div class='form-group'>
+                            <label for='event-overall-mood'>Overall Mood: </label>
+                            <input class='event overall-mood form-control' type='number' name='overall-mood' min='-50' max='50' required>
+                        </div>
+                        <div class='form-group'>
+                            <label for='event-notes'>Notes About This Event:</label>
+                            <input class='event notes form-control' type='textarea' name='notes'><br>
+                        </div>
+                    </div>
+                    <div class='modal-footer'>
+                        <button class='btn btn-primary' type='submit'>Submit</button>
+                    </div>
+                </form>
                 </div>
               </div>
             </div>
@@ -104,34 +114,43 @@
                 <div class="modal-content">
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="todayLogLabel">Log Day</h4>
+                    <h3 class="modal-title" id="todayLogLabel">Log Day</h3>
                   </div>
-                  <div class="modal-body">
+                  
                     <form class="day mood-form" action='/log_day_mood' method='POST'>
-                        <input id='today-date' type='hidden' name='today-date'>
-                        <script>
-                            // Get today's date and assign it to a hidden input
-                            $('#today-date').val(moment().format('YYYY-MM-DD'))
-                        </script>
-
-                        <label for='day-overall-mood'>Overall Mood: </label>
-                        <input class="day overall-mood" type='number' name='overall-mood' min='-50' max='50' required><br>
-
-                        <p id='day-mood-range'>Range of Mood: 
-                        <label for='day-min-mood'>Min: </label>
-                        <input class="day min-mood" type='number' name='min-mood' min='-50' max='50'>
-
-                        <label for='day-max-mood'>Max: </label>
-                        <input class='day max-mood' type='number' name='max-mood' min='-50' max='50'>
-                        <span class="day alert-msg" style='color:red;'></span><br>
-                        </p>
-
-                        <label for='day-notes'>Notes About This Day:</label>
-                        <input class="day notes" type='textarea' name='notes'><br>
-
-                        <input type='submit' value='Add Day Mood Log'>
+                        <div class="modal-body">
+                            <input id='today-date' type='hidden' name='today-date'>
+                            <script>
+                                // Get today's date and assign it to a hidden input
+                                $('#today-date').val(moment().format('YYYY-MM-DD'))
+                            </script>
+                            <div id='mood-rating-guide'>
+                                <h3 data-toggle='tooltip' title='Suggested interpretation: Negative moods are rated less than zero, positive moods are rated more than zero, a neutral disposition is rated zero.'>
+                                Moods can be rated on a scale from -50 to +50.</h3><br>
+                                
+                            </div>
+                            <div class='form-group'>
+                                <label for='day-overall-mood'>Overall Mood For Today: </label>
+                                <input class="day overall-mood form-control" type='number' name='overall-mood' min='-50' max='50' required>
+                            </div>
+                            <div class='form-group'>
+                                <label for='day-min-mood'>Lowest Point You Felt Today: </label>
+                                <input class="day min-mood form-control" type='number' name='min-mood' min='-50' max='50'>
+                            </div>
+                            <div class='form-group'>
+                                <label for='day-max-mood'>Highest Point You Felt Today: </label>
+                                <input class='day max-mood form-control' type='number' name='max-mood' min='-50' max='50'>
+                                <span class="day alert-msg" style='color:red;'></span>
+                            </div>
+                            <div class='form-group'>
+                                <label for='day-notes'>Notes:</label>
+                                <input class="day notes form-control" type='textarea' name='notes'><br>
+                            </div>
+                        </div>
+                        <div class='modal-footer'>
+                            <button class='btn btn-primary' type='submit'>Submit</button>
+                        </div>
                     </form>
-                  </div>
                 </div>
               </div>
             </div>
@@ -141,7 +160,9 @@
     <script src='static/main.js'></script>
     <script src='static/mood_chart.js'></script>
     <script>
-        
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
 
         // Create day chart for today
         var dCtx = $('#dayChart').get(0).getContext('2d');
