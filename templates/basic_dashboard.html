@@ -8,10 +8,16 @@
 
             <!-- Add logs for today -->
             <div class='col-xs-12 col-md-4 col-md-offset-1'>
-                <h3 id='hi-message'>Hi {{ user_info.user.username }}, How Are You Doing Today?</h3><br><br>
+                <h3 id='hi-message'>Hi {{ user_info.user.username }}, How Are You Doing Today?</h3>
+                
+                <div>
+                <!-- Log Details: Search and view details on same page -->
+                    <div class='log-details main-log'></div>
+                    <div class='log-details associated-logs'></div>
+                </div>  
                 <!-- Button trigger for event log modal -->
                 <div  id='add-logs'>
-                    <br>
+                    <br><br><br>
                     <button type="button" class="btn custom-button btn-lg text" data-toggle="modal" data-target="#todayEvent">
                     Log Event
                     </button><br><br>
@@ -20,6 +26,7 @@
                       Log Today
                     </button>
                 </div>
+              
             </div>
 
             <!-- Chart of logs for today -->
@@ -144,7 +151,9 @@
 
         // Remove add log buttons if day has already been logged
         if ('{{ user_info.daylog_info.lastlog_date }}' == moment().format('YYYY-MM-DD') && '{{ user_info.daylog_info.is_lastlog_valid }}' == 'True') {
-            $('#add-logs').html('<h1>You Have Already Logged Today</h1>');
+            $('#hi-message').html('<h3>You Have Already Logged Today</h3>');
+            $('#add-logs').empty();
+            displaySearchResults(today);
         }
                                
         // Validate mood form before submission

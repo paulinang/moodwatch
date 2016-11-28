@@ -491,6 +491,8 @@ def get_day_logs():
                                     {'x': date_str, 'y': day.max_mood}])
             # append day dataset to the master list of datasets
             datasets.append({'label': 'Day %s' % date_str,
+                             'borderWidth': 3,
+                             'borderColor': 'rgba(67,124,234,0.7)',
                              'pointBackgroundColor': 'rgba(67,124,234,0.3)',
                              'pointBorderColor': 'rgba(67,124,234,0.7)',
                              'data': day_dataset})
