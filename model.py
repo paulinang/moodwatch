@@ -34,15 +34,6 @@ class User(db.Model, UserMixin):
 
         return self.user_id
 
-    # def group_prescriptions_by_drug(self):
-    #     """Returns a dictionary {'drug_name': [list of prescription objects]}"""
-
-    #     prescription_dict = {}
-    #     for prescription in self.prescriptions:
-    #         prescription_dict.setdefault(prescription.drug.generic_name, []).append(prescription.make_dict())
-
-    #     return prescription_dict
-
     def get_active_prescriptions(self):
         """Returns list of active prescriptions"""
 
@@ -62,25 +53,6 @@ class User(db.Model, UserMixin):
                 active[prescription.drug.generic_name]['has_old'] = True
 
         return active
-
-    def get_prescriptions_for_drug(self, drug_id):
-        """Return list of all prescriptions for a drug"""
-
-        meds = []
-        for prescription in self.prescriptions:
-            if prescription.drug_id == drug_id:
-                med = {'drug': prescription.drug.generic_name,
-                       'drug_id': prescription.drug.drug_id,
-                       'prescription_id': prescription.prescription_id,
-                       'pro': prescription.professional.user.username,
-                       'instructions': prescription.instructions,
-                       'start_date': datetime.strftime(prescription.start_date, '%Y-%m-%d'),
-                       'end_date': None}
-                if prescription.end_date:
-                    med['end_date'] = datetime.strftime(prescription.end_date, '%Y-%m-%d')
-                meds.append(med)
-
-        return meds
 
     def get_daylog_info(self):
         """Returns pertinent info of user day logs"""
@@ -104,17 +76,6 @@ class Professional(db.Model):
 
     def __repr__(self):
         return "<Professional user_id=%s username=%s>" % (self.user_id, self.user.username)
-
-    def sort_clients(self):
-        """Sort clients by status of contracts"""
-
-        clients = {'active': [], 'inactive': []}
-        for contract in self.contracts:
-            if contract.active:
-                clients['active'].append(contract.client)
-            # else:
-            #     clients['inactive'].append(contract.client)
-        return clients
 
 
 class Contract(db.Model):
