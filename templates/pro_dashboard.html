@@ -93,6 +93,8 @@
         });
 
         $('#prescriptionModal').on('show.bs.modal', function(evt) {
+
+            // When prescription modal is showed, prefill form with data for specific prescription selected
             $('#prescriptionModalTitle').html(targetMed.innerText);
             $('#med-notes').empty();
             $('#prescribing-pro').html(targetMed.dataset['proUsername']);
@@ -102,12 +104,14 @@
                 $('#med-notes').html('Notes: ' + targetMed.dataset['notes']);
             }
 
+            // If pro who prescribed medication is pro that is logged in, give option to change/end med
             if (targetMed.dataset['proId'] == '{{ session["user_id"] }}') {
                 $('#contact-pro').empty();
                 $('#prompt-instructions').html('<input type="text" class="form-control" id="new-instructions" placeholder="Enter new instructions" required></input>');
                 $('#prompt-notes').html('<input type="text" class="form-control" id="new-notes" placeholder="Enter notes if any"></input>');
                 $('.modal-footer').html('<button class="btn btn-primary" type="submit">Change</button><button class="btn btn-primary" id="end-med" type="button">End</button>');
             }
+            // Else give option to contact pro that prescribed med
             else {
                 $('#prompt-instructions').empty();
                 $('#prompt-notes').empty();
@@ -115,9 +119,9 @@
                 $('#contact-pro').html('<a href="#">Contact ' + targetMed.dataset['proUsername'] + '</a>');
             }
 
+            // End and change prescription when change prescription form is submitted
             $('#change-prescription').on('submit', function(evt) {
                 evt.preventDefault();
-                debugger;
                 formInputs = {
                     clientId: currentClient,
                     drugId: targetMed.dataset['drugId'],
@@ -125,13 +129,15 @@
                     notes: $('#new-notes').val(),
                     startDate: currentDate
                 }
-                // debugger;
                 endPrescription(targetMed.dataset['prescriptionId']);
                 addPrescription(formInputs);
                 showClientData(currentClient, '{{ pro.username }}');
             });
 
+
+            // End medication when end med button is clicked
             $('#end-med').on('click', function(evt) {
+                // Get confirmation first
                 var endMed = confirm('Are you sure you want to end this prescription?');
                 if (endMed) {
                     endPrescription(targetMed.dataset['prescriptionId']);
