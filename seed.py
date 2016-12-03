@@ -117,16 +117,8 @@ def load_days():
 
     dates, overall_moods = rand_day_moods()
 
-    # DAY_STEPS = range(1, 16)
-    # EXTREME_MOODS = [49, 47, 36, -38, -42, -43, -44, - 45, -48]
-    # day_step = choice(DAY_STEPS)
-
     # give tyr random moods
     for i, date in enumerate(dates):
-        # if i == day_step:
-        #     overall_mood = choice(EXTREME_MOODS)
-        #     day_step += choice(DAY_STEPS)
-        # else:
         overall_mood = int(overall_moods[i])
         day = Day(user_id=2,
                   date=date,
@@ -177,10 +169,6 @@ def load_events():
     db.session.add(event)
     db.session.commit()
     event.associate_day(user.days[4].date)
-
-#     start_date = datetime.strptime('2016-10-05', '%Y-%m-%d').date()
-#     end_date = datetime.strptime('2016-10-20', '%Y-%m-%d').date()
-#     event.associate_days(start_date, end_date)
 
 
 ########################################################
@@ -235,25 +223,12 @@ def rand_day_moods(num_days=1000, tz='US/Pacific'):
 
     random_moods = pd.Series((np.random.rand(num_days) * 20) - (20/2))
     offsets = [(x * .03 - 15) for x in range(1, 1001)]
-    # for i in range(985, 1000):
-    #     offsets[i] = 30
-
-    # for x, i in enumerate(range(954, 985)):
-    #     offsets[i] = x
-    # weird_moods = random_moods + offsets
     sine_nums = [(int(5) * sin(x * 0.1)) for x in range(1, 1001)]
     weird_moods = random_moods + sine_nums + offsets
     mood_list = list(weird_moods)
 
     pd_dates = pd.date_range(first_day, periods=num_days)
     dates_str = [datetime.strftime(date, '%Y-%m-%d') for date in pd_dates]
-
-    # moods = pd.Series(random_moods)
-    # r_window = 60
-    # r = moods.rolling(window=r_window)
-    # r_mean_moods = r.mean()
-    # r_mean_mood_list = [int(mean) for mean in r_mean_moods[(r_window-1):]]
-    # mood_list = list(moods[:(r_window-1)]) + r_mean_mood_list
 
     return (dates_str, mood_list)
 
