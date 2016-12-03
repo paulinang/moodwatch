@@ -10,7 +10,7 @@ PostgreSQL, SQLAlchemy, Python, Bcrypt, Pandas, Cron, Flask, Flask-Mail, Jinja, 
 ### Recording Moods and Medications Over Time
 Users are able to keep track of their moods by numerically rating days and events. Physicians and their patients also get to look back at changes in their medications. User resources are stored in a PostgreSQL database which are mapped to Python classes using Flask-SQLAlchemy ORM.
 
-![alt-text](https://github.com/qwnpng/moodwatch/blob/master/screenshots/basic_dashboard.JPG)
+![alt-text](https://github.com/qwnpng/moodwatch/blob/master/screenshots/log_event.gif)
 
 ### Interactive Visualization Of Moods Over Time
 Using the chart.js library, users' mood logs are visualized on a line chart. The Python Pandas library has been used to do statistical analysis such as moving average and standard deviation. The mood charts have interactive features such as changing the time window and visibility of different datasets. This is accomplished with a combination of AJAX requests for specific datasets and Jquery event listeners plus DOM element manipulation.
