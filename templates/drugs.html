@@ -78,6 +78,7 @@
         <!-- END OF ADD PRESCRIPTION MODAL -->
 
     <script>
+        $('#user-specific-page').html('<li><a href=\'/drugs\'>Medications Database</a></li>');
         $('.drug-record').on('dblclick', function(evt){
             var genericName = this.children[0].innerHTML;
             $('#generic-name').html(genericName.charAt(0).toUpperCase() + genericName.slice(1));

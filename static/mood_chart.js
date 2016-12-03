@@ -128,6 +128,9 @@ function createDayChart(day) {
 // Will adjust to time window containing current day
 function changeTimeWindow(timeWindow) {
     $('.mood-chart').css('visibility', 'hidden');
+    $('#toggle-events').css('background-color', 'rgba(255,255,255,1)');
+    $('#roll-avg').css('background-color', 'rgba(255,255,255,1)');
+    $('#roll-std').css('background-color', 'rgba(255,255,255,1)');
     moodChart.destroy();
 
     // if all logs requested, set min to first log and max to current day
@@ -203,6 +206,9 @@ $('.move-time-button').on('click', function () {
                 var newMinDate = currentMinDate.add(step, 'month').startOf('month').format('YYYY-MM-DD');
                 var newMaxDate = currentMaxDate.add(step, 'month').endOf('month').format('YYYY-MM-DD');
                 $('.mood-chart').css('visibility', 'hidden');
+                $('#toggle-events').css('background-color', 'rgba(255,255,255,1)');
+                $('#roll-avg').css('background-color', 'rgba(255,255,255,1)');
+                $('#roll-std').css('background-color', 'rgba(255,255,255,1)');
                 moodChart.destroy();
                 createMoodChart(newMinDate, newMaxDate);
                 changeTimeWindowStr(timeWindow, newMinDate, newMaxDate);
@@ -212,6 +218,9 @@ $('.move-time-button').on('click', function () {
                 var newMinDate = currentMinDate.subtract(step, 'month').startOf('month').format('YYYY-MM-DD');
                 var newMaxDate = currentMaxDate.subtract(step, 'month').endOf('month').format('YYYY-MM-DD');
                 $('.mood-chart').css('visibility', 'hidden');
+                $('#toggle-events').css('background-color', 'rgba(255,255,255,1)');
+                $('#roll-avg').css('background-color', 'rgba(255,255,255,1)');
+                $('#roll-std').css('background-color', 'rgba(255,255,255,1)');
                 moodChart.destroy();
                 createMoodChart(newMinDate, newMaxDate);
                 changeTimeWindowStr(timeWindow, newMinDate, newMaxDate);       

@@ -94,6 +94,7 @@
 
         $('#prescriptionModal').on('show.bs.modal', function(evt) {
             $('#prescriptionModalTitle').html(targetMed.innerText);
+            $('#med-notes').empty();
             $('#prescribing-pro').html(targetMed.dataset['proUsername']);
             $('#med-start-date').html(targetMed.dataset['startDate']);
             $('#med-instructions').html(targetMed.dataset['instructions']);

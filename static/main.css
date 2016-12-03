@@ -162,3 +162,8 @@ select, .custom-button, .search-date-interactions {
     font-size: 18px;
     font-family: lato;
 }
+
+#search-logs {
+    height: 380px;
+    overflow: auto;
+}

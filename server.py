@@ -362,7 +362,7 @@ def get_mood_chart_data():
             datasets.append({'label': 'Day %s' % date,
                              'pointBackgroundColor': 'rgba(67,124,234,0.3)',
                              'pointBorderColor': 'rgba(67,124,234,0.7)',
-                             # 'pointRadius': 6,
+                             'pointRadius': 3.5,
                              'data': day_dataset})
 
             if (not np.isnan(roll_avg[i])):
@@ -486,7 +486,7 @@ def get_mood_rating():
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
-    app.debug = True
+    app.debug = False
 
     connect_to_db(app, 'asgard_db')
 

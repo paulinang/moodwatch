@@ -170,6 +170,14 @@ def load_events():
         event_day = EventDay(event_id=event.event_id, day_id=day.day_id)
         db.session.add(event_day)
         db.session.commit()
+
+    event = Event(user_id=1,
+                  event_name='Ate an amazing sandwich',
+                  overall_mood='8')
+    db.session.add(event)
+    db.session.commit()
+    event.associate_day(user.days[4].date)
+
 #     start_date = datetime.strptime('2016-10-05', '%Y-%m-%d').date()
 #     end_date = datetime.strptime('2016-10-20', '%Y-%m-%d').date()
 #     event.associate_days(start_date, end_date)
