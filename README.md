@@ -25,10 +25,10 @@ This was started as a project during my time as a software engineering fellow at
 
 I will continue to improve existing features, as well as build new features to explore new technologies.
 Some of my planned changes include:
-..1. Exploring ways to improve interactivity with the mood charts.
-..2. Implement more complex data analysis to provide more insight and possibly predictions on user moods.
-..3. Learning about how health tech companies follow HIPAA regulations and applying it to my own app.
-..4. Implementing APIs
-    ..* Twilio API: Text message alerts
-    ..* OpenFDA API: Get more information on medications to help users make informed decisions
-    ..* BetterDoctorAPI/ YelpAPI + GoogleMaps API: Help users find nearby/ reputable healthcare professionals
+1. Exploring ways to improve interactivity with the mood charts.
+2. Implement more complex data analysis to provide more insight and possibly predictions on user moods.
+3. Learning about how health tech companies follow HIPAA regulations and applying it to my own app.
+4. Implementing APIs
+..* Twilio API: Text message alerts
+..* OpenFDA API: Get more information on medications to help users make informed decisions
+..* BetterDoctorAPI/ YelpAPI + GoogleMaps API: Help users find nearby/ reputable healthcare professionals
