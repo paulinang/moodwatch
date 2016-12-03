@@ -1,0 +1,177 @@
+alprazolam
+Xanax
+anxiety, panic
+amitriptyline
+Elavil, Endep
+depression (tricyclic)
+amoxapine
+Asendin
+psychotic depression
+amphetamine
+Adderall
+ADD
+aripiprazole
+Abilify
+schizophrenia (atypical)
+buproprion
+Wellbutrin
+depression, ADD
+buspirone
+BuSpar
+anxiety
+carbamazepine
+Tegretol
+bipolar disorder
+chloriazepoxide
+Librium
+anxiety
+chlorpromazine
+Thorazine
+schizophrenia (typical)
+citalopram hydrobromide
+Celexa
+depression (SSRI)
+clomipramine
+Anafranil
+OCD, depression (tricyclic)
+clonazepam
+Klonopin
+anxiety
+clorazepate
+Tranxene
+anxiety
+clozapine
+Clozaril
+schizophrenia (atypical)
+desipramine
+Norpramin
+depression (tricyclic), ADD
+GENERIC
+dextroamphetamine
+diazepam
+divalproex sodium
+doxepin
+escitalopram
+fluoxetine
+fluphenazine
+fluvoxamine
+haloperidol
+imipramine
+lithium carbonate
+lithium citrate
+lorazepam
+loxapine
+maprotiline
+mesoridazine
+methylphenidate
+mirtazapine
+molindone
+nefazodone
+nortriptyline
+olanzapine
+oxazepam
+paroxetine
+pemoline
+perphenazine
+phenelzine
+prazepam
+prochlorperazine
+protriptyline
+quetiapine
+risperidone
+sertraline
+thioridazine
+thiothixene
+tranylcypromine sulfate
+trazodone
+trifluoperazine
+BRAND
+Adderall, Dexedrine
+Valium
+Depakote
+Adapin, Sinequan
+Lexapro
+Prozac
+Prolixin, Prolixin Decanoate
+Luvox
+Haldol, Haldol Decanoate
+Tofranil
+Eskalith, Lithobid
+Cibalith S
+Ativan
+Loxitane
+Ludiomil
+Serentil
+Ritalin
+Remeron
+Moban
+Serzone
+Pamelor
+Zyprexa
+Serax
+Paxil
+Cylert
+Trilafon
+Nardil
+Centrax
+Compazine
+Vivactil
+Seroquel
+Risperdal
+Zoloft
+Mellaril
+Navane
+Prarnate
+Desyrel
+Stelazine, Vesprin
+USES
+ADD
+anxiety
+bipolar disorder
+depression (tricyclic)
+depression (SSRI), anxiety
+depression (SSRI), OCD, panic
+schizophrenia (typical)
+OCD, depression (SSRI)
+schizophrenia (typical)
+depression (tricyclic), panic
+bipolar disorder
+bipolar disorder
+anxiety
+schiophrenia (typical)
+depression (tricyclic)
+schiophrenia (typical)
+ADD
+depression
+schiophrenia (typical)
+depression
+depression (tricyclic)
+schizophrenia (atypical)
+anxiety
+depression (SSRI), OCD, panic
+ADD
+schizophrenia (typical)
+depression (MAOI)
+anxiety
+schizophrenia (typical)
+depression (tricyclic)
+schizophrenia (atypical)
+schizophrenia (atypical)
+depression (SSRI), ODC, panic
+schizophrenia (typical)
+schizophrenia (typical)
+depression (MAOI)
+depression (tricyclic)
+schizophrenia (typical)
+GENERIC
+trimipramine
+valproic acid
+venlafaxine
+BRAND
+Surmontil
+Depakene
+Effexor
+USES
+depression (tricyclic)
+bipolar disorder
+depression
